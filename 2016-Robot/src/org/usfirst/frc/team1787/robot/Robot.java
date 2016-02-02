@@ -25,7 +25,7 @@ public class Robot extends IterativeRobot {
      */
     public void robotInit() {
         chooser = new SendableChooser();
-        chooser.addDefault("Default Auto", def aultAuto);
+        chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
     }
