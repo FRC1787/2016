@@ -7,7 +7,43 @@ import edu.wpi.first.wpilibj.DigitalInput;
  * Class for pickup arm
  * 
  * @author David Miron
+ * @author Simon Wieder
  *
+ */
+
+/*
+ * Notes for determining the current region the arm occupies.
+ * 
+ * Region 0 = The default position of the arm / Where the arm is stored when not in use.
+ * Region 1 = The area between region 0 and region 2.
+ * Region 2 = The position the arm needs to be in when approaching a ball.
+ * Region 3 = The area between region 2 and region 4.
+ * Region 4 = The position the arm needs to be in to load the ball into the robot.
+ * 
+ * We know for a fact whether or not the arm is in regions 0, 2, or 4 because limit switches will be in those positions.
+ * When the limit switch in one of those regions is pressed down, we know the arm is in the region associated with that limit switch.
+ * 
+ * For the regions where a limit switch is not present, we can use other available information to determine if the arm is in those regions.
+ * 
+ * We know the arm is in region 1 when:
+ * 	A)
+ * 	  1) The last region the arm occupied was region 0
+ * 	  2) The arm is not currently in region 0
+ * 	  3) The arm has not yet entered region 2
+ *  B)
+ *    1) The last region the arm occupied was region 2
+ *    2) The arm is not currently in region 2, 0, or 4
+ *    3) The motors are moving the arm backward
+ *    
+ * We know the arm is in region 3 when:
+ * A)
+ * 	 1) The last region the arm occupied was region 4
+ * 	 2) The arm is not currently in region 4
+ * 	 3) The arm has not yet entered region 2
+ * B)
+ *   1) The last region the arm occupied was region 2
+ *   2) The arm is not currently in region 2, 0, or 4
+ *   3) The motors are moving the arm forward.
  */
 
 public class PickupArm {
