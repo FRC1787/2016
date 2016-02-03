@@ -76,64 +76,77 @@ public class PickupArm {
 		posApproachLS = new DigitalInput(POS_APPROACHPort);
 		posPickupLS = new DigitalInput(POS_PICKUPPort);
 		position = 0;
+		
 	}
 	
 	/**
-	 * Set goal position to storage position
+	 * Set goal position
+	 * @param positionToGo position to go
 	 */
-	public void moveToStore()
+	public void setToGo(int positionToGo)
 	{
-		toGo = POS_STORE;
-	}
-	
-	/**
-	 * Set goal position to approach position
-	 */
-	public void moveToApproach()
-	{
-		toGo = POS_APPROACH;
-	}
-	
-	/**
-	 * Set goal position to pickup position
-	 */
-	public void moveToPickup()
-	{
-		toGo = POS_PICKUP;
-	}
-	
-	/**
-	 * Move to current goal position
-	 */
-	public void goToGoal()
-	{
-		switch(toGo)
+		switch(positionToGo)
 		{
 		case POS_STORE:
-			if(posStoreLS.get())
-			{
-				pickupRight.set(0);
-				pickupLeft.set(0);
-			}
-			pickupRight.set(motorSpeed);
-			pickupLeft.set(-motorSpeed);
+			toGo = POS_STORE;
 			break;
 		case POS_APPROACH:
-			if (position < POS_APPROACH)
-			{
-				pickupRight.set(-motorSpeed);
-				pickupLeft.set(motorSpeed);
-			} else if (position > POS_APPROACH)
-			{
-				pickupRight.set(motorSpeed);
-				pickupLeft.set(-motorSpeed);
-			}
+			toGo = POS_APPROACH;
 			break;
 		case POS_PICKUP:
-			pickupRight.set(-motorSpeed);
-			pickupLeft.set(motorSpeed);
+			toGo = POS_PICKUP;
 			break;
 		}
 	}
 	
+	/**
+	 * Move to current goal position
+	 * This method is called a lot every second (60 times)
+	 */
+	public void goToGoal()
+	{
+		checkPositonChange();
+		switch(toGo)
+		{
+		case POS_STORE:
+			goToStore();
+			break;
+			
+		case POS_PICKUP:
+			goToPickup();
+			break;
+		
+		case POS_APPROACH:
+			
+		}
+	}
+	
+	private void goToStore()
+	{
+		if(!posStoreLS.get())
+		{
+			pickupRight.set(motorSpeed);
+			pickupLeft.set(-motorSpeed);
+		} else {
+			pickupRight.set(0);
+			pickupLeft.set(0);
+		}
+	}
+	
+	private void goToPickup()
+	{
+		if(!posPickupLS.get())
+		{
+			pickupRight.set(-motorSpeed);
+			pickupLeft.set(motorSpeed);
+		} else {
+			pickupRight.set(0);
+			pickupLeft.set(0);
+		}
+	}
+	
+	private void checkPositionChange()
+	{
+		 
+	}
 }
