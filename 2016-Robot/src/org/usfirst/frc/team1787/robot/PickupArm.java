@@ -114,6 +114,7 @@ public class PickupArm {
 			{
 				pickupRight.set(0);
 				pickupLeft.set(0);
+				int x = 2;
 			}
 			pickupRight.set(motorSpeed);
 			pickupLeft.set(-motorSpeed);
