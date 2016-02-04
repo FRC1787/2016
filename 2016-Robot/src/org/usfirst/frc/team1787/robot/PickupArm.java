@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
  * Region 1 = The area between region 0 and region 2.
  * Region 2 = The position the arm needs to be in when approaching a ball.
  * Region 3 = The area between region 2 and region 4.
- * Region 4 = The position the arm needs to be in to load the ball into the robot.
+ * Region 4 = The position the arm needs to be in to pickup the ball / load the ball into the robot.
  * 
  * We know for a fact whether or not the arm is in regions 0, 2, or 4 because limit switches will be in those positions.
  * When the limit switch in one of those regions is pressed down, we know the arm is in the region associated with that limit switch.
@@ -48,26 +48,32 @@ import edu.wpi.first.wpilibj.DigitalInput;
 
 public class PickupArm {
 
-	/** Talon for right pickup arm */
-	private CANTalon pickupRight;
+	/** Talon on the right side of the pickup arm */
+	private CANTalon rightTalon;
 	
-	/** Talon for left pickup arm */
-	private CANTalon pickupLeft;
+	/** Talon on the left side of the pickup arm */
+	private CANTalon leftTalon;
 	
-	/** Talon for spinning pickup wheels */
+	/** Talon used for spinning the pickup-wheels */
 	private CANTalon pickupWheels;
 	
-	/** Limit Switch stored position */
-	private DigitalInput posStoreLS;
+	/** Limit Switch located at the arm's "default/stored" position (Region 0) */
+	private DigitalInput region0LS;
 	
-	/** Limit Switch for approach position */
-	private DigitalInput posApproachLS;
+	/** Limit Switch located at the arm's "approach" position (Region 2) */
+	private DigitalInput region2LS;
 	
-	/** Limit Switch for pickup position */
-	private DigitalInput posPickupLS;
+	/** Limit Switch located at the arm's pickup position (Region 4) */
+	private DigitalInput region4LS;
 	
-	/** Position to move to */
-	private int toGo;
+	/** Current position of arm */
+	private int currentRegion;
+	
+	/** Previous position of arm */
+	private int previousPosition;
+	
+	/** The position the arm needs to move to */
+	private int desiredPosition;
 	
 	/** ID of storage position */
 	public static final int POS_STORE = 0;
@@ -87,32 +93,29 @@ public class PickupArm {
 	 * Approach: 2
 	 * Approach to Pickup: 3
 	 * Pickup: 4
+	 * 
 	 */
-	
-	/** Current position of arm */
-	private int position;
 	
 	
 	/**
 	 * Takes IDs and port numbers, not objects
-	 * @param pickupRightID    ID of right pickup motor Talon
-	 * @param pickupLeftID     ID of left pickup motor Talon
-	 * @param pickupWheelsID   ID of pickup wheel motor Talon
-	 * @param posStorePort     Analog input port of storage position limit switch
-	 * @param posApproachPort  Analog input port of approach position limit switch
-	 * @param posPickupPort    Analog input port of pickup position limit switch
+	 * @param rightTalonID    ID of the talon on the right of the arm.
+	 * @param leftTalonID     ID of the talon on the left of the arm.
+	 * @param pickupWheelsID  ID of the talon that controls the pickup-wheels.
+	 * @param region0LSPort   The physical port that the limit switch at region 0 is plugged in to on the roboRio.
+	 * @param region2LSPort   The physical port that the limit switch at region 2 is plugged in to on the roboRio.
+	 * @param region4LSPort   The physical port that the limit switch at region 4 is plugged in to on the roboRio.
 	 */
-	public PickupArm(int pickupRightID, int pickupLeftID, int pickupWheelsID, 
-					 int POS_STOREPort, int POS_APPROACHPort, int POS_PICKUPPort)
+	public PickupArm(int rightTalonID, int leftTalonID, int pickupWheelsID, 
+					 int region0LSPort, int region2LSPort, int region4LSPort)
 	{
-		pickupRight = new CANTalon(pickupRightID);
-		pickupLeft = new CANTalon(pickupLeftID);
+		rightTalon = new CANTalon(rightTalonID);
+		leftTalon = new CANTalon(leftTalonID);
 		pickupWheels = new CANTalon(pickupWheelsID);
-		posStoreLS = new DigitalInput(POS_STOREPort);
-		posApproachLS = new DigitalInput(POS_APPROACHPort);
-		posPickupLS = new DigitalInput(POS_PICKUPPort);
-		position = 0;
-		
+		region0LS = new DigitalInput(region0LSPort);
+		region2LS = new DigitalInput(region2LSPort);
+		region4LS = new DigitalInput(region4LSPort);
+		//Add method here for moving the arm to region 0.
 	}
 	
 	/**
@@ -124,13 +127,13 @@ public class PickupArm {
 		switch(positionToGo)
 		{
 		case POS_STORE:
-			toGo = POS_STORE;
+			desiredPosition = POS_STORE;
 			break;
 		case POS_APPROACH:
-			toGo = POS_APPROACH;
+			desiredPosition = POS_APPROACH;
 			break;
 		case POS_PICKUP:
-			toGo = POS_PICKUP;
+			desiredPosition = POS_PICKUP;
 			break;
 		}
 	}
@@ -142,7 +145,7 @@ public class PickupArm {
 	public void goToGoal()
 	{
 		checkPositonChange();
-		switch(toGo)
+		switch(desiredPosition)
 		{
 		case POS_STORE:
 			goToStore();
@@ -159,30 +162,75 @@ public class PickupArm {
 	
 	private void goToStore()
 	{
-		if(!posStoreLS.get())
+		if(!region0LS.get())
 		{
-			pickupRight.set(motorSpeed);
-			pickupLeft.set(-motorSpeed);
+			rightTalon.set(motorSpeed);
+			leftTalon.set(-motorSpeed);
 		} else {
-			pickupRight.set(0);
-			pickupLeft.set(0);
+			rightTalon.set(0);
+			leftTalon.set(0);
 		}
 	}
 	
 	private void goToPickup()
 	{
-		if(!posPickupLS.get())
+		if(!region4LS.get())
 		{
-			pickupRight.set(-motorSpeed);
-			pickupLeft.set(motorSpeed);
+			rightTalon.set(-motorSpeed);
+			leftTalon.set(motorSpeed);
 		} else {
-			pickupRight.set(0);
-			pickupLeft.set(0);
+			rightTalon.set(0);
+			leftTalon.set(0);
 		}
 	}
 	
 	private void checkPositionChange()
 	{
 		 
+	}
+	
+	//Code below here is some stuff Simon is working on / thinking about.
+	
+	public void moveToRegion (int desiredRegion)
+	{
+		determineCurrentRegion();
+		if (currentRegion < desiredRegion)
+		{
+			//move arm forward
+		}
+		else if (currentRegion > desiredRegion)
+		{
+			//move arm backward
+		}
+		else
+		{
+			//set arm motor speed to 0
+		}		
+	}
+	
+	private void determineCurrentRegion ()
+	{
+		if (region0LS.get())
+		{
+			currentRegion = 0;
+		}
+		else if (region2LS.get())
+		{
+			currentRegion = 2;
+		}
+		else if (region4LS.get())
+		{
+			currentRegion = 4;
+		}
+		else if ((!region0LS.get()) && (currentRegion == 0))
+		{
+			currentRegion = 1;
+		}
+		else if ((!region4LS.get()) && (currentRegion == 4))
+		{
+			currentRegion = 3;
+		}
+		/* Need an else if condition for when the currentRegion is 2, but the limit switch in region 2 reads false.
+		The arm can be in either region 1 or 3 in that case. */
 	}
 }
