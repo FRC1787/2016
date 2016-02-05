@@ -215,7 +215,14 @@ public class PickupArm {
 		{
 			currentRegion = REG_APPROACHPICKUP;
 		}
-		else if (currentRegion == REG_PICKUP)
+		else if (currentRegion == REG_PICKUP && armDirection == ARM_FORWARDS)
+		{
+			currentRegion = REG_APPROACHPICKUP;
+		}
+		else if (currentRegion == REG_PICKUP && armDirection == ARM_BACKWARDS)
+		{
+			currentRegion = REG_STOREAPPROACH;
+		}
 		/* Need an else if condition for when the currentRegion is 2, but the limit switch in region 2 reads false.
 		The arm can be in either region 1 or 3 in that case. */
 	}
