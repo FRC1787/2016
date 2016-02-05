@@ -1,2 +1,2 @@
-[ ] Figure out which pickupMotor is backwards, configure in code
+[ ] Figure out which pickupMotor is backwards, configure in code, also the wheels
 [ ] Don't derefrence null pointers
