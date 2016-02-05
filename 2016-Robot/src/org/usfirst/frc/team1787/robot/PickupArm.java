@@ -69,12 +69,6 @@ public class PickupArm {
 	/** Current position of arm */
 	private int currentRegion;
 	
-	/** Previous position of arm */
-	private int previousRegion;
-	
-	/** The position the arm needs to move to */
-	private int desiredRegion;
-	
 	/** Region number of storage position */
 	public static final int REG_STORE = 0;
 	
@@ -101,9 +95,6 @@ public class PickupArm {
 	
 	/** Don't ask. */
 	protected int farfar37;
-
-	/** Motor speed */
-	public static double motorSpeed = 0.5;
 	
 	/** 
 	 * Direction arm  is moving
@@ -146,40 +137,51 @@ public class PickupArm {
 	}
 	
 	/**
-	 * 
-	 * @param desiredRegion
+	 * Move to a specified region
+	 * @param desiredRegion The  int region to move to
 	 */
-	public void moveToRegion (int desiredRegion)
+	public void moveToRegion (int desiredRegion, double motorSpeed)
 	{
-		determineCurrentRegion();
 		if (currentRegion < desiredRegion)
 		{
-			moveArmForwards();
+			moveArmForwards(motorSpeed);
 		}
 		else if (currentRegion > desiredRegion)
 		{
-			moveArmBackwards();
+			moveArmBackwards(motorSpeed);
 		}
 		else
 		{
 			stopArm();
-		}		
+		}
+		
 	}
 	
-	private void moveArmForwards()
+	/**
+	 * Move arm forwards
+	 * @param motorSpeed Desired arm speed
+	 */
+	private void moveArmForwards(double motorSpeed)
 	{
 		rightTalon.set(motorSpeed);
 		leftTalon.set(-motorSpeed);
 		armDirection = ARM_FORWARDS;
 	}
 	
-	private void moveArmBackwards()
+	/**
+	 * Move arm forwards
+	 * @param motorSpeed Desired arm speed
+	 */
+	private void moveArmBackwards(double motorSpeed)
 	{
 		rightTalon.set(-motorSpeed);
 		leftTalon.set(motorSpeed);
 		armDirection = ARM_BACKWARDS;
 	}
 	
+	/**
+	 * Make arm stationary
+	 */
 	private void stopArm()
 	{
 		rightTalon.set(0);
@@ -187,46 +189,60 @@ public class PickupArm {
 		armDirection = ARM_STATIONARY;
 	}
 	
-	
-	
-	
-	
-	
-	//Code below here is some stuff Simon is working on / thinking about.
-	
-
-	private void determineCurrentRegion ()
+	/**
+	 * Updates the current region the arm occupies when called.
+	 */
+	private void determineCurrentRegion()
 	{
 		
-		if (regStoreLS.get())
+		if (regStoreLS.get()) // If the LS @ region 0 reads true, the arm is in region 0.
 		{
 			currentRegion = REG_STORE;
 		}
-		else if (regApproachLS.get())
+		else if (regApproachLS.get()) // If the LS @ region 2 reads true, the arm is in region 2
 		{
 			currentRegion = REG_APPROACH;
 		}
-		else if (regPickupLS.get())
+		else if (regPickupLS.get()) // If the LS @ region 4 reads true, the arm is in region 4.
 		{
 			currentRegion = REG_PICKUP;
 		}
-		else if (currentRegion == REG_STORE && !regStoreLS.get())
+		else if (currentRegion == REG_STORE && !regStoreLS.get()) // if the currentRegion is 0, but the LS in region 0 reads false, the arm is in region 1.
 		{
 			currentRegion = REG_STOREAPPROACH;
 		}
-		else if (currentRegion == REG_PICKUP && !regPickupLS.get())
+		else if (currentRegion == REG_PICKUP && !regPickupLS.get()) // if the currentRegion is 4, but the LS in region 4 reads false, the arm is in region 3.
 		{
 			currentRegion = REG_APPROACHPICKUP;
 		}
-		else if (currentRegion == REG_PICKUP && armDirection == ARM_FORWARDS)
+		else if (currentRegion == REG_PICKUP && !regApproachLS.get()) // if the currentRegion is 2, but the LS in region 2 reads false, and the arm is moving forward
 		{
-			currentRegion = REG_APPROACHPICKUP;
+			if (armDirection == ARM_FORWARDS)
+			{
+				currentRegion = REG_APPROACHPICKUP;
+			}
+			else if (armDirection == ARM_BACKWARDS)
+			{
+				currentRegion = REG_STOREAPPROACH;
+			}
 		}
-		else if (currentRegion == REG_PICKUP && armDirection == ARM_BACKWARDS)
-		{
-			currentRegion = REG_STOREAPPROACH;
-		}
-		/* Need an else if condition for when the currentRegion is 2, but the limit switch in region 2 reads false.
-		The arm can be in either region 1 or 3 in that case. */
+	}
+	
+	/**
+	 * Spin wheels forwards (to pick up the ball)
+	 * @param motorSpeed
+	 */
+	public void spinPickupWheelsForwards(double motorSpeed)
+	{
+		pickupWheels.set(motorSpeed);
+	}
+	
+	/**
+	 * Spin wheels backwards (to eject the ball)
+	 * @param motorSpeed
+	 */
+	public void spinPickupWheelsBackwards(double motorSpeed)
+	{
+		pickupWheels.set(-motorSpeed);
 	}
 }
