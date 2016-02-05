@@ -145,7 +145,10 @@ public class PickupArm {
 		//Add method here for moving the arm to region 0.
 	}
 	
-	
+	/**
+	 * 
+	 * @param desiredRegion
+	 */
 	public void moveToRegion (int desiredRegion)
 	{
 		determineCurrentRegion();
