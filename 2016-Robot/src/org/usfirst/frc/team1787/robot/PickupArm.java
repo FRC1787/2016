@@ -69,7 +69,7 @@ public class PickupArm {
 	/** Current position of arm */
 	private int currentRegion;
 	
-	/** Region number of storage position */
+	/** Region number of storage position */ 
 	public static final int REG_STORE = 0;
 	
 	/** Region number of area between Store and Approach */
@@ -133,7 +133,6 @@ public class PickupArm {
 		regStoreLS = new DigitalInput(region0LSPort);
 		regApproachLS = new DigitalInput(region2LSPort);
 		regPickupLS = new DigitalInput(region4LSPort);
-		//Add method here for moving the arm to region 0.
 	}
 	
 	/**
