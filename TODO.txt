@@ -1,3 +1,2 @@
-[ ] Figure out which pickupMotor is backwards, configure in code, also the wheels
 [ ] In Robot2016, set PickupArm to stored position
 [ ] Don't derefrence null pointers
