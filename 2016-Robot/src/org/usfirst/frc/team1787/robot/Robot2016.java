@@ -18,5 +18,9 @@ public class Robot2016 {
 	{
 		this.settings = settings;
 	}
+	public void resetPickupArm(PickupArm pickupArm)
+	{
+		pickupArm.moveToRegion(0)
+	}
 	
 }
