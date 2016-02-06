@@ -2,6 +2,7 @@ package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Joystick;
 
 /**
  * Class for pickup arm
@@ -66,7 +67,7 @@ public class PickupArm {
 	/** Limit Switch located at the arm's pickup position (Region 4) */
 	private DigitalInput regPickupLS;
 	
-	/** Current position of arm */
+	/** Current region of arm */
 	private int currentRegion;
 	
 	/** Region number of storage position */ 
@@ -105,17 +106,6 @@ public class PickupArm {
 	private int armDirection = 0;
 	
 	/**
-	 * System for position:
-	 * Stored: 0
-	 * Stored to Approach: 1
-	 * Approach: 2
-	 * Approach to Pickup: 3
-	 * Pickup: 4
-	 * 
-	 */
-	
-	
-	/**
 	 * Takes IDs and port numbers, not objects
 	 * @param rightTalonID    ID of the talon on the right of the arm.
 	 * @param leftTalonID     ID of the talon on the left of the arm.
@@ -137,45 +127,30 @@ public class PickupArm {
 	
 	/**
 	 * Move to a specified region
-	 * @param desiredRegion The  int region to move to
+	 * @param desiredRegion The region to move to.
+	 * @param motorSpeed Desired arm speed.
 	 */
-	public void moveToRegion (int desiredRegion, double motorSpeed)
-	{
-		if (currentRegion < desiredRegion)
-		{
-			moveArmForwards(motorSpeed);
-		}
-		else if (currentRegion > desiredRegion)
-		{
-			moveArmBackwards(motorSpeed);
-		}
-		else
-		{
-			stopArm();
-		}
-		
-	}
+	 public void moveToRegion(int desiredRegion, double motorSpeed)
+	 {
+  		determineCurrentRegion();
+  		if (currentRegion < desiredRegion)
+  			moveArm(motorSpeed);
+  		else if (currentRegion > desiredRegion)
+  			moveArm(-motorSpeed);
+  		else
+  			stopArm();
+	 }
 	
-	/**
-	 * Move arm forwards
-	 * @param motorSpeed Desired arm speed
-	 */
-	private void moveArmForwards(double motorSpeed)
+	public void moveArm(double motorSpeed)
 	{
 		rightTalon.set(motorSpeed);
 		leftTalon.set(-motorSpeed);
-		armDirection = ARM_FORWARDS;
-	}
-	
-	/**
-	 * Move arm forwards
-	 * @param motorSpeed Desired arm speed
-	 */
-	private void moveArmBackwards(double motorSpeed)
-	{
-		rightTalon.set(-motorSpeed);
-		leftTalon.set(motorSpeed);
-		armDirection = ARM_BACKWARDS;
+		if (motorSpeed > 0)
+			armDirection = ARM_FORWARDS;
+		else if (motorSpeed < 0)
+			armDirection = ARM_BACKWARDS;
+		else if (motorSpeed == 0)
+			armDirection = ARM_STATIONARY;
 	}
 	
 	/**
@@ -214,13 +189,13 @@ public class PickupArm {
 		{
 			currentRegion = REG_APPROACHPICKUP;
 		}
-		else if (currentRegion == REG_PICKUP && !regApproachLS.get()) // if the currentRegion is 2, but the LS in region 2 reads false, and the arm is moving forward
+		else if (currentRegion == REG_PICKUP && !regApproachLS.get()) // if the currentRegion is 2, but the LS in region 2 reads false, and...
 		{
-			if (armDirection == ARM_FORWARDS)
+			if (armDirection == ARM_FORWARDS) // the arm is moving forwards, then arm is in region 3
 			{
 				currentRegion = REG_APPROACHPICKUP;
 			}
-			else if (armDirection == ARM_BACKWARDS)
+			else if (armDirection == ARM_BACKWARDS) // the arm is moving backwards, then the arm is in region 1
 			{
 				currentRegion = REG_STOREAPPROACH;
 			}
@@ -229,7 +204,7 @@ public class PickupArm {
 	
 	/**
 	 * Spin wheels forwards (to pick up the ball)
-	 * @param motorSpeed
+	 * @param motorSpeed How fast the wheels spin.
 	 */
 	public void spinPickupWheelsForwards(double motorSpeed)
 	{
@@ -238,10 +213,20 @@ public class PickupArm {
 	
 	/**
 	 * Spin wheels backwards (to eject the ball)
-	 * @param motorSpeed
+	 * @param motorSpeed How fast the wheels spin.
 	 */
 	public void spinPickupWheelsBackwards(double motorSpeed)
 	{
 		pickupWheels.set(-motorSpeed);
 	}
+	
+	/**
+	 * Manually control the arm with a joystick.
+	 * @param stick The joystick being used.
+	 */
+	public void manualControl(Joystick stick)
+	{
+		moveArm(stick.getY());
+		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
+	}	 
 }
