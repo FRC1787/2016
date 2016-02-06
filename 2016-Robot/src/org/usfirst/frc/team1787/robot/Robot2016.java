@@ -13,17 +13,8 @@ public class Robot2016 {
 	
 	/** The settings for the robot */
 	RobotSettings settings;
-	/** The Pickup Arm */
-	PickupArm pickupArm;
-	
 	public Robot2016(RobotSettings settings)
 	{
 		this.settings = settings;
 	}
-	/** Sets Pickup Arm to Stored Position */
-	public void resetPickupArm(PickupArm pickupArm)
-	{
-		pickupArm.moveToRegion(0);
-	}
-	
 }
