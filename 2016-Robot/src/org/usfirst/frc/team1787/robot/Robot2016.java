@@ -13,6 +13,8 @@ public class Robot2016 {
 	
 	/** The settings for the robot */
 	RobotSettings settings;
+	/** The Pickup Arm */
+	PickupArm pickupArm;
 	
 	public Robot2016(RobotSettings settings)
 	{
@@ -21,7 +23,7 @@ public class Robot2016 {
 	/** Sets Pickup Arm to Stored Position */
 	public void resetPickupArm(PickupArm pickupArm)
 	{
-		pickupArm.moveToRegion(0)
+		pickupArm.moveToRegion(0);
 	}
 	
 }
