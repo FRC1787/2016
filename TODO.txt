@@ -1,2 +1,0 @@
-[ ] In Robot2016, set PickupArm to stored position
-[ ] Don't derefrence null pointers
