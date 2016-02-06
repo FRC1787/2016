@@ -21,6 +21,8 @@ public class Robot extends IterativeRobot
     String autoSelected;
     SendableChooser chooser;
     */
+	
+	// Objects / Variables used for the PickupArm.
 	private PickupArm arm;
 	private static final int PICKUP_ARM_RIGHT_TALON_ID = 0;
 	private static final int PICKUP_ARM_LEFT_TALON_ID = 1;
