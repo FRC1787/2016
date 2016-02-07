@@ -2,6 +2,9 @@
 package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,14 +25,31 @@ public class Robot extends IterativeRobot
     SendableChooser chooser;
     */
 	
-	// Objects / Variables used for the PickupArm.
+	// Objects and variables used for driving the robot.
+	private RobotDrive myRobot;
+	private static final int FRONT_LEFT_DRIVING_TALON_ID = 0;
+	private static final int BACK_LEFT_DRIVING_TALON_ID = 1;
+	private static final int FRONT_RIGHT_DRIVING_TALON_ID = 2;
+	private static final int BACK_RIGHT_DRIVING_TALON_ID = 3;
+	
+	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
-	private static final int PICKUP_ARM_RIGHT_TALON_ID = 0;
-	private static final int PICKUP_ARM_LEFT_TALON_ID = 1;
-	private static final int PICKUP_ARM_PICKUP_WHEELS_TALON_ID = 2;
-	private static final int PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID = 3;
-	private static final int PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID = 4;
-	private static final int PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID = 5;
+	private static final int PICKUP_ARM_RIGHT_TALON_ID = 4;
+	private static final int PICKUP_ARM_LEFT_TALON_ID = 5;
+	private static final int PICKUP_ARM_PICKUP_WHEELS_TALON_ID = 6;
+	private static final int PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID =  7;
+	private static final int PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID = 8;
+	private static final int PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID = 9;
+	
+	// Objects and variables involving control of the robot
+	private Joystick stick;
+	private static final int JOYSTICK_PORT = 10;
+	
+	// Objects and variables used for shifting gears
+	private Solenoid gearShiftingSolenoid;
+	private static final int GEAR_SHIFTING_SOLENOID_ID = 11;
+	private static final int GEAR_SHIFTING_SOLENOID_PCM_PORT = 12;
+	
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -43,8 +63,16 @@ public class Robot extends IterativeRobot
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
         */
+    	myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
+    			FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
+    	
     	arm = new PickupArm(PICKUP_ARM_RIGHT_TALON_ID, PICKUP_ARM_LEFT_TALON_ID, PICKUP_ARM_PICKUP_WHEELS_TALON_ID, 
     			PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID);
+    	// arm.moveToRegion(0, 0.2);
+    	
+    	stick = new Joystick(JOYSTICK_PORT);
+    	
+    	gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID, GEAR_SHIFTING_SOLENOID_PCM_PORT);
     }
     
 	/**
@@ -89,7 +117,7 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
-        arm.moveToRegion(0, 0.2);
+    	myRobot.arcadeDrive(stick);
     }
     
     /**
