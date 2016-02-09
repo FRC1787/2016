@@ -1,6 +1,7 @@
 
 package org.usfirst.frc.team1787.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
@@ -118,6 +119,7 @@ public class Robot extends IterativeRobot
     public void teleopPeriodic()
     {
     	myRobot.arcadeDrive(stick);
+    	DriverStation.reportError(stick.getRawAxis(0) + "\n", false);
     	
     }
     
