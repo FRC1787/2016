@@ -49,7 +49,7 @@ public class Robot extends IterativeRobot
 	private static final int JOYSTICK_PORT = 0;
 	
 	// Objects and variables used for shifting gears
-	//private Solenoid gearShiftingSolenoid;
+	private Shifter shifter;
 	private static final int SOL_GEAR_SHIFTING_PORT = 11;
 	
 	
@@ -74,12 +74,12 @@ public class Robot extends IterativeRobot
     	
     	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
     			LS_PICKUP_ARM_STORED_PORT, LS_PICKUP_ARM_APPROACH_PORT, LS_PICKUP_ARM_PICKUP_PORT);
-    	//arm.mo);
     	
     	stick = new Joystick(JOYSTICK_PORT);
     	
-    	//gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID);
-    }
+    	shifter = new Shifter(SOL_GEAR_SHIFTING_PORT);
+    	
+        }
     
 	/**
 	 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
