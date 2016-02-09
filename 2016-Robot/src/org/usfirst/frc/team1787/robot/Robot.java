@@ -27,10 +27,10 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables used for driving the robot.
 	private RobotDrive myRobot;
-	private static final int FRONT_LEFT_DRIVING_TALON_ID = 0;
-	private static final int BACK_LEFT_DRIVING_TALON_ID = 1;
-	private static final int FRONT_RIGHT_DRIVING_TALON_ID = 2;
-	private static final int BACK_RIGHT_DRIVING_TALON_ID = 3;
+	private static final int FRONT_LEFT_DRIVING_TALON_ID = 3;
+	private static final int BACK_LEFT_DRIVING_TALON_ID = 4;
+	private static final int FRONT_RIGHT_DRIVING_TALON_ID = 1;
+	private static final int BACK_RIGHT_DRIVING_TALON_ID = 2;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
@@ -43,7 +43,7 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables involving control of the robot
 	private Joystick stick;
-	private static final int JOYSTICK_PORT = 10;
+	private static final int JOYSTICK_PORT = 0;
 	
 	// Objects and variables used for shifting gears
 	private Solenoid gearShiftingSolenoid;
@@ -68,7 +68,7 @@ public class Robot extends IterativeRobot
     	
     	arm = new PickupArm(PICKUP_ARM_RIGHT_TALON_ID, PICKUP_ARM_LEFT_TALON_ID, PICKUP_ARM_PICKUP_WHEELS_TALON_ID, 
     			PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID);
-    	// arm.moveToRegion(0, 0.2);
+    	//arm.mo);
     	
     	stick = new Joystick(JOYSTICK_PORT);
     	
@@ -118,6 +118,7 @@ public class Robot extends IterativeRobot
     public void teleopPeriodic()
     {
     	myRobot.arcadeDrive(stick);
+    	
     }
     
     /**
