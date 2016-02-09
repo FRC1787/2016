@@ -46,7 +46,7 @@ public class Robot extends IterativeRobot
 	private static final int JOYSTICK_PORT = 0;
 	
 	// Objects and variables used for shifting gears
-	private Solenoid gearShiftingSolenoid;
+	//private Solenoid gearShiftingSolenoid;
 	private static final int GEAR_SHIFTING_SOLENOID_ID = 11;
 	private static final int GEAR_SHIFTING_SOLENOID_PCM_PORT = 12;
 	
@@ -72,7 +72,7 @@ public class Robot extends IterativeRobot
     	
     	stick = new Joystick(JOYSTICK_PORT);
     	
-    	gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID, GEAR_SHIFTING_SOLENOID_PCM_PORT);
+    	//gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID, GEAR_SHIFTING_SOLENOID_PCM_PORT);
     }
     
 	/**
