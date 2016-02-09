@@ -1,6 +1,7 @@
 
 package org.usfirst.frc.team1787.robot;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -33,14 +34,19 @@ public class Robot extends IterativeRobot
 	private static final int FRONT_RIGHT_DRIVING_TALON_ID = 1;
 	private static final int BACK_RIGHT_DRIVING_TALON_ID = 2;
 	
+	private CANTalon t1;
+	private CANTalon t2;
+	private CANTalon t3;
+	private CANTalon t4;
+	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
-	private static final int PICKUP_ARM_RIGHT_TALON_ID = 4;
-	private static final int PICKUP_ARM_LEFT_TALON_ID = 5;
-	private static final int PICKUP_ARM_PICKUP_WHEELS_TALON_ID = 6;
-	private static final int PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID =  7;
-	private static final int PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID = 8;
-	private static final int PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID = 9;
+	private static final int PICKUP_ARM_RIGHT_TALON_ID = 5;
+	private static final int PICKUP_ARM_LEFT_TALON_ID = 6;
+	private static final int PICKUP_ARM_PICKUP_WHEELS_TALON_ID = 7;
+	private static final int PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID =  8;
+	private static final int PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID = 9;
+	private static final int PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID = 10;
 	
 	// Objects and variables involving control of the robot
 	private Joystick stick;
@@ -64,8 +70,16 @@ public class Robot extends IterativeRobot
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
         */
-    	myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
-    			FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
+    	
+    	t1 = new CANTalon(1); //front right
+    	t2 = new CANTalon(2); //back right
+    	t3 = new CANTalon(3); //front left
+    	t4 = new CANTalon(4); //back left
+    	
+    	//myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
+    	//		FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
+    	
+    	myRobot = new RobotDrive(t3, t4, t1, t2);
     	
     	arm = new PickupArm(PICKUP_ARM_RIGHT_TALON_ID, PICKUP_ARM_LEFT_TALON_ID, PICKUP_ARM_PICKUP_WHEELS_TALON_ID, 
     			PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID);
@@ -112,6 +126,11 @@ public class Robot extends IterativeRobot
     	}
     	*/
     }
+    
+    public void teleopInit()
+    {
+    	
+    }
 
     /**
      * This function is called periodically during operator control
@@ -120,7 +139,6 @@ public class Robot extends IterativeRobot
     {
     	myRobot.arcadeDrive(stick);
     	DriverStation.reportError(stick.getRawAxis(0) + "\n", false);
-    	
     }
     
     /**
@@ -128,7 +146,7 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    
+    	
     }
     
 }
