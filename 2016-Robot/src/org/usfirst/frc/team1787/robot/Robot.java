@@ -29,25 +29,33 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables used for driving the robot.
 	private Drive driveControl;
-	private static final int TALON_DRIVE_FL_ID = 3;
-	private static final int TALON_DRIVE_BL_ID = 4;
-	private static final int TALON_DRIVE_FR_ID = 1;
-	private static final int TALON_DRIVE_BR_ID = 2;
-	private static final int SOL_GEAR_SHIFTING_PORT = 11;
+	public static final int TALON_DRIVE_FL_ID = 3;
+	public static final int TALON_DRIVE_BL_ID = 4;
+	public static final int TALON_DRIVE_FR_ID = 1;
+	public static final int TALON_DRIVE_BR_ID = 2;
+	public static final int SOL_GEAR_SHIFTING_PORT = 11;
 	
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
-	private static final int TALON_PICKUP_ARM_RIGHT_ID = 5;
-	private static final int TALON_PICKUP_ARM_LEFT_ID = 6;
-	private static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
-	private static final int LS_PICKUP_ARM_STORED_PORT =  8;
-	private static final int LS_PICKUP_ARM_APPROACH_PORT = 9;
-	private static final int LS_PICKUP_ARM_PICKUP_PORT = 10;
+	public static final int TALON_PICKUP_ARM_RIGHT_ID = 5;
+	public static final int TALON_PICKUP_ARM_LEFT_ID = 6;
+	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
+	public static final int LS_PICKUP_ARM_STORED_PORT =  8;
+	public static final int LS_PICKUP_ARM_APPROACH_PORT = 9;
+	public static final int LS_PICKUP_ARM_PICKUP_PORT = 10;
+	public static final double PICKUP_ARM_MOTOR_SPEED = 0.4;
+	//Set to 0 automatically, unless changed
+	private int pickup_arm_desiredRegion = 0;
 	
 	// Objects and variables involving control of the robot
 	private Joystick stick;
-	private static final int JOYSTICK_PORT = 0;
+	public static final int JOYSTICK_PORT = 0;
+	public static final int JOYSTICK_HIGH_GEAR = 6;
+	public static final int JOYSTICK_LOW_GEAR = 7;
+	public static final int JOYSTICK_PICKUP_ARM_STORE = 4;
+	public static final int JOYSTICK_PICKUP_ARM_APPROACH = 3;
+	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 5;
 	
 	
 	
@@ -122,6 +130,31 @@ public class Robot extends IterativeRobot
     public void teleopPeriodic()
     {
     	driveControl.drive(stick);
+    	
+    	//Set Gear
+    	if(stick.getRawButton(JOYSTICK_HIGH_GEAR))
+    	{
+    		driveControl.setHighGear();
+    	}
+    	else if(stick.getRawButton(JOYSTICK_LOW_GEAR))
+    	{
+    		driveControl.setLowGear();
+    	}
+    	
+    	//Set Pickup Arm Position
+    	if(stick.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
+    	{
+    		pickup_arm_desiredRegion = PickupArm.REG_STORE;
+    	}
+    	else if(stick.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
+    	{
+    		pickup_arm_desiredRegion = PickupArm.REG_APPROACH;
+    	}
+    	else if(stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    	{
+    		pickup_arm_desiredRegion = PickupArm.REG_PICKUP;
+    	}
+    	arm.moveToRegion(pickup_arm_desiredRegion, PICKUP_ARM_MOTOR_SPEED);
     }
     
     /**

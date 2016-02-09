@@ -141,7 +141,7 @@ public class PickupArm {
   			stopArm();
 	 }
 	
-	public void moveArm(double motorSpeed)
+	private void moveArm(double motorSpeed)
 	{
 		rightTalon.set(motorSpeed);
 		leftTalon.set(-motorSpeed);
