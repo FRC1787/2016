@@ -28,11 +28,12 @@ public class Robot extends IterativeRobot
     */
 	
 	// Objects and variables used for driving the robot.
+	private Drive driveControl;
 	private static final int TALON_DRIVE_FL_ID = 3;
 	private static final int TALON_DRIVE_BL_ID = 4;
 	private static final int TALON_DRIVE_FR_ID = 1;
 	private static final int TALON_DRIVE_BR_ID = 2;
-	private Drive drive;
+	private static final int SOL_GEAR_SHIFTING_PORT = 11;
 	
 	
 	// Objects and variables used for the PickupArm.
@@ -48,9 +49,6 @@ public class Robot extends IterativeRobot
 	private Joystick stick;
 	private static final int JOYSTICK_PORT = 0;
 	
-	// Objects and variables used for shifting gears
-	private Shifter shifter;
-	private static final int SOL_GEAR_SHIFTING_PORT = 11;
 	
 	
     /**
@@ -66,10 +64,7 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("Auto choices", chooser);
         */
     	
-    	drive = new Drive(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID);
-    	
-    	//myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
-    	//		FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
+    	driveControl = new Drive(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, SOL_GEAR_SHIFTING_PORT);
     	
     	
     	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
@@ -77,9 +72,7 @@ public class Robot extends IterativeRobot
     	
     	stick = new Joystick(JOYSTICK_PORT);
     	
-    	shifter = new Shifter(SOL_GEAR_SHIFTING_PORT);
-    	
-        }
+    }
     
 	/**
 	 * This autonomous (along with the chooser code above) shows how to select between different autonomous modes
@@ -128,7 +121,7 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
-    	DriverStation.reportError(stick.getRawAxis(0) + "\n", false);
+    	driveControl.drive(stick);
     }
     
     /**
