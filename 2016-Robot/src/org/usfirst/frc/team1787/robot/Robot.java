@@ -28,25 +28,21 @@ public class Robot extends IterativeRobot
     */
 	
 	// Objects and variables used for driving the robot.
-	private RobotDrive myRobot;
-	private static final int FRONT_LEFT_DRIVING_TALON_ID = 3;
-	private static final int BACK_LEFT_DRIVING_TALON_ID = 4;
-	private static final int FRONT_RIGHT_DRIVING_TALON_ID = 1;
-	private static final int BACK_RIGHT_DRIVING_TALON_ID = 2;
+	private static final int TALON_DRIVE_FL_ID = 3;
+	private static final int TALON_DRIVE_BL_ID = 4;
+	private static final int TALON_DRIVE_FR_ID = 1;
+	private static final int TALON_DRIVE_BR_ID = 2;
+	private Drive drive;
 	
-	private CANTalon t1;
-	private CANTalon t2;
-	private CANTalon t3;
-	private CANTalon t4;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
-	private static final int PICKUP_ARM_RIGHT_TALON_ID = 5;
-	private static final int PICKUP_ARM_LEFT_TALON_ID = 6;
-	private static final int PICKUP_ARM_PICKUP_WHEELS_TALON_ID = 7;
-	private static final int PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID =  8;
-	private static final int PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID = 9;
-	private static final int PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID = 10;
+	private static final int TALON_PICKUP_ARM_RIGHT_ID = 5;
+	private static final int TALON_PICKUP_ARM_LEFT_ID = 6;
+	private static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
+	private static final int LS_PICKUP_ARM_STORED_PORT =  8;
+	private static final int LS_PICKUP_ARM_APPROACH_PORT = 9;
+	private static final int LS_PICKUP_ARM_PICKUP_PORT = 10;
 	
 	// Objects and variables involving control of the robot
 	private Joystick stick;
@@ -54,8 +50,7 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables used for shifting gears
 	//private Solenoid gearShiftingSolenoid;
-	private static final int GEAR_SHIFTING_SOLENOID_ID = 11;
-	private static final int GEAR_SHIFTING_SOLENOID_PCM_PORT = 12;
+	private static final int SOL_GEAR_SHIFTING_PORT = 11;
 	
 	
     /**
@@ -71,23 +66,19 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("Auto choices", chooser);
         */
     	
-    	t1 = new CANTalon(1); //front right
-    	t2 = new CANTalon(2); //back right
-    	t3 = new CANTalon(3); //front left
-    	t4 = new CANTalon(4); //back left
+    	drive = new Drive(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID);
     	
     	//myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
     	//		FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
     	
-    	myRobot = new RobotDrive(t3, t4, t1, t2);
     	
-    	arm = new PickupArm(PICKUP_ARM_RIGHT_TALON_ID, PICKUP_ARM_LEFT_TALON_ID, PICKUP_ARM_PICKUP_WHEELS_TALON_ID, 
-    			PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID);
+    	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
+    			LS_PICKUP_ARM_STORED_PORT, LS_PICKUP_ARM_APPROACH_PORT, LS_PICKUP_ARM_PICKUP_PORT);
     	//arm.mo);
     	
     	stick = new Joystick(JOYSTICK_PORT);
     	
-    	//gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID, GEAR_SHIFTING_SOLENOID_PCM_PORT);
+    	//gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID);
     }
     
 	/**
@@ -137,7 +128,6 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
-    	myRobot.arcadeDrive(stick);
     	DriverStation.reportError(stick.getRawAxis(0) + "\n", false);
     }
     
