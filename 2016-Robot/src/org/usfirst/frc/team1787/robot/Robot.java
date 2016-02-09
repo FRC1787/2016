@@ -29,15 +29,14 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables used for driving the robot.
 	private RobotDrive myRobot;
+	private CANTalon frontLeftDrivingTalon;
+	private CANTalon backLeftDrivingTalon;
+	private CANTalon frontRightDrivingTalon;
+	private CANTalon backRightDrivingTalon;
 	private static final int FRONT_LEFT_DRIVING_TALON_ID = 3;
 	private static final int BACK_LEFT_DRIVING_TALON_ID = 4;
 	private static final int FRONT_RIGHT_DRIVING_TALON_ID = 1;
 	private static final int BACK_RIGHT_DRIVING_TALON_ID = 2;
-	
-	private CANTalon t1;
-	private CANTalon t2;
-	private CANTalon t3;
-	private CANTalon t4;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
@@ -53,7 +52,7 @@ public class Robot extends IterativeRobot
 	private static final int JOYSTICK_PORT = 0;
 	
 	// Objects and variables used for shifting gears
-	//private Solenoid gearShiftingSolenoid;
+	private Solenoid gearShiftingSolenoid;
 	private static final int GEAR_SHIFTING_SOLENOID_ID = 11;
 	private static final int GEAR_SHIFTING_SOLENOID_PCM_PORT = 12;
 	
@@ -71,23 +70,29 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("Auto choices", chooser);
         */
     	
-    	t1 = new CANTalon(1); //front right
-    	t2 = new CANTalon(2); //back right
-    	t3 = new CANTalon(3); //front left
-    	t4 = new CANTalon(4); //back left
+    	/* This RobotDrive constructor should work when the WPILib is updated.
     	
-    	//myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
-    	//		FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
+    	myRobot = new RobotDrive(FRONT_LEFT_DRIVING_TALON_ID, BACK_LEFT_DRIVING_TALON_ID, 
+    		FRONT_RIGHT_DRIVING_TALON_ID, BACK_RIGHT_DRIVING_TALON_ID);
+    	*/
     	
-    	myRobot = new RobotDrive(t3, t4, t1, t2);
+    	// Construct driving objects
+    	frontRightDrivingTalon = new CANTalon(FRONT_RIGHT_DRIVING_TALON_ID);
+    	backRightDrivingTalon = new CANTalon(BACK_RIGHT_DRIVING_TALON_ID);
+    	frontLeftDrivingTalon = new CANTalon(FRONT_LEFT_DRIVING_TALON_ID);
+    	backLeftDrivingTalon = new CANTalon(BACK_LEFT_DRIVING_TALON_ID);
+    	myRobot = new RobotDrive(frontLeftDrivingTalon, backLeftDrivingTalon, frontRightDrivingTalon, backRightDrivingTalon);
     	
+    	// Construct PickupArm and move the arm to region 0
     	arm = new PickupArm(PICKUP_ARM_RIGHT_TALON_ID, PICKUP_ARM_LEFT_TALON_ID, PICKUP_ARM_PICKUP_WHEELS_TALON_ID, 
     			PICKUP_ARM_REGION_0_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_2_LIMIT_SWITCH_ID, PICKUP_ARM_REGION_4_LIMIT_SWITCH_ID);
-    	//arm.mo);
+    	arm.moveToRegion(0, 0.2);
     	
+    	// Construct the joystick
     	stick = new Joystick(JOYSTICK_PORT);
     	
-    	//gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID, GEAR_SHIFTING_SOLENOID_PCM_PORT);
+    	// Construct the gearShiftingSolenoid
+    	gearShiftingSolenoid = new Solenoid(GEAR_SHIFTING_SOLENOID_ID, GEAR_SHIFTING_SOLENOID_PCM_PORT);
     }
     
 	/**
@@ -103,7 +108,7 @@ public class Robot extends IterativeRobot
     {
     	/* Even more SendableChooser stuff:
     	autoSelected = (String) chooser.getSelected();
-//		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
+		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 		*/
     }
@@ -127,6 +132,9 @@ public class Robot extends IterativeRobot
     	*/
     }
     
+    /**
+     * This method is called once upon entering teleop.
+     */
     public void teleopInit()
     {
     	
@@ -137,8 +145,8 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
-    	myRobot.arcadeDrive(stick);
-    	DriverStation.reportError(stick.getRawAxis(0) + "\n", false);
+    	myRobot.arcadeDrive(stick); // Allows the robot to be driven given a single joystick.
+    	DriverStation.reportError(stick.getRawAxis(0) + "\n", false); // prints the joystick's value to the driver station.
     }
     
     /**
