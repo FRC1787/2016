@@ -5,15 +5,13 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 
 /**
- * Class for pickup arm
- * 
+ * This class represents the pickup arm on the robot.
  * @author David Miron
  * @author Simon Wieder
- *
  */
 
 /*
- * Notes for determining the current region the arm occupies.
+ * Notes regarding the "region" the arm occupies and logic for determining that region.
  * 
  * Region 0 = The default position of the arm / Where the arm is stored when not in use.
  * Region 1 = The area between region 0 and region 2.
@@ -49,13 +47,13 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class PickupArm {
 
-	/** Talon on the right side of the pickup arm */
+	/** Talon that controls the motor on the right side of the pickup arm */
 	private CANTalon rightTalon;
 	
-	/** Talon on the left side of the pickup arm */
+	/** Talon that controls the motor on the left side of the pickup arm */
 	private CANTalon leftTalon;
 	
-	/** Talon used for spinning the pickup-wheels */
+	/** Talon that controls the motor which spins the pickup-wheels */
 	private CANTalon pickupWheels;
 	
 	/** Limit Switch located at the arm's "default/stored" position (Region 0) */
@@ -64,7 +62,7 @@ public class PickupArm {
 	/** Limit Switch located at the arm's "approach" position (Region 2) */
 	private DigitalInput regApproachLS;
 	
-	/** Limit Switch located at the arm's pickup position (Region 4) */
+	/** Limit Switch located at the arm's "pickup" position (Region 4) */
 	private DigitalInput regPickupLS;
 	
 	/** Current region of arm */
@@ -94,16 +92,11 @@ public class PickupArm {
 	/** Number designating the forwards motion of the arm */
 	public static final int ARM_FORWARDS = 1;
 	
+	/** Number representing the current direction of the arm as defined by the constants above */
+	private int armDirection = 0;
+	
 	/** Don't ask. */
 	protected int farfar37;
-	
-	/** 
-	 * Direction arm  is moving
-	 * -1: Backwards
-	 *  0: Not Moving
-	 *  1: Forwards
-	 */
-	private int armDirection = 0;
 	
 	/**
 	 * Takes IDs and port numbers, not objects
@@ -126,7 +119,7 @@ public class PickupArm {
 	}
 	
 	/**
-	 * Move to a specified region
+	 * Method for moving to a specified region
 	 * @param desiredRegion The region to move to.
 	 * @param motorSpeed Desired arm speed.
 	 */
@@ -141,6 +134,12 @@ public class PickupArm {
   			stopArm();
 	 }
 	
+	 /**
+	  * Method for moving the arm at a desired speed.
+	  * @param motorSpeed The desired speed of the arm.
+	  * A positive value indicates forwards motion.
+	  * A negative value indicates backwards motion.
+	  */
 	private void moveArm(double motorSpeed)
 	{
 		rightTalon.set(motorSpeed);
@@ -153,9 +152,7 @@ public class PickupArm {
 			armDirection = ARM_STATIONARY;
 	}
 	
-	/**
-	 * Make arm stationary
-	 */
+	/** Method for making the arm stationary */
 	private void stopArm()
 	{
 		rightTalon.set(0);
@@ -163,9 +160,7 @@ public class PickupArm {
 		armDirection = ARM_STATIONARY;
 	}
 	
-	/**
-	 * Updates the current region the arm occupies when called.
-	 */
+	/** Mehtod that updates the current region the arm occupies when called. */
 	private void determineCurrentRegion()
 	{
 		
@@ -203,7 +198,7 @@ public class PickupArm {
 	}
 	
 	/**
-	 * Spin wheels forwards (to pick up the ball)
+	 * Method that spins the pickup-wheels forwards (to pick up the ball)
 	 * @param motorSpeed How fast the wheels spin.
 	 */
 	public void spinPickupWheelsForwards(double motorSpeed)
@@ -212,7 +207,7 @@ public class PickupArm {
 	}
 	
 	/**
-	 * Spin wheels backwards (to eject the ball)
+	 * Method that spins the pickup-wheels backwards (to eject the ball)
 	 * @param motorSpeed How fast the wheels spin.
 	 */
 	public void spinPickupWheelsBackwards(double motorSpeed)
@@ -221,7 +216,7 @@ public class PickupArm {
 	}
 	
 	/**
-	 * Manually control the arm with a joystick.
+	 * Method for manually controlling the arm with a joystick.
 	 * @param stick The joystick being used.
 	 */
 	public void manualControl(Joystick stick)

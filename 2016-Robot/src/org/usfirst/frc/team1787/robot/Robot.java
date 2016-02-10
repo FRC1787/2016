@@ -1,4 +1,3 @@
-
 package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.CANTalon;
@@ -28,13 +27,12 @@ public class Robot extends IterativeRobot
     */
 	
 	// Objects and variables used for driving the robot.
-	private Drive driveControl;
+	private DrivingDevices driveControl;
 	public static final int TALON_DRIVE_FL_ID = 3;
 	public static final int TALON_DRIVE_BL_ID = 4;
 	public static final int TALON_DRIVE_FR_ID = 1;
 	public static final int TALON_DRIVE_BR_ID = 2;
 	public static final int SOL_GEAR_SHIFTING_PORT = 11;
-	
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
@@ -57,8 +55,6 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_PICKUP_ARM_APPROACH = 3;
 	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 5;
 	
-	
-	
     /**
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
@@ -72,14 +68,13 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("Auto choices", chooser);
         */
     	
-    	driveControl = new Drive(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, SOL_GEAR_SHIFTING_PORT);
+    	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, SOL_GEAR_SHIFTING_PORT);
     	
     	
     	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
     			LS_PICKUP_ARM_STORED_PORT, LS_PICKUP_ARM_APPROACH_PORT, LS_PICKUP_ARM_PICKUP_PORT);
     	
-    	stick = new Joystick(JOYSTICK_PORT);
-    	
+    	stick = new Joystick(JOYSTICK_PORT);	
     }
     
 	/**
@@ -95,7 +90,7 @@ public class Robot extends IterativeRobot
     {
     	/* Even more SendableChooser stuff:
     	autoSelected = (String) chooser.getSelected();
-//		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
+    	autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 		*/
     }
@@ -129,28 +124,28 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
-    	driveControl.drive(stick);
+    	driveControl.driveWithJoystick(stick);
     	
     	//Set Gear
-    	if(stick.getRawButton(JOYSTICK_HIGH_GEAR))
+    	if (stick.getRawButton(JOYSTICK_HIGH_GEAR))
     	{
     		driveControl.setHighGear();
     	}
-    	else if(stick.getRawButton(JOYSTICK_LOW_GEAR))
+    	else if (stick.getRawButton(JOYSTICK_LOW_GEAR))
     	{
     		driveControl.setLowGear();
     	}
     	
     	//Set Pickup Arm Position
-    	if(stick.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
+    	if (stick.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
     	{
     		pickup_arm_desiredRegion = PickupArm.REG_STORE;
     	}
-    	else if(stick.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
+    	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
     	{
     		pickup_arm_desiredRegion = PickupArm.REG_APPROACH;
     	}
-    	else if(stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
     	{
     		pickup_arm_desiredRegion = PickupArm.REG_PICKUP;
     	}
@@ -163,6 +158,5 @@ public class Robot extends IterativeRobot
     public void testPeriodic()
     {
     	
-    }
-    
+    }   
 }
