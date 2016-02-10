@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -54,6 +55,8 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_PICKUP_ARM_STORE = 4;
 	public static final int JOYSTICK_PICKUP_ARM_APPROACH = 3;
 	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 5;
+	
+	DigitalInput ls = new DigitalInput(0);
 	
     /**
      * This function is run when the robot is first started up and should be

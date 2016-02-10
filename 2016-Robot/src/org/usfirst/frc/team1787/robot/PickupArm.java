@@ -43,6 +43,10 @@ import edu.wpi.first.wpilibj.Joystick;
  *   1) The last region the arm occupied was region 2
  *   2) The arm is not currently in region 2, 0, or 4
  *   3) The motors are moving the arm forward.
+ * 
+ * Note: Limit switches read false when they are activated
+ * Note: Limit switches are wired from ground to signal
+ * 
  */
 
 public class PickupArm {
@@ -164,27 +168,27 @@ public class PickupArm {
 	private void determineCurrentRegion()
 	{
 		
-		if (regStoreLS.get()) // If the LS @ region 0 reads true, the arm is in region 0.
+		if (!regStoreLS.get()) // If the LS @ region 0 reads true, the arm is in region 0.
 		{
 			currentRegion = REG_STORE;
 		}
-		else if (regApproachLS.get()) // If the LS @ region 2 reads true, the arm is in region 2
+		else if (!regApproachLS.get()) // If the LS @ region 2 reads true, the arm is in region 2
 		{
 			currentRegion = REG_APPROACH;
 		}
-		else if (regPickupLS.get()) // If the LS @ region 4 reads true, the arm is in region 4.
+		else if (!regPickupLS.get()) // If the LS @ region 4 reads true, the arm is in region 4.
 		{
 			currentRegion = REG_PICKUP;
 		}
-		else if (currentRegion == REG_STORE && !regStoreLS.get()) // if the currentRegion is 0, but the LS in region 0 reads false, the arm is in region 1.
+		else if (currentRegion == REG_STORE && regStoreLS.get()) // if the currentRegion is 0, but the LS in region 0 reads false, the arm is in region 1.
 		{
 			currentRegion = REG_STOREAPPROACH;
 		}
-		else if (currentRegion == REG_PICKUP && !regPickupLS.get()) // if the currentRegion is 4, but the LS in region 4 reads false, the arm is in region 3.
+		else if (currentRegion == REG_PICKUP && regPickupLS.get()) // if the currentRegion is 4, but the LS in region 4 reads false, the arm is in region 3.
 		{
 			currentRegion = REG_APPROACHPICKUP;
 		}
-		else if (currentRegion == REG_PICKUP && !regApproachLS.get()) // if the currentRegion is 2, but the LS in region 2 reads false, and...
+		else if (currentRegion == REG_PICKUP && regApproachLS.get()) // if the currentRegion is 2, but the LS in region 2 reads false, and...
 		{
 			if (armDirection == ARM_FORWARDS) // the arm is moving forwards, then arm is in region 3
 			{
