@@ -146,14 +146,22 @@ public class PickupArm {
 	  */
 	private void moveArm(double motorSpeed)
 	{
-		rightTalon.set(motorSpeed);
-		leftTalon.set(-motorSpeed);
-		if (motorSpeed > 0)
-			armDirection = ARM_FORWARDS;
-		else if (motorSpeed < 0)
-			armDirection = ARM_BACKWARDS;
-		else if (motorSpeed == 0)
-			armDirection = ARM_STATIONARY;
+		if((motorSpeed > 0 && !regPickupLS.get()) || (motorSpeed < 0 && !regStoreLS.get()))
+		{
+			stopArm();
+		}
+		else
+		{
+			rightTalon.set(motorSpeed);
+			leftTalon.set(-motorSpeed);
+			if (motorSpeed > 0)
+				armDirection = ARM_FORWARDS;
+			else if (motorSpeed < 0)
+				armDirection = ARM_BACKWARDS;
+			else if (motorSpeed == 0)
+				armDirection = ARM_STATIONARY;
+		}
+		
 	}
 	
 	/** Method for making the arm stationary */
