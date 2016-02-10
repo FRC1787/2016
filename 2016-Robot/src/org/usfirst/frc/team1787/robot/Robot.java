@@ -32,7 +32,7 @@ public class Robot extends IterativeRobot
 	public static final int TALON_DRIVE_BL_ID = 4;
 	public static final int TALON_DRIVE_FR_ID = 1;
 	public static final int TALON_DRIVE_BR_ID = 2;
-	public static final int SOL_GEAR_SHIFTING_PORT = 11;
+	public static final int SOL_GEAR_SHIFTING_PORT = 0;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
