@@ -55,8 +55,11 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_PICKUP_ARM_STORE = 4;
 	public static final int JOYSTICK_PICKUP_ARM_APPROACH = 3;
 	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 5;
+	public static final int JOYSTICK_WEDGE_DEPLOY = 11;
+	public static final int JOYSTICK_WEDGE_RETRACT = 10;
 	
-	DigitalInput ls = new DigitalInput(0);
+	private Wedge wedge;
+	public static final int TALON_WEDGE_ID = 8;
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -77,7 +80,9 @@ public class Robot extends IterativeRobot
     	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
     			LS_PICKUP_ARM_STORED_PORT, LS_PICKUP_ARM_APPROACH_PORT, LS_PICKUP_ARM_PICKUP_PORT);
     	
-    	stick = new Joystick(JOYSTICK_PORT);	
+    	stick = new Joystick(JOYSTICK_PORT);
+    	
+    	wedge = new Wedge(TALON_WEDGE_ID);
     }
     
 	/**
@@ -153,6 +158,20 @@ public class Robot extends IterativeRobot
     		pickup_arm_desiredRegion = PickupArm.REG_PICKUP;
     	}
     	arm.moveToRegion(pickup_arm_desiredRegion, PICKUP_ARM_MOTOR_SPEED);
+    	
+    	//Wedge
+    	if (stick.getRawButton(JOYSTICK_WEDGE_DEPLOY))
+    	{
+    		wedge.deploy();
+    	}
+    	else if (stick.getRawButton(JOYSTICK_WEDGE_RETRACT))
+    	{
+    		wedge.retract();
+    	}
+    	else
+    	{
+    		wedge.stop();
+    	}
     }
     
     /**
