@@ -34,6 +34,10 @@ public class Robot extends IterativeRobot
 	public static final int TALON_DRIVE_FR_ID = 1;
 	public static final int TALON_DRIVE_BR_ID = 2;
 	public static final int SOL_GEAR_SHIFTING_PORT = 0;
+	public static final int LEFT_ENCODER_PORT_A = 0;
+	public static final int LEFT_ENCODER_PORT_B = 1;
+	public static final int RIGHT_ENCODER_PORT_A = 2;
+	public static final int RIGHT_ENCODER_PORT_B = 3;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
@@ -74,7 +78,8 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("Auto choices", chooser);
         */
     	
-    	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, SOL_GEAR_SHIFTING_PORT);
+    	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
+    			SOL_GEAR_SHIFTING_PORT, LEFT_ENCODER_PORT_A, LEFT_ENCODER_PORT_B, RIGHT_ENCODER_PORT_A, LEFT_ENCODER_PORT_B);
     	
     	
     	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 

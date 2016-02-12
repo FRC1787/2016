@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 
@@ -22,6 +23,11 @@ public class DrivingDevices
 	/** The talon connected to the front-left motor */
 	private CANTalon talon_FL;
 	
+	/** The encoder on the left side of the robot */
+	private Encoder leftEncoder;
+	/** The encoder on the right side of the robot */
+	private Encoder rightEncoder;
+	
 	/** The RobotDrive object that controls the driving of the robot */
 	RobotDrive theRobot;
 	
@@ -36,12 +42,16 @@ public class DrivingDevices
 	 * @param motor_FL_ID The ID of the talon connected to the front-left motor
 	 * @param sol_shifter_port The port where the solenoid that controls gear-shifting is plugged in to on the PCM
 	 */
-	public DrivingDevices(int talon_BR_ID, int talon_BL_ID, int talon_FR_ID, int talon_FL_ID, int sol_shifter_port)
+	public DrivingDevices(int talon_BR_ID, int talon_BL_ID, int talon_FR_ID, int talon_FL_ID, int sol_shifter_port, 
+			int left_encoder_port_a, int left_encoder_port_b, int right_encoder_port_a, int right_encoder_port_b)
 	{
 		talon_BR = new CANTalon(talon_BR_ID);
 		talon_BL = new CANTalon(talon_BL_ID);
 		talon_FR = new CANTalon(talon_FR_ID);
 		talon_FL = new CANTalon(talon_FL_ID);
+		
+		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
+		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b);
 		
 		theRobot = new RobotDrive(talon_FL, talon_BL, talon_FR, talon_BR);
 		
