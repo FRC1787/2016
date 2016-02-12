@@ -82,4 +82,14 @@ public class DrivingDevices
 	{
 		shifter.setLowGear();
 	}
+	
+	public Encoder getLeftEncoder()
+	{
+		return leftEncoder;
+	}
+	
+	public Encoder getRightEncoder()
+	{
+		return rightEncoder;
+	}
 }

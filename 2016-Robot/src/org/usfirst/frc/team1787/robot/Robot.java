@@ -185,6 +185,7 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    	
+    	driveControl.driveWithJoystick(stick);
+    	System.out.println(driveControl.getRightEncoder().get());
     }   
 }
