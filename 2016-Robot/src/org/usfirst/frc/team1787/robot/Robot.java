@@ -62,6 +62,7 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_WEDGE_DEPLOY = 11;
 	public static final int JOYSTICK_WEDGE_RETRACT = 10;
 	
+	// Objects and variables used for the Wedge
 	private Wedge wedge;
 	public static final int TALON_WEDGE_ID = 8;
 	
