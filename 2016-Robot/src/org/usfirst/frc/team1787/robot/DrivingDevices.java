@@ -51,8 +51,11 @@ public class DrivingDevices
 		talon_FR = new CANTalon(talon_FR_ID);
 		talon_FL = new CANTalon(talon_FL_ID);
 		
-		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
+		// Initial testing indicates 35060 ticks per revolution. Therefore, if distance is in revolutions, then distancePerPulse = 1/35060
+		//leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
 		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b);
+		
+		rightEncoder.setDistancePerPulse(0.00002852253);
 		
 		theRobot = new RobotDrive(talon_FL, talon_BL, talon_FR, talon_BR);
 		

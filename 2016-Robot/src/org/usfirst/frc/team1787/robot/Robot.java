@@ -181,15 +181,18 @@ public class Robot extends IterativeRobot
     	}
     }
     
+    public void testInit()
+    {
+    	driveControl.getRightEncoder().reset();
+    }
+    
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic()
     {
-    	driveControl.driveWithJoystick(stick);
-    	double ticks = driveControl.getLeftEncoder().get();
-    	double distance = driveControl.getLeftEncoder().getDistance();
-    	System.out.println("ticks: "+ticks);
-    	System.out.println("distance: "+distance);
+    		//Code for initial encoder testing.
+    		double revolutions = driveControl.getRightEncoder().getDistance();
+    		System.out.println("revolutions: "+revolutions);
     }   
 }
