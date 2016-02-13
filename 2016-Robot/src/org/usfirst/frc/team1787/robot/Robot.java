@@ -38,8 +38,8 @@ public class Robot extends IterativeRobot
 	public static final int SOL_GEAR_SHIFTING_PCM_PORT = 0;
 	public static final int LEFT_ENCODER_DIO_PORT_A = 3;
 	public static final int LEFT_ENCODER_DIO_PORT_B = 4;
-	public static final int RIGHT_ENCODER_DIO_PORT_A = 2;
-	public static final int RIGHT_ENCODER_DIO_PORT_B = 1;
+	public static final int RIGHT_ENCODER_DIO_PORT_A = 1;
+	public static final int RIGHT_ENCODER_DIO_PORT_B = 2;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
@@ -187,8 +187,8 @@ public class Robot extends IterativeRobot
     public void testPeriodic()
     {
     	driveControl.driveWithJoystick(stick);
-    	double ticks = driveControl.getRightEncoder().get();
-    	double distance = driveControl.getRightEncoder().getDistance();
+    	double ticks = driveControl.getLeftEncoder().get();
+    	double distance = driveControl.getLeftEncoder().getDistance();
     	System.out.println("ticks: "+ticks);
     	System.out.println("distance: "+distance);
     }   

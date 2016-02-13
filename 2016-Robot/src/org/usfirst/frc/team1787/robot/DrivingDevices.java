@@ -51,7 +51,7 @@ public class DrivingDevices
 		talon_FR = new CANTalon(talon_FR_ID);
 		talon_FL = new CANTalon(talon_FL_ID);
 		
-		//leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
+		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
 		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b);
 		
 		theRobot = new RobotDrive(talon_FL, talon_BL, talon_FR, talon_BR);
