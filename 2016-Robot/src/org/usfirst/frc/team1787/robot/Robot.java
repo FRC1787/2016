@@ -36,8 +36,8 @@ public class Robot extends IterativeRobot
 	public static final int TALON_DRIVE_FR_ID = 1;
 	public static final int TALON_DRIVE_BR_ID = 2;
 	public static final int SOL_GEAR_SHIFTING_PCM_PORT = 0;
-	public static final int LEFT_ENCODER_DIO_PORT_A = 4;
-	public static final int LEFT_ENCODER_DIO_PORT_B = 3;
+	public static final int LEFT_ENCODER_DIO_PORT_A = 3;
+	public static final int LEFT_ENCODER_DIO_PORT_B = 4;
 	public static final int RIGHT_ENCODER_DIO_PORT_A = 2;
 	public static final int RIGHT_ENCODER_DIO_PORT_B = 1;
 	
