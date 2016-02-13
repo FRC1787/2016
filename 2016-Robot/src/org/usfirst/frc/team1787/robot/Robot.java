@@ -43,15 +43,15 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
-	public static final int TALON_PICKUP_ARM_RIGHT_ID = 5;
-	public static final int TALON_PICKUP_ARM_LEFT_ID = 6;
+	public static final int TALON_PICKUP_ARM_LEFT_ID = 5;
+	public static final int TALON_PICKUP_ARM_RIGHT_ID = 6;
 	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
 	public static final int LS_PICKUP_ARM_STORED_DIO_PORT =  5;
 	public static final int LS_PICKUP_ARM_APPROACH_DIO_PORT = 6;
 	public static final int LS_PICKUP_ARM_PICKUP_DIO_PORT = 7;
 	public static final double PICKUP_ARM_MOTOR_SPEED = 0.4;
 	//Set to 0 automatically, unless changed
-	private int pickup_arm_desiredRegion = 0;
+	private int pickupArmDesiredRegion = 0;
 	
 	// Objects and variables involving control of the robot
 	private Joystick stick;
@@ -84,7 +84,7 @@ public class Robot extends IterativeRobot
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
     			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B);
     		
-    	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
+    	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
     			LS_PICKUP_ARM_STORED_DIO_PORT, LS_PICKUP_ARM_APPROACH_DIO_PORT, LS_PICKUP_ARM_PICKUP_DIO_PORT);
     	
     	stick = new Joystick(JOYSTICK_USB_PORT);
@@ -154,17 +154,17 @@ public class Robot extends IterativeRobot
     	//Set Pickup Arm Position
     	if (stick.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
     	{
-    		pickup_arm_desiredRegion = PickupArm.REG_STORE;
+    		pickupArmDesiredRegion = PickupArm.REG_STORE;
     	}
     	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
     	{
-    		pickup_arm_desiredRegion = PickupArm.REG_APPROACH;
+    		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	}
     	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
     	{
-    		pickup_arm_desiredRegion = PickupArm.REG_PICKUP;
+    		pickupArmDesiredRegion = PickupArm.REG_PICKUP;
     	}
-    	arm.moveToRegion(pickup_arm_desiredRegion, PICKUP_ARM_MOTOR_SPEED);
+    	arm.moveToRegion(pickupArmDesiredRegion, PICKUP_ARM_MOTOR_SPEED);
     	
     	//Wedge
     	if (stick.getRawButton(JOYSTICK_WEDGE_DEPLOY))
@@ -183,7 +183,7 @@ public class Robot extends IterativeRobot
     
     public void testInit()
     {
-    	driveControl.getRightEncoder().reset();
+    	
     }
     
     /**
@@ -191,8 +191,6 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    		//Code for initial encoder testing.
-    		double revolutions = driveControl.getRightEncoder().getDistance();
-    		System.out.println("revolutions: "+revolutions);
+    	
     }   
 }

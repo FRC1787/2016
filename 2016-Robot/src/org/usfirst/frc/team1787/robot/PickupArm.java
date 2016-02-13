@@ -49,13 +49,13 @@ import edu.wpi.first.wpilibj.Joystick;
  * 
  */
 
-public class PickupArm {
-
-	/** Talon that controls the motor on the right side of the pickup arm */
-	private CANTalon rightTalon;
-	
+public class PickupArm
+{
 	/** Talon that controls the motor on the left side of the pickup arm */
 	private CANTalon leftTalon;
+	
+	/** Talon that controls the motor on the right side of the pickup arm */
+	private CANTalon rightTalon;
 	
 	/** Talon that controls the motor which spins the pickup-wheels */
 	private CANTalon pickupWheels;
@@ -111,11 +111,11 @@ public class PickupArm {
 	 * @param region2LSPort   The physical port that the limit switch at region 2 is plugged in to on the roboRio.
 	 * @param region4LSPort   The physical port that the limit switch at region 4 is plugged in to on the roboRio.
 	 */
-	public PickupArm(int rightTalonID, int leftTalonID, int pickupWheelsID, 
+	public PickupArm(int leftTalonID, int rightTalonID, int pickupWheelsID, 
 					 int region0LSPort, int region2LSPort, int region4LSPort)
 	{
-		rightTalon = new CANTalon(rightTalonID);
 		leftTalon = new CANTalon(leftTalonID);
+		rightTalon = new CANTalon(rightTalonID);
 		pickupWheels = new CANTalon(pickupWheelsID);
 		regStoreLS = new DigitalInput(region0LSPort);
 		regApproachLS = new DigitalInput(region2LSPort);
