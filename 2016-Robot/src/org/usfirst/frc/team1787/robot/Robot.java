@@ -27,33 +27,35 @@ public class Robot extends IterativeRobot
     SendableChooser chooser;
     */
 	
+	//NOTE: MAKE SURE PORT/ID NUMBERS DON'T REPEAT FOR LIKE OBJECTS, AND THAT PORT NUMBERS DON'T GO OUT OF BOUNDS
+	
 	// Objects and variables used for driving the robot.
 	private DrivingDevices driveControl;
 	public static final int TALON_DRIVE_FL_ID = 3;
 	public static final int TALON_DRIVE_BL_ID = 4;
 	public static final int TALON_DRIVE_FR_ID = 1;
 	public static final int TALON_DRIVE_BR_ID = 2;
-	public static final int SOL_GEAR_SHIFTING_PORT = 0;
-	public static final int LEFT_ENCODER_PORT_A = 4;
-	public static final int LEFT_ENCODER_PORT_B = 3;
-	public static final int RIGHT_ENCODER_PORT_A = 2;
-	public static final int RIGHT_ENCODER_PORT_B = 1;
+	public static final int SOL_GEAR_SHIFTING_PCM_PORT = 0;
+	public static final int LEFT_ENCODER_DIO_PORT_A = 4;
+	public static final int LEFT_ENCODER_DIO_PORT_B = 3;
+	public static final int RIGHT_ENCODER_DIO_PORT_A = 2;
+	public static final int RIGHT_ENCODER_DIO_PORT_B = 1;
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
 	public static final int TALON_PICKUP_ARM_RIGHT_ID = 5;
 	public static final int TALON_PICKUP_ARM_LEFT_ID = 6;
 	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
-	public static final int LS_PICKUP_ARM_STORED_PORT =  8;
-	public static final int LS_PICKUP_ARM_APPROACH_PORT = 9;
-	public static final int LS_PICKUP_ARM_PICKUP_PORT = 10;
+	public static final int LS_PICKUP_ARM_STORED_DIO_PORT =  5;
+	public static final int LS_PICKUP_ARM_APPROACH_DIO_PORT = 6;
+	public static final int LS_PICKUP_ARM_PICKUP_DIO_PORT = 7;
 	public static final double PICKUP_ARM_MOTOR_SPEED = 0.4;
 	//Set to 0 automatically, unless changed
 	private int pickup_arm_desiredRegion = 0;
 	
 	// Objects and variables involving control of the robot
 	private Joystick stick;
-	public static final int JOYSTICK_PORT = 0;
+	public static final int JOYSTICK_USB_PORT = 0;
 	public static final int JOYSTICK_HIGH_GEAR = 6;
 	public static final int JOYSTICK_LOW_GEAR = 7;
 	public static final int JOYSTICK_PICKUP_ARM_STORE = 4;
@@ -80,13 +82,12 @@ public class Robot extends IterativeRobot
         */
     	
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
-    			SOL_GEAR_SHIFTING_PORT, LEFT_ENCODER_PORT_A, LEFT_ENCODER_PORT_B, RIGHT_ENCODER_PORT_A, LEFT_ENCODER_PORT_B);
-    	
-    	
+    			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B);
+    		
     	arm = new PickupArm(TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
-    			LS_PICKUP_ARM_STORED_PORT, LS_PICKUP_ARM_APPROACH_PORT, LS_PICKUP_ARM_PICKUP_PORT);
+    			LS_PICKUP_ARM_STORED_DIO_PORT, LS_PICKUP_ARM_APPROACH_DIO_PORT, LS_PICKUP_ARM_PICKUP_DIO_PORT);
     	
-    	stick = new Joystick(JOYSTICK_PORT);
+    	stick = new Joystick(JOYSTICK_USB_PORT);
     	
     	wedge = new Wedge(TALON_WEDGE_ID);
     }
