@@ -33,8 +33,8 @@ public class Robot extends IterativeRobot
 	private DrivingDevices driveControl;
 	public static final int TALON_DRIVE_FL_ID = 3;
 	public static final int TALON_DRIVE_BL_ID = 4;
-	public static final int TALON_DRIVE_FR_ID = 1;
-	public static final int TALON_DRIVE_BR_ID = 2;
+	public static final int TALON_DRIVE_FR_ID = 5;  // This value was changed from 1 to 5 for testing the pickup arm.
+	public static final int TALON_DRIVE_BR_ID = 6;  // This value was changed from 2 to 6 for testing the pickup arm.
 	public static final int SOL_GEAR_SHIFTING_PCM_PORT = 0;
 	public static final int LEFT_ENCODER_DIO_PORT_A = 3;
 	public static final int LEFT_ENCODER_DIO_PORT_B = 4;
@@ -43,13 +43,13 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables used for the PickupArm.
 	private PickupArm arm;
-	public static final int TALON_PICKUP_ARM_LEFT_ID = 5;
-	public static final int TALON_PICKUP_ARM_RIGHT_ID = 6;
+	public static final int TALON_PICKUP_ARM_LEFT_ID = 1; // This value was changed from 5 to 1 for testing the pickup arm.
+	public static final int TALON_PICKUP_ARM_RIGHT_ID = 2; // This value was changed from 6 to 2 for testing the pickup arm.
 	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
 	public static final int LS_PICKUP_ARM_STORED_DIO_PORT =  5;
 	public static final int LS_PICKUP_ARM_APPROACH_DIO_PORT = 6;
 	public static final int LS_PICKUP_ARM_PICKUP_DIO_PORT = 7;
-	public static final double PICKUP_ARM_MOTOR_SPEED = 0.4;
+	public static final double PICKUP_ARM_MOTOR_SPEED = 0.2;
 	//Set to 0 automatically, unless changed
 	private int pickupArmDesiredRegion = 0;
 	
@@ -191,6 +191,6 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    	
+    	arm.manualControl(stick);
     }   
 }
