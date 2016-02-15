@@ -146,6 +146,8 @@ public class PickupArm
 	  */
 	private void moveArm(double motorSpeed)
 	{
+		motorSpeed = motorSpeed / 3;
+		
 		if((motorSpeed > 0 && !regPickupLS.get()) || (motorSpeed < 0 && !regStoreLS.get()))
 		{
 			stopArm();
@@ -153,7 +155,7 @@ public class PickupArm
 		else
 		{
 			rightTalon.set(motorSpeed);
-			leftTalon.set(-motorSpeed);
+			leftTalon.set(motorSpeed);
 			if (motorSpeed > 0)
 				armDirection = ARM_FORWARDS;
 			else if (motorSpeed < 0)
@@ -233,7 +235,10 @@ public class PickupArm
 	 */
 	public void manualControl(Joystick stick)
 	{
-		moveArm(stick.getY());
+		moveArm(-stick.getY());
 		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
+		System.out.println("Region 0: "+!regStoreLS.get());
+		System.out.println("Region 2: "+!regApproachLS.get());
+		System.out.println("Region 4: "+!regPickupLS.get());
 	}	 
 }
