@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 /**
  * This class controls which gear the robot is in. We created this class for better read-ability in the Robot class.
  * @author David Miron
- * @author Simon Weider
+ * @author Simon Wieder
  */
 public class Shifter
 {
@@ -14,7 +14,7 @@ public class Shifter
 	
 	/**
 	 * Constructor for the Shifter class
-	 * @param sol_shifter_port The port that the gear-shifting solenoid is plugged in to on the PCM
+	 * @param sol_shifter_port The port on the PCM that the gear-shifting solenoid is connected to.
 	 */
 	public Shifter(int sol_shifter_port)
 	{
@@ -25,7 +25,7 @@ public class Shifter
 	}
 	
 	/**
-	 * This method puts the robot in high gear
+	 * This method puts the robot in high gear.
 	 */
 	public void setHighGear()
 	{
@@ -33,7 +33,7 @@ public class Shifter
 	}
 	
 	/**
-	 * This method puts the robot in low gear
+	 * This method puts the robot in low gear.
 	 */
 	public void setLowGear()
 	{

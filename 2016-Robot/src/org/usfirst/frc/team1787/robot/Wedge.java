@@ -3,9 +3,9 @@ package org.usfirst.frc.team1787.robot;
 import edu.wpi.first.wpilibj.CANTalon;
 
 /**
- * Class for controlling wedge
+ * Class representing the wedge
  * @author David Miron
- * @author Simon Weeder
+ * @author Simon Wieder
  *
  */
 
@@ -18,8 +18,8 @@ public class Wedge {
 	public static final double MOTOR_SPEED = 0.6;
 	
 	/**
-	 * Construct the wedge
-	 * @param talonId ID of the talon controlling the motor
+	 * Constructor for the wedge
+	 * @param talonId ID of the talon controlling the wedge's motor
 	 */
 	public Wedge(int talonId)
 	{
@@ -27,7 +27,7 @@ public class Wedge {
 	}
 	
 	/**
-	 * Deploy the wedge
+	 * Deploys the wedge
 	 */
 	public void deploy()
 	{
@@ -35,7 +35,7 @@ public class Wedge {
 	}
 	
 	/**
-	 * Retract the wedge
+	 * Retracts the wedge
 	 */
 	public void retract()
 	{
@@ -43,7 +43,7 @@ public class Wedge {
 	}
 	
 	/**
-	 * Stop the wedge
+	 * Stops the wedge
 	 */
 	public void stop()
 	{

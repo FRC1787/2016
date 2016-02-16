@@ -3,6 +3,7 @@ package org.usfirst.frc.team1787.robot;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class represents the pickup arm on the robot.
@@ -44,63 +45,53 @@ import edu.wpi.first.wpilibj.Joystick;
  *   2) The arm is not currently in region 2, 0, or 4
  *   3) The motors are moving the arm forward.
  * 
- * Note: Limit switches read false when they are activated
- * Note: Limit switches are wired from ground to signal
+ * Code Note: The limit switches we are using are "Normally Open" meaning 
+ * they read true when open (not activated) and read false when closed (activated).
  * 
+ * Electrical Note: Limit switches are wired from ground to signal
  */
 
 public class PickupArm
 {
+	// Talons
 	/** Talon that controls the motor on the left side of the pickup arm */
 	private CANTalon leftTalon;
-	
 	/** Talon that controls the motor on the right side of the pickup arm */
 	private CANTalon rightTalon;
-	
 	/** Talon that controls the motor which spins the pickup-wheels */
 	private CANTalon pickupWheels;
 	
+	// Limit Switches
 	/** Limit Switch located at the arm's "default/stored" position (Region 0) */
 	private DigitalInput regStoreLS;
-	
 	/** Limit Switch located at the arm's "approach" position (Region 2) */
 	private DigitalInput regApproachLS;
-	
 	/** Limit Switch located at the arm's "pickup" position (Region 4) */
 	private DigitalInput regPickupLS;
 	
-	/** Current region of arm */
-	private int currentRegion;
-	
+	// Region Info
 	/** Region number of storage position */ 
 	public static final int REG_STORE = 0;
-	
 	/** Region number of area between Store and Approach */
 	public static final int REG_STOREAPPROACH = 1;
-	
 	/** Region number of approach position */
 	public static final int REG_APPROACH = 2;
-	
 	/** Region number of area between Approach and Pickup */
 	public static final int REG_APPROACHPICKUP = 3;
-	
 	/** Region number of pickup position */
 	public static final int REG_PICKUP = 4;
+	/** Current region the arm occupies */
+	private int currentRegion;
 	
-	/** Number designating the backwards motion of the arm */
+	// Motion Info
+	/** Number designating backwards motion of the arm */
 	public static final int ARM_BACKWARDS = -1;
-	
-	/** Number designating the lack of motion of the arm */
+	/** Number designating no motion of the arm */
 	public static final int ARM_STATIONARY = 0;
-	
-	/** Number designating the forwards motion of the arm */
+	/** Number designating forwards motion of the arm */
 	public static final int ARM_FORWARDS = 1;
-	
-	/** Number representing the current direction of the arm as defined by the constants above */
+	/** Number representing the current motion of the arm */
 	private int armDirection = 0;
-	
-	/** Don't ask. */
-	protected int farfar37;
 	
 	/**
 	 * Takes IDs and port numbers, not objects
@@ -166,7 +157,9 @@ public class PickupArm
 		
 	}
 	
-	/** Method for making the arm stationary */
+	/**
+	 * Method for making the arm stationary
+	 */
 	private void stopArm()
 	{
 		rightTalon.set(0);
@@ -174,7 +167,9 @@ public class PickupArm
 		armDirection = ARM_STATIONARY;
 	}
 	
-	/** Mehtod that updates the current region the arm occupies when called. */
+	/**
+	 * Method that updates the current region the arm occupies when called.
+	 */
 	private void determineCurrentRegion()
 	{
 		
@@ -237,8 +232,14 @@ public class PickupArm
 	{
 		moveArm(-stick.getY());
 		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
+		
 		System.out.println("Region 0: "+!regStoreLS.get()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 0:", !regStoreLS.get()); // This was added for testing the arm.
+		
 		System.out.println("Region 2: "+!regApproachLS.get()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 2:", !regApproachLS.get()); // This was added for testing the arm.
+		
 		System.out.println("Region 4: "+!regPickupLS.get()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 4:", !regPickupLS.get());
 	}	 
 }
