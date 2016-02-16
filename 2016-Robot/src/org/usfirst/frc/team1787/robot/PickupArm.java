@@ -146,7 +146,7 @@ public class PickupArm
 	  */
 	private void moveArm(double motorSpeed)
 	{
-		motorSpeed = motorSpeed / 3;
+		motorSpeed = motorSpeed / 3; // This was added for testing the arm.
 		
 		if((motorSpeed > 0 && !regPickupLS.get()) || (motorSpeed < 0 && !regStoreLS.get()))
 		{
@@ -237,8 +237,8 @@ public class PickupArm
 	{
 		moveArm(-stick.getY());
 		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
-		System.out.println("Region 0: "+!regStoreLS.get());
-		System.out.println("Region 2: "+!regApproachLS.get());
-		System.out.println("Region 4: "+!regPickupLS.get());
+		System.out.println("Region 0: "+!regStoreLS.get()); // This was added for testing the arm.
+		System.out.println("Region 2: "+!regApproachLS.get()); // This was added for testing the arm.
+		System.out.println("Region 4: "+!regPickupLS.get()); // This was added for testing the arm.
 	}	 
 }

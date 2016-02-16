@@ -20,12 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot
 {
-	/* SendableChooser stuff:
-    final String defaultAuto = "Default";
-    final String customAuto = "My Auto";
-    String autoSelected;
+	// The SendableChooser object that allows different autonomous modes to be selected from the dirver station.
     SendableChooser chooser;
-    */
+    // The number which represents the selected autonomous mode.
+    public int selectedAuto;
 	
 	//NOTE: MAKE SURE PORT/ID NUMBERS DON'T REPEAT FOR LIKE OBJECTS, AND THAT PORT NUMBERS DON'T GO OUT OF BOUNDS
 	
@@ -74,12 +72,10 @@ public class Robot extends IterativeRobot
      */
     public void robotInit()
     {
-    	/* More SendableChooser stuff:
         chooser = new SendableChooser();
-        chooser.addDefault("Default Auto", defaultAuto);
-        chooser.addObject("My Auto", customAuto);
-        SmartDashboard.putData("Auto choices", chooser);
-        */
+        chooser.addDefault("Autonomous Option 1", 1);
+        chooser.addObject("Autonomous Option 2", 2);
+        SmartDashboard.putData("Which autonomous option would you like to use?", chooser);
     	
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
     			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B);
@@ -103,11 +99,8 @@ public class Robot extends IterativeRobot
 	 */
     public void autonomousInit()
     {
-    	/* Even more SendableChooser stuff:
-    	autoSelected = (String) chooser.getSelected();
-    	autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
-		*/
+    	selectedAuto = (int) chooser.getSelected();
+		System.out.println("Preparing to run autonomous option #"+selectedAuto+".");
     }
 
     /**
@@ -115,18 +108,14 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	/* Still even more SendableChooser stuff:
-    	switch(autoSelected)
+    	if (selectedAuto == 1)
     	{
-    	case customAuto:
-        //Put custom auto code here   
-            break;
-    	case defaultAuto:
-    	default:
-    	//Put default auto code here
-            break;
+    		System.out.println("Running autonomous option #"+selectedAuto+".");
     	}
-    	*/
+    	else if (selectedAuto == 2)
+    	{
+    		System.out.println("Running autonomous option #"+selectedAuto+".");
+    	}
     }
     
     public void teleopInit()
