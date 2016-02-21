@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot
 	
 	// Arm Motion
 	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
-	public static final double PICKUP_ARM_MOTOR_SPEED = 0.2;
+	public static final double PICKUP_ARM_MOTOR_SPEED = (2/3);
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
 	private int pickupArmDesiredRegion = 0; // Set to 0 automatically, unless changed
 	
@@ -223,11 +223,11 @@ public class Robot extends IterativeRobot
     	arm.moveToRegion(pickupArmDesiredRegion, PICKUP_ARM_MOTOR_SPEED);
     	
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
-    		arm.spinPickupWheelsForwards(1);
+    		arm.spinPickupWheels(1);
     	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
-    		arm.spinPickupWheelsBackwards(1);
+    		arm.spinPickupWheels(-1);
     	else
-    		arm.spinPickupWheelsForwards(0);
+    		arm.stopPickupWheels();
     	
     	// Wedge
     	if (stick.getRawButton(JOYSTICK_WEDGE_DEPLOY))
@@ -254,10 +254,10 @@ public class Robot extends IterativeRobot
     	arm.manualControl(stick); // This is for testing the pickup arm
     	
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
-    		arm.spinPickupWheelsForwards(1);
+    		arm.spinPickupWheels(1);
     	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
-    		arm.spinPickupWheelsBackwards(1);
+    		arm.spinPickupWheels(-1);
     	else
-    		arm.spinPickupWheelsForwards(0);
+    		arm.stopPickupWheels();
     }   
 }

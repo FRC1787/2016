@@ -137,12 +137,7 @@ public class PickupArm
 	  */
 	private void moveArm(double motorSpeed)
 	{
-		motorSpeed = ((motorSpeed * 2) /3); // This was added for testing the arm.
-		//SmartDashboard.putBoolean("Region 0:", !regStoreLS.get()); // This was added for testing the arm.
-		//SmartDashboard.putBoolean("Region 2:", !regApproachLS.get()); // This was added for testing the arm.
-		//SmartDashboard.putBoolean("Region 4:", !regPickupLS.get()); // This was added for testing the arm.
-		
-		if((motorSpeed > 0 && !regPickupLS.get()) || (motorSpeed < 0 && !regStoreLS.get()))
+		if((motorSpeed > 0 && reg_Pickup_LS_Is_Activated()) || (motorSpeed < 0 && reg_Store_LS_Is_Activated()))
 		{
 			stopArm();
 		}
@@ -158,6 +153,9 @@ public class PickupArm
 				armDirection = ARM_STATIONARY;
 		}
 		
+		SmartDashboard.putBoolean("Region 0:", reg_Store_LS_Is_Activated()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 2:", reg_Approach_LS_Is_Activated()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 4:", reg_Pickup_LS_Is_Activated()); // This was added for testing the arm.	
 	}
 	
 	/**
@@ -171,60 +169,21 @@ public class PickupArm
 	}
 	
 	/**
-	 * Method that updates the current region the arm occupies when called.
-	 */
-	private void determineCurrentRegion()
-	{
-		
-		if (!regStoreLS.get()) // If the LS @ region 0 reads true, the arm is in region 0.
-		{
-			currentRegion = REG_STORE;
-		}
-		else if (!regApproachLS.get()) // If the LS @ region 2 reads true, the arm is in region 2
-		{
-			currentRegion = REG_APPROACH;
-		}
-		else if (!regPickupLS.get()) // If the LS @ region 4 reads true, the arm is in region 4.
-		{
-			currentRegion = REG_PICKUP;
-		}
-		else if (currentRegion == REG_STORE && regStoreLS.get()) // if the currentRegion is 0, but the LS in region 0 reads false, the arm is in region 1.
-		{
-			currentRegion = REG_STOREAPPROACH;
-		}
-		else if (currentRegion == REG_PICKUP && regPickupLS.get()) // if the currentRegion is 4, but the LS in region 4 reads false, the arm is in region 3.
-		{
-			currentRegion = REG_APPROACHPICKUP;
-		}
-		else if (currentRegion == REG_PICKUP && regApproachLS.get()) // if the currentRegion is 2, but the LS in region 2 reads false, and...
-		{
-			if (armDirection == ARM_FORWARDS) // the arm is moving forwards, then arm is in region 3
-			{
-				currentRegion = REG_APPROACHPICKUP;
-			}
-			else if (armDirection == ARM_BACKWARDS) // the arm is moving backwards, then the arm is in region 1
-			{
-				currentRegion = REG_STOREAPPROACH;
-			}
-		}
-	}
-	
-	/**
-	 * Method that spins the pickup-wheels forwards (to pick up the ball)
+	 * Method that spins the pickup-wheels. A positive value will spin them forwards (to pick up the ball), 
+	 * and a negative value will spin them backwards (to eject the ball).
 	 * @param motorSpeed How fast the wheels spin.
 	 */
-	public void spinPickupWheelsForwards(double motorSpeed)
+	public void spinPickupWheels(double motorSpeed)
 	{
 		pickupWheels.set(motorSpeed);
 	}
 	
 	/**
-	 * Method that spins the pickup-wheels backwards (to eject the ball)
-	 * @param motorSpeed How fast the wheels spin.
+	 * Method that stops the pickup wheels.
 	 */
-	public void spinPickupWheelsBackwards(double motorSpeed)
+	public void stopPickupWheels()
 	{
-		pickupWheels.set(-motorSpeed);
+		pickupWheels.set(0);
 	}
 	
 	/**
@@ -233,7 +192,47 @@ public class PickupArm
 	 */
 	public void manualControl(Joystick stick)
 	{
-		moveArm(-stick.getY());
+		moveArm(-stick.getY() * (2/3));
 		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
-	}	 
+	}
+	
+	/**
+	 * Method that updates the current region the arm occupies when called.
+	 */
+	private void determineCurrentRegion()
+	{
+		
+		if (reg_Store_LS_Is_Activated()) // If the LS @ region 0 is activated, the arm is in region 0.
+			currentRegion = REG_STORE;
+		else if (reg_Approach_LS_Is_Activated()) // If the LS @ region 2 is activated, the arm is in region 2
+			currentRegion = REG_APPROACH;
+		else if (reg_Pickup_LS_Is_Activated()) // If the LS @ region 4 is activated, the arm is in region 4.
+			currentRegion = REG_PICKUP;
+		else if (currentRegion == REG_STORE && !reg_Store_LS_Is_Activated()) // if the currentRegion is 0, but the LS in region 0 is not activated, the arm is in region 1.
+			currentRegion = REG_STOREAPPROACH;
+		else if (currentRegion == REG_PICKUP && !reg_Pickup_LS_Is_Activated()) // if the currentRegion is 4, but the LS in region 4 is not activated, the arm is in region 3.
+			currentRegion = REG_APPROACHPICKUP;
+		else if (currentRegion == REG_PICKUP && !reg_Approach_LS_Is_Activated()) // if the currentRegion is 2, but the LS in region 2 is not activated, and...
+		{
+			if (armDirection == ARM_FORWARDS) // the arm is moving forwards, then arm is in region 3
+				currentRegion = REG_APPROACHPICKUP;
+			else if (armDirection == ARM_BACKWARDS) // the arm is moving backwards, then the arm is in region 1
+				currentRegion = REG_STOREAPPROACH;
+		}
+	}
+	
+	public boolean reg_Store_LS_Is_Activated()
+	{
+		return regStoreLS.get(); // This switch is normally closed
+	}
+	
+	public boolean reg_Approach_LS_Is_Activated()
+	{
+		return regApproachLS.get(); // This switch is normally open
+	}
+	
+	public boolean reg_Pickup_LS_Is_Activated()
+	{
+		return regPickupLS.get(); // This switch is normally closed
+	}
 }
