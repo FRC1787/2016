@@ -33,9 +33,9 @@ public class Robot extends IterativeRobot
 	/** The ID of the Talon that controls the back-left driving motor */
 	public static final int TALON_DRIVE_BL_ID = 4;
 	/** The ID of the Talon that controls the front-right driving motor */
-	public static final int TALON_DRIVE_FR_ID = 5; // This value was changed from 1 to 5 for testing the pickup arm.
+	public static final int TALON_DRIVE_FR_ID = 1;
 	/** The ID of the Talon that controls the back-right driving motor */
-	public static final int TALON_DRIVE_BR_ID = 6;  // This value was changed from 2 to 6 for testing the pickup arm.
+	public static final int TALON_DRIVE_BR_ID = 2;
 	
 	// Solenoid
 	/** The port on the PCM where the solenoid that controls the shifter is connected */
@@ -43,13 +43,13 @@ public class Robot extends IterativeRobot
 	
 	// Encoders
 	/** The port on the DIO where the left encoder's A channel is connected */
-	public static final int LEFT_ENCODER_DIO_PORT_A = 7;
+	public static final int LEFT_ENCODER_DIO_PORT_A = 6;
 	/** The port on the DIO where the left encoder's B channel is connected */
-	public static final int LEFT_ENCODER_DIO_PORT_B = 8;
+	public static final int LEFT_ENCODER_DIO_PORT_B = 7;
 	/** The port on the DIO where the right encoder's A channel is connected */
-	public static final int RIGHT_ENCODER_DIO_PORT_A = 5;
+	public static final int RIGHT_ENCODER_DIO_PORT_A = 8;
 	/** The port on the DIO where the right encoder's B channel is connected */
-	public static final int RIGHT_ENCODER_DIO_PORT_B = 6;
+	public static final int RIGHT_ENCODER_DIO_PORT_B = 9;
 	
 	// Objects and variables used for the PickupArm.
 	
@@ -59,11 +59,11 @@ public class Robot extends IterativeRobot
 	
 	// Talons
 	/** The ID of the Talon that controls the pickup arm's left motor */
-	public static final int TALON_PICKUP_ARM_LEFT_ID = 1; // This value was changed from 5 to 1 for testing the pickup arm.
+	public static final int TALON_PICKUP_ARM_LEFT_ID = 8;
 	/** The ID of the Talon that controls the pickup arm's right motor */
-	public static final int TALON_PICKUP_ARM_RIGHT_ID = 2; // This value was changed from 6 to 2 for testing the pickup arm.
+	public static final int TALON_PICKUP_ARM_RIGHT_ID = 7;
 	/** The ID of the Talon that controls the wheels on the pickup arm. */
-	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 7;
+	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 6;
 	
 	// Limit Switches
 	/** The port on the DIO where the limit switch in the pickup arm's "Stored Region" is connected */
@@ -84,7 +84,7 @@ public class Robot extends IterativeRobot
 	/** The wedge on the robot */
 	private Wedge wedge;
 	/** The ID of the Talon that controls the wedge */
-	public static final int TALON_WEDGE_ID = 8;
+	public static final int TALON_WEDGE_ID = 5;
 	
 	// Objects and variables involving manual control of the robot
 	
