@@ -31,7 +31,7 @@ public class Wedge {
 	 */
 	public void deploy()
 	{
-		motor.set(MOTOR_SPEED);
+		motor.set(-MOTOR_SPEED);
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class Wedge {
 	 */
 	public void retract()
 	{
-		motor.set(-MOTOR_SPEED);
+		motor.set(MOTOR_SPEED);
 	}
 	
 	/**
