@@ -79,6 +79,11 @@ public class DrivingDevices
 		theRobot.arcadeDrive(stick);
 	}
 	
+	public void tankDriveUsingValues(double leftValue, double rightValue)
+	{
+		theRobot.tankDrive(leftValue, rightValue);
+	}
+	
 	/**
 	 * Method that shifts the robot into high gear
 	 */
