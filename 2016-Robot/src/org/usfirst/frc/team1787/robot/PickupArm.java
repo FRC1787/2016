@@ -192,7 +192,7 @@ public class PickupArm
 	 */
 	public void manualControl(Joystick stick)
 	{
-		moveArm(-stick.getY() * (2/3));
+		moveArm(-stick.getY() * 0.66);
 		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
 	}
 	
@@ -228,7 +228,7 @@ public class PickupArm
 	
 	public boolean reg_Approach_LS_Is_Activated()
 	{
-		return regApproachLS.get(); // This switch is normally open
+		return !regApproachLS.get(); // This switch is normally open
 	}
 	
 	public boolean reg_Pickup_LS_Is_Activated()

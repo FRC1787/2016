@@ -75,7 +75,7 @@ public class Robot extends IterativeRobot
 	
 	// Arm Motion
 	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
-	public static final double PICKUP_ARM_MOTOR_SPEED = (2/3);
+	public static final double PICKUP_ARM_MOTOR_SPEED = 0.66;
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
 	private int pickupArmDesiredRegion = 0; // Set to 0 automatically, unless changed
 	
