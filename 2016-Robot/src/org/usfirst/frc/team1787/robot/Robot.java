@@ -222,12 +222,12 @@ public class Robot extends IterativeRobot
     	
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup wheels
     	{
-    		System.out.println("Trying to spin wheels");
+    		// System.out.println("Trying to spin wheels");
     		arm.spinPickupWheels(-1);
     	}
     	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup wheels
     	{
-    		System.out.println("Trying to spin wheels");
+    		// System.out.println("Trying to spin wheels");
     		arm.spinPickupWheels(1);
     	}
     	else
