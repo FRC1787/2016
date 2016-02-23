@@ -146,11 +146,20 @@ public class PickupArm
 			rightTalon.set(motorSpeed);
 			leftTalon.set(motorSpeed);
 			if (motorSpeed > 0)
+			{
 				armDirection = ARM_FORWARDS;
+				spinPickupWheels(1);
+			}
 			else if (motorSpeed < 0)
+			{
 				armDirection = ARM_BACKWARDS;
+				spinPickupWheels(-1);
+			}
 			else if (motorSpeed == 0)
+			{
 				armDirection = ARM_STATIONARY;
+				stopPickupWheels();
+			}
 		}
 		
 		SmartDashboard.putBoolean("Region 0:", reg_Store_LS_Is_Activated()); // This was added for testing the arm.
