@@ -234,8 +234,7 @@ public class Robot extends IterativeRobot
     		wedge.deploy();
     	else if (stick.getRawButton(JOYSTICK_WEDGE_RETRACT))
     		wedge.retract();
-    	else
-    		wedge.stop();
+    	wedge.update();
     }
     
     /**
