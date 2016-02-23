@@ -3,6 +3,7 @@ package org.usfirst.frc.team1787.robot;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -93,6 +94,13 @@ public class PickupArm
 	/** Number representing the current motion of the arm */
 	private int armDirection = 0;
 	
+	// Timer
+	private Timer reg2Timer;
+	private static final double STORE_TO_APPROACH_TIME = 1;
+	private static final double PICKUP_TO_APPROACH_TIME = 1;
+	private boolean movingToApproachFromStore = false;
+	private boolean movingToApproachFromPickup = false;
+	
 	/**
 	 * Takes IDs and port numbers, not objects
 	 * @param rightTalonID    ID of the talon on the right of the arm.
@@ -111,6 +119,7 @@ public class PickupArm
 		regStoreLS = new DigitalInput(region0LSPort);
 		regApproachLS = new DigitalInput(region2LSPort);
 		regPickupLS = new DigitalInput(region4LSPort);
+		reg2Timer = new Timer();
 	}
 	
 	/**
@@ -121,10 +130,25 @@ public class PickupArm
 	 public void moveToRegion(int desiredRegion, double motorSpeed)
 	 {
   		determineCurrentRegion();
+  		
   		if (currentRegion < desiredRegion)
+  		{
   			moveArm(motorSpeed);
+  			if (currentRegion == REG_STORE && desiredRegion == REG_APPROACH)
+  			{
+  				reg2Timer.start();
+  				movingToApproachFromStore = true;
+  			}
+  		}
   		else if (currentRegion > desiredRegion)
+  		{
   			moveArm(-motorSpeed);
+  			if (currentRegion == REG_PICKUP && desiredRegion == REG_APPROACH)
+  			{
+  				reg2Timer.start();
+  				movingToApproachFromPickup = true;
+  			}
+  		}
   		else if (currentRegion == desiredRegion)
   			stopArm();
 	 }
@@ -146,22 +170,12 @@ public class PickupArm
 			rightTalon.set(motorSpeed);
 			leftTalon.set(motorSpeed);
 			if (motorSpeed > 0)
-			{
 				armDirection = ARM_FORWARDS;
-				spinPickupWheels(-1);
-			}
 			else if (motorSpeed < 0)
-			{
 				armDirection = ARM_BACKWARDS;
-				spinPickupWheels(1);
-			}
 			else if (motorSpeed == 0)
 				armDirection = ARM_STATIONARY;
-		}
-		
-		SmartDashboard.putBoolean("Region 0:", reg_Store_LS_Is_Activated()); // This was added for testing the arm.
-		SmartDashboard.putBoolean("Region 2:", reg_Approach_LS_Is_Activated()); // This was added for testing the arm.
-		SmartDashboard.putBoolean("Region 4:", reg_Pickup_LS_Is_Activated()); // This was added for testing the arm.	
+		}	
 	}
 	
 	/**
@@ -169,15 +183,12 @@ public class PickupArm
 	 */
 	private void stopArm()
 	{
-		System.out.println("Trying to stop arm");
 		rightTalon.set(0);
 		leftTalon.set(0);
-		stopPickupWheels();
 		armDirection = ARM_STATIONARY;
-		
-		SmartDashboard.putBoolean("Region 0:", reg_Store_LS_Is_Activated()); // This was added for testing the arm.
-		SmartDashboard.putBoolean("Region 2:", reg_Approach_LS_Is_Activated()); // This was added for testing the arm.
-		SmartDashboard.putBoolean("Region 4:", reg_Pickup_LS_Is_Activated()); // This was added for testing the arm.
+		movingToApproachFromStore = false;
+		movingToApproachFromPickup = false;
+		reg2Timer.reset();
 	}
 	
 	/**
@@ -216,21 +227,28 @@ public class PickupArm
 		
 		if (reg_Store_LS_Is_Activated()) // If the LS @ region 0 is activated, the arm is in region 0.
 			currentRegion = REG_STORE;
-		else if (reg_Approach_LS_Is_Activated()) // If the LS @ region 2 is activated, the arm is in region 2
-			currentRegion = REG_APPROACH;
 		else if (reg_Pickup_LS_Is_Activated()) // If the LS @ region 4 is activated, the arm is in region 4.
-			currentRegion = REG_PICKUP;
-		else if (currentRegion == REG_STORE && !reg_Store_LS_Is_Activated()) // if the currentRegion is 0, but the LS in region 0 is not activated, the arm is in region 1.
+			currentRegion = REG_PICKUP;		
+		else if ( (movingToApproachFromStore && reg2Timer.get() >= STORE_TO_APPROACH_TIME) || (movingToApproachFromPickup && reg2Timer.get() >= PICKUP_TO_APPROACH_TIME))
+			currentRegion = REG_APPROACH;
+		
+		else if (movingToApproachFromStore && reg2Timer.get() < STORE_TO_APPROACH_TIME) // if movingToApproachFromStore, but the time it takes to move from region 0 to region 2 hasn't passed, the arm is in region 1.
 			currentRegion = REG_STOREAPPROACH;
-		else if (currentRegion == REG_PICKUP && !reg_Pickup_LS_Is_Activated()) // if the currentRegion is 4, but the LS in region 4 is not activated, the arm is in region 3.
+		else if (movingToApproachFromPickup && reg2Timer.get() < PICKUP_TO_APPROACH_TIME) // if movingToApproachFromPickup, but the time it takes to move from region 4 to region 2 hasn't passed, the arm is in region 3.
 			currentRegion = REG_APPROACHPICKUP;
-		else if (currentRegion == REG_PICKUP && !reg_Approach_LS_Is_Activated()) // if the currentRegion is 2, but the LS in region 2 is not activated, and...
+
+		
+		else if (currentRegion == REG_PICKUP) // if the currentRegion is 2 and...
 		{
 			if (armDirection == ARM_FORWARDS) // the arm is moving forwards, then arm is in region 3
 				currentRegion = REG_APPROACHPICKUP;
 			else if (armDirection == ARM_BACKWARDS) // the arm is moving backwards, then the arm is in region 1
 				currentRegion = REG_STOREAPPROACH;
 		}
+		SmartDashboard.putNumber("Current Region", currentRegion);
+		SmartDashboard.putBoolean("Region 0", reg_Store_LS_Is_Activated());
+		SmartDashboard.putBoolean("Region 2", reg_Approach_LS_Is_Activated());
+		SmartDashboard.putBoolean("Region 4", reg_Pickup_LS_Is_Activated());
 	}
 	
 	public boolean reg_Store_LS_Is_Activated()
