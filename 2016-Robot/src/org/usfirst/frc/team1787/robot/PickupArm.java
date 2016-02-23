@@ -94,10 +94,13 @@ public class PickupArm
 	/** Number representing the current motion of the arm */
 	private int armDirection = 0;
 	
+	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
+	public static final double MOTOR_SPEED = 0.66;
+	
 	// Timer
 	private Timer reg2Timer;
-	private static final double STORE_TO_APPROACH_TIME = 0.5;
-	private static final double PICKUP_TO_APPROACH_TIME = 0.5;
+	private static final double STORE_TO_APPROACH_TIME = 1.1;
+	private static final double PICKUP_TO_APPROACH_TIME = 0.07;
 	private boolean movingToApproachFromStore = false;
 	private boolean movingToApproachFromPickup = false;
 	
@@ -127,13 +130,13 @@ public class PickupArm
 	 * @param desiredRegion The region to move to.
 	 * @param motorSpeed Desired arm speed.
 	 */
-	 public void moveToRegion(int desiredRegion, double motorSpeed)
+	 public void moveToRegion(int desiredRegion)
 	 {
   		determineCurrentRegion();
   		
   		if (currentRegion < desiredRegion)
   		{
-  			moveArm(motorSpeed);
+  			moveArm(MOTOR_SPEED);
   			if (currentRegion == REG_STORE && desiredRegion == REG_APPROACH)
   			{
   				reg2Timer.start();
@@ -142,7 +145,7 @@ public class PickupArm
   		}
   		else if (currentRegion > desiredRegion)
   		{
-  			moveArm(-motorSpeed);
+  			moveArm(-MOTOR_SPEED);
   			if (currentRegion == REG_PICKUP && desiredRegion == REG_APPROACH)
   			{
   				reg2Timer.start();

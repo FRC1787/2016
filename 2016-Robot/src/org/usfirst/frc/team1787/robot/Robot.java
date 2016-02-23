@@ -74,8 +74,6 @@ public class Robot extends IterativeRobot
 	public static final int LS_PICKUP_ARM_PICKUP_DIO_PORT = 4;
 	
 	// Arm Motion
-	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
-	public static final double PICKUP_ARM_MOTOR_SPEED = 0.66;
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
 	private int pickupArmDesiredRegion = 0; // Set to 0 automatically, unless changed
 	
@@ -220,7 +218,7 @@ public class Robot extends IterativeRobot
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
     		pickupArmDesiredRegion = PickupArm.REG_PICKUP;
-    	arm.moveToRegion(pickupArmDesiredRegion, PICKUP_ARM_MOTOR_SPEED);
+    	arm.moveToRegion(pickupArmDesiredRegion);
     	
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup wheels
     	{
@@ -231,6 +229,10 @@ public class Robot extends IterativeRobot
     	{
     		System.out.println("Trying to spin wheels");
     		arm.spinPickupWheels(1);
+    	}
+    	else
+    	{
+    		arm.stopPickupWheels();
     	}
     	
     	// Wedge
