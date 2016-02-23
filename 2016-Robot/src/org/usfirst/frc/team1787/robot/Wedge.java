@@ -35,10 +35,10 @@ public class Wedge {
 	public static final double MOTOR_SPEED = 0.6;
 	
 	/** Time to run motor for retraction (seconds) */
-	public static final double RETRACT_TIME = 0.4;
+	public static final double RETRACT_TIME = 0.75;
 	
 	/** Time to run motor for deployment (seconds) */
-	public static final double DEPLOY_TIME = 0.4;
+	public static final double DEPLOY_TIME = 0.5;
 	
 	/**
 	 * Constructor for the wedge
@@ -72,12 +72,12 @@ public class Wedge {
 	
 	public void update()
 	{
-		if (wedgeDirection == WEDGE_DEPLOY && timer.get() == DEPLOY_TIME)
+		if (wedgeDirection == WEDGE_DEPLOY && timer.get() >= DEPLOY_TIME)
 		{
 			stop();
 			timer.reset();
 		}
-		else if (wedgeDirection == WEDGE_RETRACT && timer.get() == RETRACT_TIME)
+		else if (wedgeDirection == WEDGE_RETRACT && timer.get() >= RETRACT_TIME)
 		{
 			stop();
 			timer.reset();
