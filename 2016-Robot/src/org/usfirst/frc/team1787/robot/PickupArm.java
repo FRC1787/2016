@@ -125,7 +125,7 @@ public class PickupArm
   			moveArm(motorSpeed);
   		else if (currentRegion > desiredRegion)
   			moveArm(-motorSpeed);
-  		else
+  		else if (currentRegion == desiredRegion)
   			stopArm();
 	 }
 	
