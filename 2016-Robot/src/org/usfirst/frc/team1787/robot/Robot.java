@@ -222,12 +222,16 @@ public class Robot extends IterativeRobot
     		pickupArmDesiredRegion = PickupArm.REG_PICKUP;
     	arm.moveToRegion(pickupArmDesiredRegion, PICKUP_ARM_MOTOR_SPEED);
     	
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
-    		arm.spinPickupWheels(1);
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
+    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup wheels
+    	{
+    		System.out.println("Trying to spin wheels");
     		arm.spinPickupWheels(-1);
-    	else
-    		arm.stopPickupWheels();
+    	}
+    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup wheels
+    	{
+    		System.out.println("Trying to spin wheels");
+    		arm.spinPickupWheels(1);
+    	}
     	
     	// Wedge
     	if (stick.getRawButton(JOYSTICK_WEDGE_DEPLOY))

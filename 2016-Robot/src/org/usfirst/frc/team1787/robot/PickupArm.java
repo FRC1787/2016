@@ -146,9 +146,15 @@ public class PickupArm
 			rightTalon.set(motorSpeed);
 			leftTalon.set(motorSpeed);
 			if (motorSpeed > 0)
+			{
 				armDirection = ARM_FORWARDS;
+				spinPickupWheels(-1);
+			}
 			else if (motorSpeed < 0)
+			{
 				armDirection = ARM_BACKWARDS;
+				spinPickupWheels(1);
+			}
 			else if (motorSpeed == 0)
 				armDirection = ARM_STATIONARY;
 		}
@@ -163,14 +169,20 @@ public class PickupArm
 	 */
 	private void stopArm()
 	{
+		System.out.println("Trying to stop arm");
 		rightTalon.set(0);
 		leftTalon.set(0);
+		stopPickupWheels();
 		armDirection = ARM_STATIONARY;
+		
+		SmartDashboard.putBoolean("Region 0:", reg_Store_LS_Is_Activated()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 2:", reg_Approach_LS_Is_Activated()); // This was added for testing the arm.
+		SmartDashboard.putBoolean("Region 4:", reg_Pickup_LS_Is_Activated()); // This was added for testing the arm.
 	}
 	
 	/**
-	 * Method that spins the pickup-wheels. A positive value will spin them forwards (to pick up the ball), 
-	 * and a negative value will spin them backwards (to eject the ball).
+	 * Method that spins the pickup-wheels. A negative value will spin them forwards (to pick up the ball), 
+	 * and a positive value will spin them backwards (to eject the ball).
 	 * @param motorSpeed How fast the wheels spin.
 	 */
 	public void spinPickupWheels(double motorSpeed)
