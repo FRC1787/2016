@@ -96,8 +96,8 @@ public class PickupArm
 	
 	// Timer
 	private Timer reg2Timer;
-	private static final double STORE_TO_APPROACH_TIME = 1;
-	private static final double PICKUP_TO_APPROACH_TIME = 1;
+	private static final double STORE_TO_APPROACH_TIME = 0.5;
+	private static final double PICKUP_TO_APPROACH_TIME = 0.5;
 	private boolean movingToApproachFromStore = false;
 	private boolean movingToApproachFromPickup = false;
 	
