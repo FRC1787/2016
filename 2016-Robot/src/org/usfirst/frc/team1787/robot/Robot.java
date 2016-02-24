@@ -94,23 +94,26 @@ public class Robot extends IterativeRobot
 	/** The USB port on the computer that the joystick is connected to. USB port #'s are configured from the driver station */
 	public static final int JOYSTICK_USB_PORT = 0;
 	/** The button on the joystick that will put the robot in high gear */
-	public static final int JOYSTICK_HIGH_GEAR = 6;
+	public static final int JOYSTICK_HIGH_GEAR = 11;
 	/** The button on the joystick that will put the robot in low gear */
-	public static final int JOYSTICK_LOW_GEAR = 7;
+	public static final int JOYSTICK_LOW_GEAR = 10;
 	/** The button on the joystick that will set pickupArmDesiredRegion to 0 */
-	public static final int JOYSTICK_PICKUP_ARM_STORE = 4;
+	public static final int JOYSTICK_PICKUP_ARM_STORE = 2;
 	/** The button on the joystick that will set pickupArmDesiredRegion to 2 */
 	public static final int JOYSTICK_PICKUP_ARM_APPROACH = 3;
 	/** The button on the joystick that will set pickupArmDesiredRegion to 4 */
-	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 5;
+	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 1;
 	/** The button on the joystick that will spin the pickup wheels forward */
-	public static final int JOYSTICK_PICKUP_WHEELS_FORWARD = 8;
+	public static final int JOYSTICK_PICKUP_WHEELS_FORWARD = 6;
 	/** The button on the joystick that will spin the pickup wheels backward */
-	public static final int JOYSTICK_PICKUP_WHEELS_BACKWARD = 9;
+	public static final int JOYSTICK_PICKUP_WHEELS_BACKWARD = 7;
 	/** The button on the joystick that will deploy the wedge */
-	public static final int JOYSTICK_WEDGE_DEPLOY = 11;
+	public static final int JOYSTICK_WEDGE_DEPLOY = 4;
 	/** The button on the joystick that will retract the wedge */
-	public static final int JOYSTICK_WEDGE_RETRACT = 10;
+	public static final int JOYSTICK_WEDGE_RETRACT = 5;
+	/** The button on the joystick that will stop the pickup wheels when pressed */
+	public static final int JOYSTICK_PICKUP_WHEELS_STOP = 8;
+	public boolean eStopPickupWheels = false;
 	
 	// Objects and variables involving the robot's autonomous functions.
 	
@@ -223,11 +226,18 @@ public class Robot extends IterativeRobot
     		pickupArmDesiredRegion = PickupArm.REG_PICKUP;
     	arm.moveToRegion(pickupArmDesiredRegion);
     	
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup wheels
-    		arm.spinPickupWheels(-1);
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup wheels
-    		arm.spinPickupWheels(1);
-    	else
+    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_STOP))
+    		eStopPickupWheels = !eStopPickupWheels;
+    	if (eStopPickupWheels == false)
+    	{
+    		if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
+    			arm.spinPickupWheels(-1);
+    		else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD))
+    			arm.spinPickupWheels(1);
+    		else
+    			arm.stopPickupWheels();
+    	}
+    	else if (eStopPickupWheels == true)
     		arm.stopPickupWheels();
     	
     	// Arm Data

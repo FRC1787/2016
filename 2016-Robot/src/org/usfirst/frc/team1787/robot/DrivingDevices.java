@@ -122,7 +122,7 @@ public class DrivingDevices
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
-		SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
-		SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
+		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
+		//SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
 	}
 }

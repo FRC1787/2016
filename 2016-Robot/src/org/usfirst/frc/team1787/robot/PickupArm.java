@@ -98,7 +98,7 @@ public class PickupArm
 	
 	// Timer
 	private Timer reg2Timer;
-	private static final double STORE_TO_APPROACH_TIME = 1.235;
+	private static final double STORE_TO_APPROACH_TIME = 1.17;
 	private static final double PICKUP_TO_APPROACH_TIME = 0.007;
 	private boolean movingTowardsApproachFromStore = false;
 	private boolean movingTowardsApproachFromPickup = false;
@@ -273,11 +273,18 @@ public class PickupArm
 		return regPickupLS.get(); // This switch is normally closed
 	}
 	
+	public int getCurrentRegion()
+	{
+		return currentRegion;
+	}
+	
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putNumber("Current Region", currentRegion);
 		SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
 		SmartDashboard.putBoolean("Region 2 LS Reading", reg_Approach_LS_Is_Activated());
 		SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
+		// SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);
+		// SmartDashboard.putBoolean("movingTowardsApproachFromPickup", movingTowardsApproachFromPickup);
 	}
 }
