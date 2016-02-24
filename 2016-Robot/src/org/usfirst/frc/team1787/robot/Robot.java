@@ -68,8 +68,6 @@ public class Robot extends IterativeRobot
 	// Limit Switches
 	/** The port on the DIO where the limit switch in the pickup arm's "Stored Region" is connected */
 	public static final int LS_PICKUP_ARM_STORED_DIO_PORT =  0;
-	/** The port on the DIO where the limit switch in the pickup arm's "Approach Region" is connected */
-	public static final int LS_PICKUP_ARM_APPROACH_DIO_PORT = 2;
 	/** The port on the DIO where the limit switch in the pickup arm's "Pickup Region" is connected */
 	public static final int LS_PICKUP_ARM_PICKUP_DIO_PORT = 4;
 	
@@ -148,7 +146,7 @@ public class Robot extends IterativeRobot
     	
     	// Construct the PickupArm
     	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
-    			LS_PICKUP_ARM_STORED_DIO_PORT, LS_PICKUP_ARM_APPROACH_DIO_PORT, LS_PICKUP_ARM_PICKUP_DIO_PORT);
+    			LS_PICKUP_ARM_STORED_DIO_PORT, LS_PICKUP_ARM_PICKUP_DIO_PORT);
     	
     	// Construct the Wedge
     	wedge = new Wedge(TALON_WEDGE_ID);

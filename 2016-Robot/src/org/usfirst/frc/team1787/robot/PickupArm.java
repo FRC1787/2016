@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author Simon Wieder
  */
 
-/*
+/* NOTE: THIS LOGIC IS OUTDATED. WE NO LONGER USE A LIMIT SWITCH FOR THE APPROACH POSITION.
+ * REFER TO THE NEXT COMMENT FOR AN EXPLANATION OF THE NEW LOGIC.
+ * 
  * Notes regarding the "region" the arm occupies and logic for determining that region.
  * 
  * Region 0 = The default position of the arm / Where the arm is stored when not in use.
@@ -65,8 +67,6 @@ public class PickupArm
 	// Limit Switches
 	/** Limit Switch located at the arm's "default/stored" position (Region 0) */
 	private DigitalInput regStoreLS;
-	/** Limit Switch located at the arm's "approach" position (Region 2) */
-	private DigitalInput regApproachLS;
 	/** Limit Switch located at the arm's "pickup" position (Region 4) */
 	private DigitalInput regPickupLS;
 	
@@ -113,13 +113,12 @@ public class PickupArm
 	 * @param region4LSPort   The physical port that the limit switch at region 4 is plugged in to on the roboRio.
 	 */
 	public PickupArm(int leftTalonID, int rightTalonID, int pickupWheelsID, 
-					 int region0LSPort, int region2LSPort, int region4LSPort)
+					 int region0LSPort, int region4LSPort)
 	{
 		leftTalon = new CANTalon(leftTalonID);
 		rightTalon = new CANTalon(rightTalonID);
 		pickupWheels = new CANTalon(pickupWheelsID);
 		regStoreLS = new DigitalInput(region0LSPort);
-		regApproachLS = new DigitalInput(region2LSPort);
 		regPickupLS = new DigitalInput(region4LSPort);
 		reg2Timer = new Timer();
 	}
@@ -263,11 +262,6 @@ public class PickupArm
 		return regStoreLS.get(); // This switch is normally closed
 	}
 	
-	public boolean reg_Approach_LS_Is_Activated()
-	{
-		return !regApproachLS.get(); // This switch is normally open
-	}
-	
 	public boolean reg_Pickup_LS_Is_Activated()
 	{
 		return regPickupLS.get(); // This switch is normally closed
@@ -282,7 +276,6 @@ public class PickupArm
 	{
 		SmartDashboard.putNumber("Current Region", currentRegion);
 		SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
-		SmartDashboard.putBoolean("Region 2 LS Reading", reg_Approach_LS_Is_Activated());
 		SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
 		// SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);
 		// SmartDashboard.putBoolean("movingTowardsApproachFromPickup", movingTowardsApproachFromPickup);
