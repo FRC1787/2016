@@ -96,12 +96,15 @@ public class PickupArm
 	/** Number representing the current motion of the arm */
 	private int armDirection = 0;
 	
-	// Timer
+	// Region 2 Timing
 	private Timer reg2Timer;
 	private static final double STORE_TO_APPROACH_TIME = 1.17;
 	private static final double PICKUP_TO_APPROACH_TIME = 0.007;
 	private boolean movingTowardsApproachFromStore = false;
 	private boolean movingTowardsApproachFromPickup = false;
+	
+	// Pickup Wheels
+	private boolean pickupWheelsAreEnabled = true;
 	
 	/**
 	 * Takes IDs and port numbers, not objects
@@ -203,7 +206,20 @@ public class PickupArm
 	 */
 	public void spinPickupWheels(double motorSpeed)
 	{
-		pickupWheels.set(motorSpeed);
+		if (pickupWheelsAreEnabled)
+			pickupWheels.set(motorSpeed);
+		else
+			stopPickupWheels();
+	}
+	
+	public void disablePickupWheels()
+	{
+		pickupWheelsAreEnabled = false;
+	}
+	
+	public void enablePickupWheels()
+	{
+		pickupWheelsAreEnabled = true;
 	}
 	
 	/**
@@ -272,9 +288,15 @@ public class PickupArm
 		return currentRegion;
 	}
 	
+	public void executePickupSequence()
+	{
+		
+	}
+	
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putNumber("Current Region", currentRegion);
+		SmartDashboard.putBoolean("pickupWheelsAreEnabled", pickupWheelsAreEnabled);
 		SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
 		SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
 		// SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);

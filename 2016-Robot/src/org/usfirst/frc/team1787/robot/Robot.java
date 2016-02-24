@@ -75,10 +75,6 @@ public class Robot extends IterativeRobot
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
 	private int pickupArmDesiredRegion = 0; // Set to 0 automatically, unless changed
 	
-	// Pickup Wheels
-	/** The boolean object that determines if the pickup wheels are enabled. This value can be toggled using a button on the joystick */
-	private boolean pickupWheelsAreEnabled = true;
-	
 	// Objects and variables used for the Wedge:
 	
 	/** The wedge on the robot */
@@ -206,6 +202,9 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
+    	// Let's try to keep this to simply method calls triggered by buttons.
+    	//Remember to have any mildly complicated operation occur in the class the operation is associated with.
+    	
     	// Driving
     	driveControl.driveWithJoystick(stick);
     	
@@ -228,19 +227,11 @@ public class Robot extends IterativeRobot
     	arm.moveToRegion(pickupArmDesiredRegion);
     	
     	// Pickup Wheels
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_ENABLE_DISABLE_TOGGLE))
-    		pickupWheelsAreEnabled = !pickupWheelsAreEnabled;
-    	
-    	if (pickupWheelsAreEnabled)
-    	{
-    		if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
-    			arm.spinPickupWheels(-1);
-    		else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD))
-    			arm.spinPickupWheels(1);
-    		else
-    			arm.stopPickupWheels();
-    	}
-    	else if (!pickupWheelsAreEnabled)
+    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD))
+    		arm.spinPickupWheels(1);
+    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
+			arm.spinPickupWheels(-1);
+		else
     		arm.stopPickupWheels();
     	
     	// Arm Data
