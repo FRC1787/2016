@@ -113,7 +113,8 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_WEDGE_RETRACT = 5;
 	/** The button on the joystick that will stop the pickup wheels when pressed */
 	public static final int JOYSTICK_PICKUP_WHEELS_STOP = 8;
-	public boolean eStopPickupWheels = false;
+	
+	private boolean eStopPickupWheels = false;
 	
 	// Objects and variables involving the robot's autonomous functions.
 	
