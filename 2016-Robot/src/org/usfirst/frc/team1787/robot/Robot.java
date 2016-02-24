@@ -51,7 +51,7 @@ public class Robot extends IterativeRobot
 	/** The port on the DIO where the right encoder's B channel is connected */
 	public static final int RIGHT_ENCODER_DIO_PORT_B = 9;
 	
-	// Objects and variables used for the PickupArm.
+	// Objects and variables used for the PickupArm:
 	
 	// PickupArm
 	/** The pickup arm on the robot */
@@ -75,22 +75,26 @@ public class Robot extends IterativeRobot
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
 	private int pickupArmDesiredRegion = 0; // Set to 0 automatically, unless changed
 	
-	// Objects and variables used for the Wedge
+	// Pickup Wheels
+	/** The boolean object that determines if the pickup wheels are enabled. This value can be toggled using a button on the joystick */
+	private boolean pickupWheelsAreEnabled = true;
+	
+	// Objects and variables used for the Wedge:
 	
 	/** The wedge on the robot */
 	private Wedge wedge;
 	/** The ID of the Talon that controls the wedge */
 	public static final int TALON_WEDGE_ID = 5;
 	
-	// Objects and variables involving manual control of the robot
+	// Objects and variables involving manual control of the robot:
 	
 	// Joystick
 	/** The joystick used to control the robot */
 	private Joystick stick;
-	
-	// Button Mapping
 	/** The USB port on the computer that the joystick is connected to. USB port #'s are configured from the driver station */
 	public static final int JOYSTICK_USB_PORT = 0;
+	
+	// Button Mapping
 	/** The button on the joystick that will put the robot in high gear */
 	public static final int JOYSTICK_HIGH_GEAR = 11;
 	/** The button on the joystick that will put the robot in low gear */
@@ -109,12 +113,10 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_WEDGE_DEPLOY = 4;
 	/** The button on the joystick that will retract the wedge */
 	public static final int JOYSTICK_WEDGE_RETRACT = 5;
-	/** The button on the joystick that will stop the pickup wheels when pressed */
-	public static final int JOYSTICK_PICKUP_WHEELS_STOP = 8;
+	/** The button on the joystick that will enable or disable the pickup wheels */
+	public static final int JOYSTICK_PICKUP_WHEELS_ENABLE_DISABLE_TOGGLE = 8;
 	
-	private boolean eStopPickupWheels = false;
-	
-	// Objects and variables involving the robot's autonomous functions.
+	// Objects and variables involving the robot's autonomous functions:
 	
 	// AutoMethods
 	/** A collection of the various autonomous routines */
@@ -123,16 +125,16 @@ public class Robot extends IterativeRobot
 	// Choosing an autonomous routine
 	/** The SendableChooser object that allows different autonomous modes to be selected from the driver station. */
     SendableChooser autonomousChooser;
-    /** The number that represents which autonomous was selected from the driver station */
+    /** The number that represents which autonomous routine is selected on the driver station */
     public int selectedAuto;
     
-    // Miscellaneous objects and variables.
+    // Miscellaneous objects and variables:
     
 	/** Don't ask. */
 	protected int farfar37;
 
 	
-	// Methods
+	// Methods:
 	
 	
     /** 
@@ -225,9 +227,11 @@ public class Robot extends IterativeRobot
     		pickupArmDesiredRegion = PickupArm.REG_PICKUP;
     	arm.moveToRegion(pickupArmDesiredRegion);
     	
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_STOP))
-    		eStopPickupWheels = !eStopPickupWheels;
-    	if (eStopPickupWheels == false)
+    	// Pickup Wheels
+    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_ENABLE_DISABLE_TOGGLE))
+    		pickupWheelsAreEnabled = !pickupWheelsAreEnabled;
+    	
+    	if (pickupWheelsAreEnabled)
     	{
     		if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
     			arm.spinPickupWheels(-1);
@@ -236,7 +240,7 @@ public class Robot extends IterativeRobot
     		else
     			arm.stopPickupWheels();
     	}
-    	else if (eStopPickupWheels == true)
+    	else if (!pickupWheelsAreEnabled)
     		arm.stopPickupWheels();
     	
     	// Arm Data
@@ -247,7 +251,7 @@ public class Robot extends IterativeRobot
     		wedge.deploy();
     	else if (stick.getRawButton(JOYSTICK_WEDGE_RETRACT))
     		wedge.retract();
-    	wedge.update();
+    	wedge.checkIfWedgeMotorShouldStop();
     }
     
     /**

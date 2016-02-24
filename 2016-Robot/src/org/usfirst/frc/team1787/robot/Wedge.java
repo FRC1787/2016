@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj.Timer;
 public class Wedge {
 	
 	/** Talon for the motor controlling the wedge */
-	private CANTalon motor;
+	private CANTalon wedgeTalon;
 	
 	/** Timer for retracting and deploying wedge */
-	private Timer timer;
+	private Timer wedgeTimer;
 	
 	/** Direction of the wedge
 	 *  1 = deploying
@@ -46,8 +46,8 @@ public class Wedge {
 	 */
 	public Wedge(int talonId)
 	{
-		motor = new CANTalon(talonId);
-		timer = new Timer();
+		wedgeTalon = new CANTalon(talonId);
+		wedgeTimer = new Timer();
 	}
 	
 	/**
@@ -56,8 +56,8 @@ public class Wedge {
 	public void deploy()
 	{
 		wedgeDirection = WEDGE_DEPLOY;
-		motor.set(-MOTOR_SPEED);
-		timer.start();
+		wedgeTalon.set(-MOTOR_SPEED);
+		wedgeTimer.start();
 	}
 	
 	/**
@@ -66,21 +66,21 @@ public class Wedge {
 	public void retract()
 	{
 		wedgeDirection = WEDGE_RETRACT;
-		motor.set(MOTOR_SPEED);
-		timer.start();
+		wedgeTalon.set(MOTOR_SPEED);
+		wedgeTimer.start();
 	}
 	
-	public void update()
+	public void checkIfWedgeMotorShouldStop()
 	{
-		if (wedgeDirection == WEDGE_DEPLOY && timer.get() >= DEPLOY_TIME)
+		if (wedgeDirection == WEDGE_DEPLOY && wedgeTimer.get() >= DEPLOY_TIME)
 		{
 			stop();
-			timer.reset();
+			wedgeTimer.reset();
 		}
-		else if (wedgeDirection == WEDGE_RETRACT && timer.get() >= RETRACT_TIME)
+		else if (wedgeDirection == WEDGE_RETRACT && wedgeTimer.get() >= RETRACT_TIME)
 		{
 			stop();
-			timer.reset();
+			wedgeTimer.reset();
 		}
 	}
 	
@@ -89,7 +89,7 @@ public class Wedge {
 	 */
 	public void stop()
 	{
-		motor.set(0);
-		wedgeDirection = 0;
+		wedgeTalon.set(0);
+		wedgeDirection = WEDGE_STATIONARY;
 	}
 }
