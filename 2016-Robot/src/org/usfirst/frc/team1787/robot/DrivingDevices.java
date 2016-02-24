@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is a collection of all the mechanisms used for driving the robot.
@@ -116,5 +117,12 @@ public class DrivingDevices
 	public Encoder getRightEncoder()
 	{
 		return rightEncoder;
+	}
+	
+	public void putDataOnSmartDashboard()
+	{
+		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
+		SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
+		SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
 	}
 }

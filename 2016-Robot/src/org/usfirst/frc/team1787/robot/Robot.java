@@ -211,6 +211,9 @@ public class Robot extends IterativeRobot
     	else if (stick.getRawButton(JOYSTICK_LOW_GEAR))
     		driveControl.setLowGear();
     	
+    	// Driving Data
+    	driveControl.putDataOnSmartDashboard();
+    	
     	// Pickup Arm
     	if (stick.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
     		pickupArmDesiredRegion = PickupArm.REG_STORE;
@@ -221,19 +224,14 @@ public class Robot extends IterativeRobot
     	arm.moveToRegion(pickupArmDesiredRegion);
     	
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup wheels
-    	{
-    		// System.out.println("Trying to spin wheels");
     		arm.spinPickupWheels(-1);
-    	}
     	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup wheels
-    	{
-    		// System.out.println("Trying to spin wheels");
     		arm.spinPickupWheels(1);
-    	}
     	else
-    	{
     		arm.stopPickupWheels();
-    	}
+    	
+    	// Arm Data
+    	arm.putDataOnSmartDashboard();
     	
     	// Wedge
     	if (stick.getRawButton(JOYSTICK_WEDGE_DEPLOY))
@@ -259,9 +257,9 @@ public class Robot extends IterativeRobot
     	arm.manualControl(stick); // This is for testing the pickup arm
     	
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
-    		arm.spinPickupWheels(1);
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
     		arm.spinPickupWheels(-1);
+    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
+    		arm.spinPickupWheels(1);
     	else
     		arm.stopPickupWheels();
     }   

@@ -38,5 +38,15 @@ public class Shifter
 	public void setLowGear()
 	{
 		sol_shifter.set(false);
-	}	
+	}
+	
+	/**
+	 * Returns a boolean value indicating the current gear of the robot. 
+	 * True indicates the robot is in high gear. False indicates the robot is in low gear.
+	 * @return
+	 */
+	public boolean getCurrentGear()
+	{
+		return sol_shifter.get();
+	}
 }
