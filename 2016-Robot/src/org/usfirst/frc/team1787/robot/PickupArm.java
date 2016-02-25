@@ -88,11 +88,11 @@ public class PickupArm
 	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
 	public static final double MOTOR_SPEED = 0.66;
 	/** Number designating backwards motion of the arm */
-	public static final int ARM_BACKWARDS = -1;
+	private static final int ARM_BACKWARDS = -1;
 	/** Number designating no motion of the arm */
-	public static final int ARM_STATIONARY = 0;
+	private static final int ARM_STATIONARY = 0;
 	/** Number designating forwards motion of the arm */
-	public static final int ARM_FORWARDS = 1;
+	private static final int ARM_FORWARDS = 1;
 	/** Number representing the current motion of the arm */
 	private int armDirection = 0;
 	

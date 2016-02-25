@@ -223,11 +223,26 @@ public class Robot extends IterativeRobot
     	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
-    		pickupArmDesiredRegion = PickupArm.REG_PICKUP;
-    	arm.moveToRegion(pickupArmDesiredRegion);
+    	{
+    		arm.moveToRegion(PickupArm.REG_PICKUP);
+    		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
+    	}
+    	
+    	if (!stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    		arm.moveToRegion(pickupArmDesiredRegion);
+
+    		
+    	/*
+    	if (arm.getCurrentRegion() == 4 && !stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP) && pickupArmDesiredRegion != 0)
+    		pickupArmDesiredRegion = PickupArm.REG_APPROACH;*/
+    		
+    	// arm.moveToRegion(pickupArmDesiredRegion);
+    	
+    	
+    	
     	
     	// Pickup Wheels
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD))
+    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD) || arm.getCurrentRegion() == 1)
     		arm.spinPickupWheels(1);
     	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
 			arm.spinPickupWheels(-1);
