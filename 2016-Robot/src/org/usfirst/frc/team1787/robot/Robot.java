@@ -203,7 +203,7 @@ public class Robot extends IterativeRobot
     public void teleopPeriodic()
     {
     	// Let's try to keep this to simply method calls triggered by buttons.
-    	//Remember to have any mildly complicated operation occur in the class the operation is associated with.
+    	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
     	// Driving
     	driveControl.driveWithJoystick(stick);

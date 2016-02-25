@@ -103,9 +103,6 @@ public class PickupArm
 	private boolean movingTowardsApproachFromStore = false;
 	private boolean movingTowardsApproachFromPickup = false;
 	
-	// Pickup Wheels
-	private boolean pickupWheelsAreEnabled = true;
-	
 	/**
 	 * Takes IDs and port numbers, not objects
 	 * @param rightTalonID    ID of the talon on the right of the arm.
@@ -284,7 +281,6 @@ public class PickupArm
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putNumber("Current Region", currentRegion);
-		SmartDashboard.putBoolean("pickupWheelsAreEnabled", pickupWheelsAreEnabled);
 		SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
 		SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
 		// SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);
