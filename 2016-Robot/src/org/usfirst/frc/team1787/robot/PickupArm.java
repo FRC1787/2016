@@ -273,11 +273,6 @@ public class PickupArm
 		return currentRegion;
 	}
 	
-	public void executePickupSequence()
-	{
-		
-	}
-	
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putNumber("Current Region", currentRegion);

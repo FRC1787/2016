@@ -227,19 +227,8 @@ public class Robot extends IterativeRobot
     		arm.moveToRegion(PickupArm.REG_PICKUP);
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	}
-    	
     	if (!stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
-    		arm.moveToRegion(pickupArmDesiredRegion);
-
-    		
-    	/*
-    	if (arm.getCurrentRegion() == 4 && !stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP) && pickupArmDesiredRegion != 0)
-    		pickupArmDesiredRegion = PickupArm.REG_APPROACH;*/
-    		
-    	// arm.moveToRegion(pickupArmDesiredRegion);
-    	
-    	
-    	
+    		arm.moveToRegion(pickupArmDesiredRegion);    	
     	
     	// Pickup Wheels
     	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD) || arm.getCurrentRegion() == 1)
