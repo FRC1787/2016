@@ -206,22 +206,10 @@ public class PickupArm
 	 */
 	public void spinPickupWheels(double motorSpeed)
 	{
-		if (pickupWheelsAreEnabled)
-			pickupWheels.set(motorSpeed);
-		else
-			stopPickupWheels();
+		pickupWheels.set(motorSpeed);
 	}
 	
-	public void disablePickupWheels()
-	{
-		pickupWheelsAreEnabled = false;
-	}
-	
-	public void enablePickupWheels()
-	{
-		pickupWheelsAreEnabled = true;
-	}
-	
+
 	/**
 	 * Method that stops the pickup wheels.
 	 */
