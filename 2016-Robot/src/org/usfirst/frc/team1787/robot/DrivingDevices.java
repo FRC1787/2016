@@ -75,7 +75,16 @@ public class DrivingDevices
 	 * Method used for driving the robot with a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
-	public void driveWithJoystick(Joystick stick)
+	public void driveForwardsWithJoystick(Joystick stick)
+	{
+		theRobot.arcadeDrive(stick);
+	}
+	
+	/**
+	 * Method used for driving the robot with a single joystick.
+	 * @param stick The joystick used to drive the robot.
+	 */
+	public void driveBackwardsWithJoystick(Joystick stick)
 	{
 		theRobot.arcadeDrive(stick);
 	}

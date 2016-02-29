@@ -85,10 +85,14 @@ public class Robot extends IterativeRobot
 	// Objects and variables involving manual control of the robot:
 	
 	// Joystick
-	/** The joystick used to control the robot */
-	private Joystick stick;
+	/** The joystick used to control the robot going forwards*/
+	private Joystick stickForwards;
+	/** The joystick used to control the robot going backwards*/
+	private Joystick stickBackwards;
 	/** The USB port on the computer that the joystick is connected to. USB port #'s are configured from the driver station */
-	public static final int JOYSTICK_USB_PORT = 0;
+	public static final int JOYSTICK_USB_PORT_FORWARDS = 0;
+	/** The USB port on the computer that the joystick is connected to. USB port #'s are configured from the driver station */
+	public static final int JOSTICK_USB_PORT_BACKWARDS = 1;
 	
 	// Button Mapping
 	/** The button on the joystick that will put the robot in high gear */
@@ -149,8 +153,9 @@ public class Robot extends IterativeRobot
     	// Construct the Wedge
     	wedge = new Wedge(TALON_WEDGE_ID);
     	
-    	// Construct the Joystick
-    	stick = new Joystick(JOYSTICK_USB_PORT);
+    	// Construct the Joysticks
+    	stickForwards = new Joystick(JOYSTICK_USB_PORT_FORWARDS);
+    	stickBackwards = new Joystick(JOSTICK_USB_PORT_BACKWARDS);
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -206,34 +211,37 @@ public class Robot extends IterativeRobot
     	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
     	// Driving
-    	driveControl.driveWithJoystick(stick);
+    	if(stickBackwards.getX() == 0 && stickBackwards.getY() == 0)
+    		driveControl.driveForwardsWithJoystick(stickForwards);
+    	if(stickForwards.getX() == 0 && stickForwards.getY() == 0)
+    		driveControl.driveBackwardsWithJoystick(stickBackwards);
     	
     	// Shifting Gears
-    	if (stick.getRawButton(JOYSTICK_HIGH_GEAR))
+    	if (stickForwards.getRawButton(JOYSTICK_HIGH_GEAR))
     		driveControl.setHighGear();
-    	else if (stick.getRawButton(JOYSTICK_LOW_GEAR))
+    	else if (stickForwards.getRawButton(JOYSTICK_LOW_GEAR))
     		driveControl.setLowGear();
     	
     	// Driving Data
     	driveControl.putDataOnSmartDashboard();
     	
     	// Pickup Arm
-    	if (stick.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
+    	if (stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
     		pickupArmDesiredRegion = PickupArm.REG_STORE;
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
+    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
     	{
     		arm.moveToRegion(PickupArm.REG_PICKUP);
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	}
-    	if (!stick.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    	if (!stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
     		arm.moveToRegion(pickupArmDesiredRegion);    	
     	
     	// Pickup Wheels
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD) || arm.getCurrentRegion() == 1)
+    	if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD) || arm.getCurrentRegion() == 1)
     		arm.spinPickupWheels(1);
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
+    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
 			arm.spinPickupWheels(-1);
 		else
     		arm.stopPickupWheels();
@@ -242,9 +250,9 @@ public class Robot extends IterativeRobot
     	arm.putDataOnSmartDashboard();
     	
     	// Wedge
-    	if (stick.getRawButton(JOYSTICK_WEDGE_DEPLOY))
+    	if (stickForwards.getRawButton(JOYSTICK_WEDGE_DEPLOY))
     		wedge.deploy();
-    	else if (stick.getRawButton(JOYSTICK_WEDGE_RETRACT))
+    	else if (stickForwards.getRawButton(JOYSTICK_WEDGE_RETRACT))
     		wedge.retract();
     	wedge.checkIfWedgeMotorShouldStop();
     }
@@ -262,11 +270,11 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    	arm.manualControl(stick); // This is for testing the pickup arm
+    	arm.manualControl(stickForwards); // This is for testing the pickup arm
     	
-    	if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
+    	if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
     		arm.spinPickupWheels(-1);
-    	else if (stick.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
+    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
     		arm.spinPickupWheels(1);
     	else
     		arm.stopPickupWheels();
