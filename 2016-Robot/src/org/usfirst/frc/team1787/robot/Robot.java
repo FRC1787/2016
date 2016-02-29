@@ -217,7 +217,7 @@ public class Robot extends IterativeRobot
     		driveControl.driveBackwardsWithJoystick(stickBackwards);
     	
     	// Shifting Gears
-    	if (stickForwards.getRawButton(JOYSTICK_HIGH_GEAR))
+    	if (stickForwards.getRawButton(JOYSTICK_HIGH_GEAR) || stickBackwards.getRawButton(JOYSTICK_HIGH_GEAR))
     		driveControl.setHighGear();
     	else if (stickForwards.getRawButton(JOYSTICK_LOW_GEAR))
     		driveControl.setLowGear();
