@@ -75,7 +75,7 @@ public class DrivingDevices
 	 * Method used for driving the robot with a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
-	public void driveForwardsWithJoystick(Joystick stick)
+	public void arcadeDriveWithPickupArmInFront(Joystick stick)
 	{
 		theRobot.arcadeDrive(stick.getY(), stick.getX());
 	}
@@ -84,12 +84,12 @@ public class DrivingDevices
 	 * Method used for driving the robot with a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
-	public void driveBackwardsWithJoystick(Joystick stick)
+	public void arcadeDriveWithWedgeInFront(Joystick stick)
 	{
 		theRobot.arcadeDrive(-stick.getY(), stick.getX());
 	}
 	
-	public void arcadeDriveWithValues(double moveValue, double rotateValue)
+	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
 		theRobot.arcadeDrive(moveValue, rotateValue);
 	}
