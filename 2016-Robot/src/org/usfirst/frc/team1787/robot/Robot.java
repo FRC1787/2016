@@ -95,26 +95,29 @@ public class Robot extends IterativeRobot
 	public static final int JOSTICK_USB_PORT_BACKWARDS = 1;
 	
 	// Button Mapping
+	// On Both Joysticks
 	/** The button on the joystick that will put the robot in high gear */
-	public static final int JOYSTICK_HIGH_GEAR = 11;
+	public static final int JOYSTICK_HIGH_GEAR = 6;
 	/** The button on the joystick that will put the robot in low gear */
-	public static final int JOYSTICK_LOW_GEAR = 10;
+	public static final int JOYSTICK_LOW_GEAR = 7;
+	
+	// On forwards Joystick
 	/** The button on the joystick that will set pickupArmDesiredRegion to 0 */
-	public static final int JOYSTICK_PICKUP_ARM_STORE = 2;
+	public static final int JOYSTICK_F_PICKUP_ARM_STORE = 2;
 	/** The button on the joystick that will set pickupArmDesiredRegion to 2 */
-	public static final int JOYSTICK_PICKUP_ARM_APPROACH = 3;
+	public static final int JOYSTICK_F_PICKUP_ARM_APPROACH = 3;
 	/** The button on the joystick that will set pickupArmDesiredRegion to 4 */
-	public static final int JOYSTICK_PICKUP_ARM_PICKUP = 1;
+	public static final int JOYSTICK_F_PICKUP_ARM_PICKUP = 1;
 	/** The button on the joystick that will spin the pickup wheels forward */
-	public static final int JOYSTICK_PICKUP_WHEELS_FORWARD = 6;
+	public static final int JOYSTICK_F_PICKUP_WHEELS_FORWARDS = 5;
 	/** The button on the joystick that will spin the pickup wheels backward */
-	public static final int JOYSTICK_PICKUP_WHEELS_BACKWARD = 7;
+	public static final int JOYSTICK_F_PICKUP_WHEELS_BACKWARDS = 4;
+	
+	// On backwards Joystick
 	/** The button on the joystick that will deploy the wedge */
-	public static final int JOYSTICK_WEDGE_DEPLOY = 4;
+	public static final int JOYSTICK_B_WEDGE_DEPLOY = 3;
 	/** The button on the joystick that will retract the wedge */
-	public static final int JOYSTICK_WEDGE_RETRACT = 5;
-	/** The button on the joystick that will enable or disable the pickup wheels */
-	public static final int JOYSTICK_PICKUP_WHEELS_ENABLE_DISABLE_TOGGLE = 8;
+	public static final int JOYSTICK_B_WEDGE_RETRACT = 2;
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
@@ -210,6 +213,8 @@ public class Robot extends IterativeRobot
     	// Let's try to keep this to simply method calls triggered by buttons.
     	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
+    	// Both Joysticks
+    	
     	// Driving
     	if(stickBackwards.getX() == 0 && stickBackwards.getY() == 0)
     		driveControl.driveForwardsWithJoystick(stickForwards);
@@ -219,29 +224,31 @@ public class Robot extends IterativeRobot
     	// Shifting Gears
     	if (stickForwards.getRawButton(JOYSTICK_HIGH_GEAR) || stickBackwards.getRawButton(JOYSTICK_HIGH_GEAR))
     		driveControl.setHighGear();
-    	else if (stickForwards.getRawButton(JOYSTICK_LOW_GEAR))
+    	else if (stickForwards.getRawButton(JOYSTICK_LOW_GEAR) || stickBackwards.getRawButton(JOYSTICK_LOW_GEAR))
     		driveControl.setLowGear();
     	
     	// Driving Data
     	driveControl.putDataOnSmartDashboard();
     	
+    	// Forwards Joystick
+    	
     	// Pickup Arm
-    	if (stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_STORE))
+    	if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_ARM_STORE))
     		pickupArmDesiredRegion = PickupArm.REG_STORE;
-    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_APPROACH))
+    	else if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_ARM_APPROACH))
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
-    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    	else if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_ARM_PICKUP))
     	{
     		arm.moveToRegion(PickupArm.REG_PICKUP);
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	}
-    	if (!stickForwards.getRawButton(JOYSTICK_PICKUP_ARM_PICKUP))
+    	if (!stickForwards.getRawButton(JOYSTICK_F_PICKUP_ARM_PICKUP))
     		arm.moveToRegion(pickupArmDesiredRegion);    	
     	
     	// Pickup Wheels
-    	if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD) || arm.getCurrentRegion() == 1)
+    	if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == 1)
     		arm.spinPickupWheels(1);
-    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD) || arm.getCurrentRegion() > 2)
+    	else if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > 2)
 			arm.spinPickupWheels(-1);
 		else
     		arm.stopPickupWheels();
@@ -249,10 +256,12 @@ public class Robot extends IterativeRobot
     	// Arm Data
     	arm.putDataOnSmartDashboard();
     	
+    	// Backwards Joystick
+    	
     	// Wedge
-    	if (stickForwards.getRawButton(JOYSTICK_WEDGE_DEPLOY))
+    	if (stickBackwards.getRawButton(JOYSTICK_B_WEDGE_DEPLOY))
     		wedge.deploy();
-    	else if (stickForwards.getRawButton(JOYSTICK_WEDGE_RETRACT))
+    	else if (stickBackwards.getRawButton(JOYSTICK_B_WEDGE_RETRACT))
     		wedge.retract();
     	wedge.checkIfWedgeMotorShouldStop();
     }
@@ -272,9 +281,9 @@ public class Robot extends IterativeRobot
     {
     	arm.manualControl(stickForwards); // This is for testing the pickup arm
     	
-    	if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_FORWARD)) // This is for testing the pickup arm
+    	if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_WHEELS_FORWARDS)) // This is for testing the pickup arm
     		arm.spinPickupWheels(-1);
-    	else if (stickForwards.getRawButton(JOYSTICK_PICKUP_WHEELS_BACKWARD)) // This is for testing the pickup arm
+    	else if (stickForwards.getRawButton(JOYSTICK_F_PICKUP_WHEELS_BACKWARDS)) // This is for testing the pickup arm
     		arm.spinPickupWheels(1);
     	else
     		arm.stopPickupWheels();
