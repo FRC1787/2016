@@ -77,7 +77,7 @@ public class DrivingDevices
 	 */
 	public void driveForwardsWithJoystick(Joystick stick)
 	{
-		theRobot.arcadeDrive(stick);
+		theRobot.arcadeDrive(stick.getY(), stick.getX());
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class DrivingDevices
 	 */
 	public void driveBackwardsWithJoystick(Joystick stick)
 	{
-		theRobot.arcadeDrive(stick);
+		theRobot.arcadeDrive(-stick.getY(), stick.getX());
 	}
 	
 	public void tankDriveUsingValues(double leftValue, double rightValue)
