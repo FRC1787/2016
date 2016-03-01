@@ -35,6 +35,9 @@ public class AutoMethods
 	public void Auto1()
 	{
 		System.out.println("Running Auto1()");
+		
+		if (driveControl.getLeftEncoder().getDistance() < 5 && driveControl.getRightEncoder().getDistance() < 5)
+			driveControl.arcadeDriveWithValues(0.5, 0);
 	}
 	
 	/**

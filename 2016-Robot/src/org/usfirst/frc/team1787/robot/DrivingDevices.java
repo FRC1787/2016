@@ -89,6 +89,11 @@ public class DrivingDevices
 		theRobot.arcadeDrive(-stick.getY(), stick.getX());
 	}
 	
+	public void arcadeDriveWithValues(double moveValue, double rotateValue)
+	{
+		theRobot.arcadeDrive(moveValue, rotateValue);
+	}
+	
 	public void tankDriveUsingValues(double leftValue, double rightValue)
 	{
 		theRobot.tankDrive(leftValue, rightValue);
