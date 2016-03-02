@@ -10,10 +10,11 @@ import java.util.ArrayList;
 public class AutoRoutine
 {
 	private ArrayList<AutoStep> steps = new ArrayList<AutoStep>();
+	private String name;
 	
-	public AutoRoutine()
+	public AutoRoutine(String n)
 	{
-		
+		name = n;
 	}
 	
 	public void addStep(AutoStep s)
@@ -23,6 +24,15 @@ public class AutoRoutine
 	
 	public AutoStep getStep(int desiredStep)
 	{
-		return steps.get(desiredStep-1);
+		return steps.get(desiredStep);
+	}
+	
+	public String getName()
+	{
+		return name;
+	}
+
+	public int getLength() {
+		return steps.size();
 	}
 }

@@ -3,42 +3,39 @@ import java.util.ArrayList;
 
 public class AutoRoutines
 {
-	private ArrayList routines = new ArrayList<AutoRoutine>();
+	private ArrayList<AutoRoutine> routines = new ArrayList<AutoRoutine>();
 	
-	private AutoRoutine auto1;
-	private AutoRoutine auto2;
-	private AutoRoutine auto3;
+	public static final int LOWBAR_KEY = 0;
+	
+	public static final int TO_TOWER_KEY = 1;
 	
 	public AutoRoutines()
 	{
-		initAuto1();
-		initAuto2();
-		initAuto3();
+		routines.add(LOWBAR_KEY, initLowbar());
+		routines.add(TO_TOWER_KEY, initToTower());
 	}
 	
-	public void initAuto1()
+	public AutoRoutine initLowbar()
 	{
-		auto1 = new AutoRoutine();
-		auto1.addStep(new AutoStep("M", 5));
-		auto1.addStep(new AutoStep("M", -5));
-		auto1.addStep(new AutoStep("M", 5));
-		routines.add(auto1);
+		AutoRoutine rout = new AutoRoutine("Lowbar");
+		rout.addStep(new AutoStep("M", 5));
+		rout.addStep(new AutoStep("M", -5));
+		rout.addStep(new AutoStep("M", 5));
+		return rout;
 	}
 	
-	public void initAuto2()
+	public AutoRoutine initToTower()
 	{
-		auto2 = new AutoRoutine();
-		routines.add(auto2);
+		AutoRoutine rout = new AutoRoutine("Go To Tower");
+		rout.addStep(new AutoStep("M", 5));
+		rout.addStep(new AutoStep("T", 30));
+		rout.addStep(new AutoStep("M", 5));
+		return rout;
 	}
-	
-	public void initAuto3()
-	{
-		auto3 = new AutoRoutine();
-		routines.add(auto3);
-	}
+
 	
 	public AutoRoutine getRoutine(int desiredRoutine)
 	{
-		return (AutoRoutine) routines.get(desiredRoutine-1);
+		return routines.get(desiredRoutine);
 	}
 }

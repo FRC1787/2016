@@ -124,7 +124,7 @@ public class Robot extends IterativeRobot
 	/** The collection of the various autonomous routines */
 	private AutoRoutines autoRoutines;
 	/** The current step in a given autonomous routine that is being performed */
-	private int currentStep = 1;
+	private int currentStep = 0;
 	
 	private String autoAction;
 	private double autoActionValue;
@@ -133,7 +133,7 @@ public class Robot extends IterativeRobot
 	/** The SendableChooser object that allows different autonomous modes to be selected from the driver station. */
     SendableChooser autonomousChooser;
     /** The number that represents which autonomous routine is selected on the driver station */
-    public int selectedAuto;
+    private AutoRoutine selectedAuto;
     
     // Miscellaneous objects and variables:
     
@@ -171,8 +171,8 @@ public class Robot extends IterativeRobot
     	autonomousChooser = new SendableChooser();
     	
     	// Add the different autonomous options to the chooser
-        autonomousChooser.addDefault("Autonomous Option 1", 1);
-        autonomousChooser.addObject("Autonomous Option 2", 2);
+        autonomousChooser.addDefault("Drive Under Low Bar", AutoRoutines.LOWBAR_KEY);
+        autonomousChooser.addObject("Drive Under Low Bar & Go to Tower", AutoRoutines.TO_TOWER_KEY);
         
         // Put the chooser on the SmartDashboard
         SmartDashboard.putData("Which autonomous option would you like to use?", autonomousChooser);
@@ -186,8 +186,8 @@ public class Robot extends IterativeRobot
     public void autonomousInit()
     {
     	// Get the selected autonomous routine from the driver station
-    	selectedAuto = (int) autonomousChooser.getSelected();
-		System.out.println("Preparing to run autonomous option #"+selectedAuto+"."); // This is for testing the SendableChooser
+    	selectedAuto =  autoRoutines.getRoutine((int)autonomousChooser.getSelected());
+		System.out.println("Preparing to run autonomous routine: " + selectedAuto.getName() + "."); // This is for testing the SendableChooser
 		
 		// Reset the encoders
 		driveControl.resetEncoders();
@@ -198,15 +198,22 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	autoAction = autoRoutines.getRoutine(selectedAuto).getStep(currentStep).getAction();
-    	autoActionValue = autoRoutines.getRoutine(selectedAuto).getStep(currentStep).getActionValue();
-    	
-    	if (autoAction.equals("M"))
+    	if (currentStep < selectedAuto.getLength())
     	{
-    		if (driveControl.robotHasDrivenDistance(autoActionValue))
-    			driveControl.arcadeDriveUsingValues(0.5, 0);
-    		else
-    			currentStep++;
+	    	autoAction = selectedAuto.getStep(currentStep).getAction();
+	    	autoActionValue = selectedAuto.getStep(currentStep).getActionValue();
+	    	
+	    	if (autoAction.equals("M"))
+	    	{
+	    		if (!driveControl.robotHasDrivenDistance(autoActionValue))
+	    			driveControl.arcadeDriveUsingValues(0.5, 0);
+	    		else
+	    			currentStep++;
+	    	}
+	    	else
+	    	{
+	    		System.out.println("Action not Recognized");
+	    	}
     	}
     }
     
