@@ -1,10 +1,12 @@
 package org.usfirst.frc.team1787.robot;
 
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -39,6 +41,10 @@ public class DrivingDevices
 	/** The Shifter object that controls which gear the robot is in */
 	Shifter shifter;
 	
+	//Gyro
+	/** The gyro */
+	Gyro gyro;
+	
 	/**
 	 * Constructor for the DrivingDevices class
 	 * @param talon_BR_ID The ID of the Talon connected to the back-right motor
@@ -52,7 +58,7 @@ public class DrivingDevices
 	 * @param right_encoder_port_b
 	 */
 	public DrivingDevices(int talon_BR_ID, int talon_BL_ID, int talon_FR_ID, int talon_FL_ID, int sol_shifter_port, 
-			int left_encoder_port_a, int left_encoder_port_b, int right_encoder_port_a, int right_encoder_port_b)
+			int left_encoder_port_a, int left_encoder_port_b, int right_encoder_port_a, int right_encoder_port_b, int gyro_port)
 	{
 		talon_BR = new CANTalon(talon_BR_ID);
 		talon_BL = new CANTalon(talon_BL_ID);
@@ -69,6 +75,9 @@ public class DrivingDevices
 		//leftEncoder.setDistancePerPulse(0.00002852253);
 		
 		shifter = new Shifter(sol_shifter_port);
+		
+		gyro = new AnalogGyro(gyro_port);
+		resetGyro();
 	}
 	
 	/**
@@ -111,6 +120,25 @@ public class DrivingDevices
 		else if (distance > 0)
 		{
 			if (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance)
+				return false;
+			else
+				return true;
+		}
+		return true;
+	}
+	
+	public boolean robotHasTurnedDegrees(double angle)
+	{
+		if (angle > 0)
+		{
+			if (getGyroReading() < angle)
+				return false;
+			else
+				return true;
+		}
+		else if (angle < 0)
+		{
+			if (getGyroReading() > angle)
 				return false;
 			else
 				return true;
@@ -161,6 +189,24 @@ public class DrivingDevices
 	{
 		leftEncoder.reset();
 		rightEncoder.reset();
+	}
+	
+	
+	
+	public double getGyroReading()
+	{
+		return gyro.getAngle();
+	}
+	
+	public void resetGyro()
+	{
+		gyro.reset();
+	}
+	
+	public void resetThings()
+	{
+		resetGyro();
+		resetEncoders();
 	}
 	
 	public void putDataOnSmartDashboard()

@@ -120,6 +120,9 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
+	/** Port of Gyro */
+	public static final int GYRO_PORT = 0;
+	
 	// AutoRoutines
 	/** The collection of the various autonomous routines */
 	private AutoRoutines autoRoutines;
@@ -151,7 +154,8 @@ public class Robot extends IterativeRobot
     {
     	// Construct the DrivingDevices
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
-    			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B);
+    			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B,
+    			GYRO_PORT);
     	
     	// Construct the PickupArm
     	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
@@ -207,12 +211,30 @@ public class Robot extends IterativeRobot
 	    	{
 	    		if (!driveControl.robotHasDrivenDistance(autoActionValue))
 	    		{
-	    			driveControl.arcadeDriveUsingValues(0.5, 0);
+	    			if (autoActionValue > 0)
+	    				driveControl.arcadeDriveUsingValues(0.5, 0);
+	    			else if (autoActionValue < 0)
+	    				driveControl.arcadeDriveUsingValues(-0.5, 0);
 	    		}
 	    		else
 	    		{
 	    			currentStep++;
-	    			driveControl.resetEncoders();
+	    			driveControl.resetThings();
+	    		}
+	    	}
+	    	else if(autoAction.equals("R"))
+	    	{
+	    		if(!driveControl.robotHasTurnedDegrees(autoActionValue))
+	    		{
+	    			if (autoActionValue > 0)
+	    				driveControl.arcadeDriveUsingValues(0, 0.5);
+	    			else if (autoActionValue < 0)
+	    				driveControl.arcadeDriveUsingValues(0, -0.5);
+	    		}
+	    		else
+	    		{
+	    			currentStep++;
+	    			driveControl.resetThings();
 	    		}
 	    	}
 	    	else
