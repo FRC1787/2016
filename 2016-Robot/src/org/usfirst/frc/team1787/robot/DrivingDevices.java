@@ -100,6 +100,28 @@ public class DrivingDevices
 	}
 	
 	/**
+	 * Method for use in autonomous that will move the robot a certain distance.
+	 * 
+	 * @param distance The distance the robot should move. 
+	 * A positive value will move forwards, and a negative value will move backwards.
+	 * 
+	 * @param speed The speed at which the robot will move.
+	 */
+	public void moveDistanceAtSpeed(double distance, double speed)
+	{
+		if (distance > 0)
+		{
+			while (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance)
+				theRobot.arcadeDrive(speed, 0);
+		}
+		else if (distance < 0)
+		{
+			while (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance)
+				theRobot.arcadeDrive(-speed, 0);
+		}
+	}
+	
+	/**
 	 * Method that shifts the robot into high gear
 	 */
 	public void setHighGear()
@@ -131,6 +153,12 @@ public class DrivingDevices
 	public Encoder getRightEncoder()
 	{
 		return rightEncoder;
+	}
+	
+	public void resetEncoders()
+	{
+		leftEncoder.reset();
+		rightEncoder.reset();
 	}
 	
 	public void putDataOnSmartDashboard()

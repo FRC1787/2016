@@ -183,6 +183,10 @@ public class Robot extends IterativeRobot
     	// Get the selected autonomous routine from the driver station
     	selectedAuto = (int) autonomousChooser.getSelected();
 		System.out.println("Preparing to run autonomous option #"+selectedAuto+"."); // This is for testing the SendableChooser
+		
+		// Reset the autoMethods
+		autoMethods.resetCompletedSteps();
+		driveControl.resetEncoders();
     }
 
     /** 
