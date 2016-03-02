@@ -99,6 +99,25 @@ public class DrivingDevices
 		theRobot.tankDrive(leftValue, rightValue);
 	}
 	
+	public boolean robotHasDrivenDistance(double distance)
+	{
+		if (distance > 0)
+		{
+			if (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance)
+				return false;
+			else
+				return true;
+		}
+		else if (distance > 0)
+		{
+			if (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance)
+				return false;
+			else
+				return true;
+		}
+		return true;
+	}
+	
 	public void stop()
 	{
 		theRobot.arcadeDrive(0, 0);

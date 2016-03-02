@@ -21,7 +21,7 @@ public class AutoStep
 		return action;
 	}
 	
-	public double actionValue()
+	public double getActionValue()
 	{
 		return actionValue;
 	}

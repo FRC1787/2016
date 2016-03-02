@@ -120,9 +120,14 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
-	// AutoMethods
+	// AutoRoutines
 	/** The collection of the various autonomous routines */
 	private AutoRoutines autoRoutines;
+	/** The current step in a given autonomous routine that is being performed */
+	private int currentStep = 1;
+	
+	private String autoAction;
+	private double autoActionValue;
 	
 	// Choosing an autonomous routine
 	/** The SendableChooser object that allows different autonomous modes to be selected from the driver station. */
@@ -193,7 +198,16 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
+    	autoAction = autoRoutines.getRoutine(selectedAuto).getStep(currentStep).getAction();
+    	autoActionValue = autoRoutines.getRoutine(selectedAuto).getStep(currentStep).getActionValue();
     	
+    	if (autoAction.equals("M"))
+    	{
+    		if (driveControl.robotHasDrivenDistance(autoActionValue))
+    			driveControl.arcadeDriveUsingValues(0.5, 0);
+    		else
+    			currentStep++;
+    	}
     }
     
     /**

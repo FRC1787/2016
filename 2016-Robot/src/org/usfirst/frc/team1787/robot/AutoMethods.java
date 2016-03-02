@@ -52,36 +52,4 @@ public class AutoMethods
 	{
 		System.out.println("Running Auto2()");
 	}
-	
-	public boolean hasTraveledDistance(double distance)
-	{
-		if (distance > 0)
-		{
-			if (driveControl.getLeftEncoder().getDistance() < distance && driveControl.getRightEncoder().getDistance() < distance)
-			{
-				driveControl.arcadeDriveUsingValues(AUTO_MOVEMENT_SPEED, 0);
-				return false;
-			}
-			else
-			{
-				driveControl.stop();
-				return true;
-			}
-		}
-		else if(distance < 0)
-		{
-			if (driveControl.getLeftEncoder().getDistance() > distance && driveControl.getRightEncoder().getDistance() > distance)
-			{
-				driveControl.arcadeDriveUsingValues(-AUTO_MOVEMENT_SPEED, 0);
-				return false;
-			}
-			else
-			{
-				driveControl.stop();
-				return true;
-			}
-		}
-		else
-			return true;
-	}
 }
