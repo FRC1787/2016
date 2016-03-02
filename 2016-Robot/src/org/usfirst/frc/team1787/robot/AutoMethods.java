@@ -16,9 +16,7 @@ public class AutoMethods
 	/** The wedge on the robot */
 	private Wedge wedge;
 	
-	// Boolean Values
-	private static final int MOST_STEPS_IN_ANY_AUTO_METHOD_PLUS_1 = 11;
-	private boolean steps[] = new boolean[MOST_STEPS_IN_ANY_AUTO_METHOD_PLUS_1];
+	private static final double AUTO_MOVEMENT_SPEED = 0.5;
 	
 	/**
 	 * The AutoMethods constructor passes in objects representing the various subsystems of the robot we want to use in auto.
@@ -35,49 +33,55 @@ public class AutoMethods
 	
 	/**
 	 * This is the first (and default) autonomous method.
-	 * It is used for _____
+	 * It is used to for going under the low bar
+	 * Steps:
+	 * 1: Move forwards 5 feet
+	 * 2: Move backwards 5 feet
+	 * 3: Move forwards 5 feet
 	 */
-	public void Auto1() // An example of how auto methods may be written if called periodically.
+	public void Auto1()
 	{
-		System.out.println("Running Auto1()");
-		
-		if (!steps[1]) // if step 1 is not complete, work on step one.
-		{
-			System.out.println("Running Auto1(): Step 1");
-			if (driveControl.getLeftEncoder().getDistance() < 5 && driveControl.getRightEncoder().getDistance() < 5)
-				driveControl.arcadeDriveUsingValues(0.5, 0);
-			else
-			{
-				driveControl.resetEncoders();
-				steps[1] = true;
-			}
-		}
-		else if (!steps[2]) // if step 2 is not complete, and all steps before it are complete, work on step 2.
-		{
-			System.out.println("Running Auto2(): Step 2");
-			if (driveControl.getLeftEncoder().getDistance() > -5 && driveControl.getRightEncoder().getDistance() > -5)
-				driveControl.arcadeDriveUsingValues(-0.5, 0);
-			else
-				steps[2] = true;
-		}
-			
-	}
+		System.out.println("Running Auto1()");	
+	}	
 	
 	/**
 	 * This is the second autonomous method.
 	 * It is used for _____
 	 */
-	public void Auto2() // An example of how auto methods may be written if called once.
+	public void Auto2()
 	{
 		System.out.println("Running Auto2()");
-		driveControl.moveDistanceAtSpeed(5, 0.5);
-		driveControl.resetEncoders();
-		driveControl.moveDistanceAtSpeed(-5, 0.5);
 	}
 	
-	public void resetCompletedSteps()
+	public boolean hasTraveledDistance(double distance)
 	{
-		for (boolean s : steps)
-			s = false;
+		if (distance > 0)
+		{
+			if (driveControl.getLeftEncoder().getDistance() < distance && driveControl.getRightEncoder().getDistance() < distance)
+			{
+				driveControl.arcadeDriveUsingValues(AUTO_MOVEMENT_SPEED, 0);
+				return false;
+			}
+			else
+			{
+				driveControl.stop();
+				return true;
+			}
+		}
+		else if(distance < 0)
+		{
+			if (driveControl.getLeftEncoder().getDistance() > distance && driveControl.getRightEncoder().getDistance() > distance)
+			{
+				driveControl.arcadeDriveUsingValues(-AUTO_MOVEMENT_SPEED, 0);
+				return false;
+			}
+			else
+			{
+				driveControl.stop();
+				return true;
+			}
+		}
+		else
+			return true;
 	}
 }

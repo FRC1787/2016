@@ -99,26 +99,9 @@ public class DrivingDevices
 		theRobot.tankDrive(leftValue, rightValue);
 	}
 	
-	/**
-	 * Method for use in autonomous that will move the robot a certain distance.
-	 * 
-	 * @param distance The distance the robot should move. 
-	 * A positive value will move forwards, and a negative value will move backwards.
-	 * 
-	 * @param speed The speed at which the robot will move.
-	 */
-	public void moveDistanceAtSpeed(double distance, double speed)
+	public void stop()
 	{
-		if (distance > 0)
-		{
-			while (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance)
-				theRobot.arcadeDrive(speed, 0);
-		}
-		else if (distance < 0)
-		{
-			while (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance)
-				theRobot.arcadeDrive(-speed, 0);
-		}
+		theRobot.arcadeDrive(0, 0);
 	}
 	
 	/**

@@ -122,7 +122,7 @@ public class Robot extends IterativeRobot
 	
 	// AutoMethods
 	/** The collection of the various autonomous routines */
-	private AutoMethods autoMethods;
+	private AutoRoutines autoRoutines;
 	
 	// Choosing an autonomous routine
 	/** The SendableChooser object that allows different autonomous modes to be selected from the driver station. */
@@ -159,8 +159,8 @@ public class Robot extends IterativeRobot
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
     	
-    	// Construct the AutoMethods
-    	autoMethods = new AutoMethods(driveControl, arm, wedge);
+    	// Construct the AutoRoutines
+    	autoRoutines = new AutoRoutines();
     	
     	// Construct the autonomousChooser
     	autonomousChooser = new SendableChooser();
@@ -184,8 +184,7 @@ public class Robot extends IterativeRobot
     	selectedAuto = (int) autonomousChooser.getSelected();
 		System.out.println("Preparing to run autonomous option #"+selectedAuto+"."); // This is for testing the SendableChooser
 		
-		// Reset the autoMethods
-		autoMethods.resetCompletedSteps();
+		// Reset the encoders
 		driveControl.resetEncoders();
     }
 
@@ -194,10 +193,7 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	if (selectedAuto == 1)
-    		autoMethods.Auto1();
-    	else if (selectedAuto == 2)
-    		autoMethods.Auto2();
+    	
     }
     
     /**
