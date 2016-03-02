@@ -206,9 +206,14 @@ public class Robot extends IterativeRobot
 	    	if (autoAction.equals("M"))
 	    	{
 	    		if (!driveControl.robotHasDrivenDistance(autoActionValue))
+	    		{
 	    			driveControl.arcadeDriveUsingValues(0.5, 0);
+	    		}
 	    		else
+	    		{
 	    			currentStep++;
+	    			driveControl.resetEncoders();
+	    		}
 	    	}
 	    	else
 	    	{
