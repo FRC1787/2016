@@ -108,44 +108,6 @@ public class DrivingDevices
 		theRobot.tankDrive(leftValue, rightValue);
 	}
 	
-	public boolean robotHasDrivenDistance(double distance)
-	{
-		if (distance > 0)
-		{
-			if (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance)
-				return false;
-			else
-				return true;
-		}
-		else if (distance > 0)
-		{
-			if (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance)
-				return false;
-			else
-				return true;
-		}
-		return true;
-	}
-	
-	public boolean robotHasTurnedDegrees(double angle)
-	{
-		if (angle > 0)
-		{
-			if (getGyroReading() < angle)
-				return false;
-			else
-				return true;
-		}
-		else if (angle < 0)
-		{
-			if (getGyroReading() > angle)
-				return false;
-			else
-				return true;
-		}
-		return true;
-	}
-	
 	public void stop()
 	{
 		theRobot.arcadeDrive(0, 0);
@@ -191,9 +153,18 @@ public class DrivingDevices
 		rightEncoder.reset();
 	}
 	
+	public boolean bothEncodersReadGreaterThan(double distance)
+	{
+		return (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance);
+	}
+	
+	public boolean bothEncodersReadLessThan(double distance)
+	{
+		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
+	}
 	
 	
-	public double getGyroReading()
+	public double getGyroAngle()
 	{
 		return gyro.getAngle();
 	}
@@ -203,16 +174,19 @@ public class DrivingDevices
 		gyro.reset();
 	}
 	
-	public void resetThings()
+	public void resetEncodersAndGyro()
 	{
-		resetGyro();
 		resetEncoders();
+		resetGyro();
 	}
 	
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
+		SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
 		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
+		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
 		//SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
+		//SmartDashboard.putNumber("Right Encoder Distance", rightEncoder.getDistance());
 	}
 }

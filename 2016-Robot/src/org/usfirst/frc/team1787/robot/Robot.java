@@ -51,6 +51,10 @@ public class Robot extends IterativeRobot
 	/** The port on the DIO where the right encoder's B channel is connected */
 	public static final int RIGHT_ENCODER_DIO_PORT_B = 9;
 	
+	// Gyro
+	/** Port of Gyro */
+	public static final int GYRO_PORT = 0;
+	
 	// Objects and variables used for the PickupArm:
 	
 	// PickupArm
@@ -120,23 +124,14 @@ public class Robot extends IterativeRobot
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
-	/** Port of Gyro */
-	public static final int GYRO_PORT = 0;
-	
-	// AutoRoutines
-	/** The collection of the various autonomous routines */
-	private AutoRoutines autoRoutines;
-	/** The current step in a given autonomous routine that is being performed */
-	private int currentStep = 0;
-	
-	private String autoAction;
-	private double autoActionValue;
+	// AutoMethods
+	private AutoMethods autoMethods;
 	
 	// Choosing an autonomous routine
 	/** The SendableChooser object that allows different autonomous modes to be selected from the driver station. */
     SendableChooser autonomousChooser;
     /** The number that represents which autonomous routine is selected on the driver station */
-    private AutoRoutine selectedAuto;
+    private int selectedAuto;
     
     // Miscellaneous objects and variables:
     
@@ -154,8 +149,8 @@ public class Robot extends IterativeRobot
     {
     	// Construct the DrivingDevices
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
-    			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B,
-    			GYRO_PORT);
+    			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, 
+    			RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, GYRO_PORT);
     	
     	// Construct the PickupArm
     	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
@@ -169,14 +164,14 @@ public class Robot extends IterativeRobot
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
     	
     	// Construct the AutoRoutines
-    	autoRoutines = new AutoRoutines();
+    	autoMethods = new AutoMethods(driveControl, arm, wedge);
     	
     	// Construct the autonomousChooser
     	autonomousChooser = new SendableChooser();
     	
     	// Add the different autonomous options to the chooser
-        autonomousChooser.addDefault("Drive Under Low Bar", AutoRoutines.LOWBAR_KEY);
-        autonomousChooser.addObject("Drive Under Low Bar & Go to Tower", AutoRoutines.TO_TOWER_KEY);
+        autonomousChooser.addDefault("Auto1()", 1);
+        autonomousChooser.addObject("Auto2()", 2);
         
         // Put the chooser on the SmartDashboard
         SmartDashboard.putData("Which autonomous option would you like to use?", autonomousChooser);
@@ -190,11 +185,14 @@ public class Robot extends IterativeRobot
     public void autonomousInit()
     {
     	// Get the selected autonomous routine from the driver station
-    	selectedAuto =  autoRoutines.getRoutine((int)autonomousChooser.getSelected());
-		System.out.println("Preparing to run autonomous routine: " + selectedAuto.getName() + "."); // This is for testing the SendableChooser
+    	selectedAuto =  (int) autonomousChooser.getSelected();
+		System.out.println("Preparing to run autonomous routine #" + selectedAuto + "."); // This is for testing the SendableChooser
 		
-		// Reset the encoders
-		driveControl.resetEncoders();
+		// Set the currentStep in the auto method to be executed back to 1
+		autoMethods.resetCurrentStep();
+		
+		// Reset the encoders and the gyro
+		driveControl.resetEncodersAndGyro();
     }
 
     /** 
@@ -202,46 +200,10 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	if (currentStep < selectedAuto.getLength())
-    	{
-	    	autoAction = selectedAuto.getStep(currentStep).getAction();
-	    	autoActionValue = selectedAuto.getStep(currentStep).getActionValue();
-	    	
-	    	if (autoAction.equals("M"))
-	    	{
-	    		if (!driveControl.robotHasDrivenDistance(autoActionValue))
-	    		{
-	    			if (autoActionValue > 0)
-	    				driveControl.arcadeDriveUsingValues(0.5, 0);
-	    			else if (autoActionValue < 0)
-	    				driveControl.arcadeDriveUsingValues(-0.5, 0);
-	    		}
-	    		else
-	    		{
-	    			currentStep++;
-	    			driveControl.resetThings();
-	    		}
-	    	}
-	    	else if(autoAction.equals("R"))
-	    	{
-	    		if(!driveControl.robotHasTurnedDegrees(autoActionValue))
-	    		{
-	    			if (autoActionValue > 0)
-	    				driveControl.arcadeDriveUsingValues(0, 0.5);
-	    			else if (autoActionValue < 0)
-	    				driveControl.arcadeDriveUsingValues(0, -0.5);
-	    		}
-	    		else
-	    		{
-	    			currentStep++;
-	    			driveControl.resetThings();
-	    		}
-	    	}
-	    	else
-	    	{
-	    		System.out.println("Action not Recognized");
-	    	}
-    	}
+    	if (selectedAuto == 1)
+    		autoMethods.Auto1();
+    	else if (selectedAuto == 2)
+    		autoMethods.Auto2();
     }
     
     /**
