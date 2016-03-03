@@ -127,11 +127,17 @@ public class Robot extends IterativeRobot
 	// AutoMethods
 	private AutoMethods autoMethods;
 	
-	// Choosing an autonomous routine
-	/** The SendableChooser object that allows different autonomous modes to be selected from the driver station. */
-    SendableChooser autonomousChooser;
-    /** The number that represents which autonomous routine is selected on the driver station */
-    private int selectedAuto;
+	// Used to set the starting position of the robot.
+	/** The SendableChooser object that allows the starting position of the robot to be set from the driver station. */
+    SendableChooser autonomousPositionChooser;
+    /** The position where the robot starts the match */
+    private int startingPosition;
+    
+    // Used to set which defense the robot must conquer.
+    /** The SendableChooser object that allows the specific defense the robot must conquer to be set from the driver station */
+    SendableChooser autonomousDefenseChooser;
+    /** The value indicating the specific defense the robot needs to conquer */
+    private int defenseInStartingPosition;
     
     // Miscellaneous objects and variables:
     
@@ -166,15 +172,17 @@ public class Robot extends IterativeRobot
     	// Construct the AutoRoutines
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
     	
-    	// Construct the autonomousChooser
-    	autonomousChooser = new SendableChooser();
-    	
-    	// Add the different autonomous options to the chooser
-        autonomousChooser.addDefault("Auto1()", 1);
-        autonomousChooser.addObject("Auto2()", 2);
+    	// Construct the position chooser and add all options to it
+    	autonomousPositionChooser = new SendableChooser();
+        autoMethods.addOptionsToPositionChooser(autonomousPositionChooser);
         
-        // Put the chooser on the SmartDashboard
-        SmartDashboard.putData("Which autonomous option would you like to use?", autonomousChooser);
+        // Construct the defense chooser and add all options to it
+        autonomousDefenseChooser = new SendableChooser();
+        autoMethods.addOptionsToDefenseChooser(autonomousDefenseChooser); 
+        
+        // Put the choosers on the SmartDashboard
+        SmartDashboard.putData("In which position will the robot start the match?", autonomousPositionChooser);
+        SmartDashboard.putData("What defense is in that position?", autonomousDefenseChooser);
     }
     
 	/**
@@ -184,11 +192,13 @@ public class Robot extends IterativeRobot
 	 */
     public void autonomousInit()
     {
-    	// Get the selected autonomous routine from the driver station
-    	selectedAuto =  (int) autonomousChooser.getSelected();
-		System.out.println("Preparing to run autonomous routine #" + selectedAuto + "."); // This is for testing the SendableChooser
+    	// Get the selected starting position from the driver station
+    	startingPosition =  (int) autonomousPositionChooser.getSelected();
 		
-		// Set the currentStep in the auto method to be executed back to 1
+		// Get the selected defense to conquer from the driver station
+		defenseInStartingPosition = (int) autonomousDefenseChooser.getSelected();
+		
+		// Make sure the "conquerDefenseInPosition___" will execute step 1 when initially called
 		autoMethods.resetCurrentStep();
 		
 		// Reset the encoders and the gyro
@@ -200,10 +210,16 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	if (selectedAuto == 1)
-    		autoMethods.Auto1();
-    	else if (selectedAuto == 2)
-    		autoMethods.Auto2();
+    	if (startingPosition == 1)
+    		autoMethods.conquerDefenseInPosition1(defenseInStartingPosition);
+    	else if (startingPosition == 2)
+    		autoMethods.conquerDefenseInPosition2(defenseInStartingPosition);
+    	else if (startingPosition == 3)
+    		autoMethods.conquerDefenseInPosition3(defenseInStartingPosition);
+    	else if (startingPosition == 4)
+    		autoMethods.conquerDefenseInPosition4(defenseInStartingPosition);
+    	else if (startingPosition == 5)
+    		autoMethods.conquerDefenseInPosition5(defenseInStartingPosition);
     }
     
     /**
@@ -237,7 +253,7 @@ public class Robot extends IterativeRobot
     	// Driving Data
     	driveControl.putDataOnSmartDashboard();
     	
-    	// Forwards Joystick
+    	// Functions specific to Joystick A
     	
     	// Pickup Arm
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_STORE))
@@ -263,7 +279,7 @@ public class Robot extends IterativeRobot
     	// Arm Data
     	arm.putDataOnSmartDashboard();
     	
-    	// Backwards Joystick
+    	// Functions specific to Joystick B
     	
     	// Wedge
     	if (stickB.getRawButton(JOYSTICK_B_WEDGE_DEPLOY))
