@@ -46,6 +46,18 @@ public class AutoMethods
 	/** The current step being performed in an autonomous method */
 	private int currentStep = 1;
 	
+	// Angles for each position to turn towards the tower
+	/** Angle to turn after going through the defense in position 1 */
+	public static final int POSITION_1_ANGLE = 40;
+	/** Angle to turn after going through the defense in position 2 */
+	public static final int POSITION_2_ANGLE = 20;
+	/** Angle to turn after going through the defense in position 3 */
+	public static final int POSITION_3_ANGLE = 0;
+	/** Angle to turn after going through the defense in position 4 */
+	public static final int POSITION_4_ANGLE = -20;
+	/** Angle to turn after going through the defense in position 5 */
+	public static final int POSITION_5_ANGLE = -40;
+	
 	/**
 	 * The AutoMethods constructor passes in objects representing the various subsystems of the robot we want to use in auto.
 	 * @param d The set of devices used for driving the robot
@@ -282,7 +294,8 @@ public class AutoMethods
 	
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)
 	{
-		positionChooser.addDefault("Position 1 (far left)", 1);
+		positionChooser.addDefault("No Autonomous", 0);
+		positionChooser.addObject("Position 1 (far left)", 1);
         positionChooser.addObject("Position 2 (second from the left)", 2);
         positionChooser.addObject("Position 3 (in the middle)", 3);
         positionChooser.addObject("Position 4 (second from the right)", 4);
