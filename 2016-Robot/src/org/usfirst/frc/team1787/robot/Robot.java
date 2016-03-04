@@ -220,6 +220,8 @@ public class Robot extends IterativeRobot
     		autoMethods.conquerDefenseInPosition4(defenseInStartingPosition);
     	else if (startingPosition == 5)
     		autoMethods.conquerDefenseInPosition5(defenseInStartingPosition);
+    	else if (startingPosition == 6)
+    		autoMethods.justMoveForwards();
     }
     
     /**

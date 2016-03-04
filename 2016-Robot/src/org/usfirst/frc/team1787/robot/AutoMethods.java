@@ -38,6 +38,26 @@ public class AutoMethods
 	/** The value that specifies a given defense as the Rough Terrain */
 	public static final int ROUGH_TERRAIN = 9;
 	
+	// Defense count variables
+	/** Count variable for the low bar */
+	private int count_lowbar = 1;
+	/** Count variable for the portcullis */
+	private int count_portcullis = 1;
+	/** Count variable for the cheval de frise */
+	private int count_chevaldefrise = 1;
+	/** Count variable for the ramparts */
+	private int count_ramparts = 1;
+	/** Count variable for the moat */
+	private int count_moat = 1;
+	/** Count variable for the drawbridge */
+	private int count_drawbridge = 1;
+	/** Count variable for the sally port */
+	private int count_sallyport = 1;
+	/** Count variable for the rock wall */
+	private int count_rockwall = 1;
+	/** Count variable for the rough terrain */
+	private int count_roughterrain = 1;
+	
 	// Values used for auto routines
 	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_MOVE_SPEED = 0.5;
@@ -48,15 +68,15 @@ public class AutoMethods
 	
 	// Angles for each position to turn towards the tower
 	/** Angle to turn after going through the defense in position 1 */
-	public static final int POSITION_1_ANGLE = 40;
+	public static final int POSITION_1_ANGLE = 57;
 	/** Angle to turn after going through the defense in position 2 */
-	public static final int POSITION_2_ANGLE = 20;
+	public static final int POSITION_2_ANGLE = 57;
 	/** Angle to turn after going through the defense in position 3 */
 	public static final int POSITION_3_ANGLE = 0;
 	/** Angle to turn after going through the defense in position 4 */
-	public static final int POSITION_4_ANGLE = -20;
+	public static final int POSITION_4_ANGLE = -57;
 	/** Angle to turn after going through the defense in position 5 */
-	public static final int POSITION_5_ANGLE = -40;
+	public static final int POSITION_5_ANGLE = -57 ;
 	
 	/**
 	 * The AutoMethods constructor passes in objects representing the various subsystems of the robot we want to use in auto.
@@ -79,7 +99,15 @@ public class AutoMethods
 	 */
 	public void conquerDefenseInPosition1(int defenseInPosition1)
 	{
-		System.out.println("Automatically conquering the defense in position 1");	
+		System.out.println("Automatically conquering the defense in position 1");
+		if (currentStep == 1)
+		{
+			autoConquerDefense(defenseInPosition1);
+		}
+		else if (currentStep == 2)
+		{
+			
+		}
 	}	
 	
 	/**
@@ -124,6 +152,15 @@ public class AutoMethods
 	public void conquerDefenseInPosition5(int defenseInPosition5)
 	{
 		System.out.println("Automatically conquering the defense in position 5");
+	}
+	
+	/**
+	 * This method just makes the robot drive forwards
+	 */
+	public void justMoveForwards()
+	{
+		if (currentStep == 1)
+			autoDriveDistance(12);
 	}
 	
 	/**
@@ -200,7 +237,7 @@ public class AutoMethods
 	 */
 	public void autoConquerLowBar()
 	{
-		
+		autoDriveDistance(12);
 	}
 	
 	/**
@@ -296,22 +333,23 @@ public class AutoMethods
 	{
 		positionChooser.addDefault("No Autonomous", 0);
 		positionChooser.addObject("Position 1 (far left)", 1);
-        positionChooser.addObject("Position 2 (second from the left)", 2);
-        positionChooser.addObject("Position 3 (in the middle)", 3);
-        positionChooser.addObject("Position 4 (second from the right)", 4);
-        positionChooser.addObject("Position 5 (far right)", 5);
+        //positionChooser.addObject("Position 2 (second from the left)", 2);
+        //positionChooser.addObject("Position 3 (in the middle)", 3);
+        //positionChooser.addObject("Position 4 (second from the right)", 4);
+        //positionChooser.addObject("Position 5 (far right)", 5);
+		//positionChooser.addObject("Just Move Forwards", 5);
 	}
 	
 	public void addOptionsToDefenseChooser(SendableChooser defenseChooser)
 	{
 		defenseChooser.addDefault("Low Bar", LOW_BAR);
-        defenseChooser.addObject("Portcullis (Type A)", PORTCULLIS);
-        defenseChooser.addObject("Cheval-De-Frise (Type A)", CHEVAL_DE_FRISE);
-        defenseChooser.addObject("Ramparts (Type B)", RAMPARTS);
-        defenseChooser.addObject("Moat (Type B)", MOAT);
-        defenseChooser.addObject("Drawbridge (Type C)", DRAWBRIDGE);
-        defenseChooser.addObject("Sally Port (Type C)", SALLY_PORT);
-        defenseChooser.addObject("Rock Wall (Type D)", ROCK_WALL);
-        defenseChooser.addObject("Rough Terrain (Type D)", ROUGH_TERRAIN);
+        //defenseChooser.addObject("Portcullis (Type A)", PORTCULLIS);
+        //defenseChooser.addObject("Cheval-De-Frise (Type A)", CHEVAL_DE_FRISE);
+        //defenseChooser.addObject("Ramparts (Type B)", RAMPARTS);
+        //defenseChooser.addObject("Moat (Type B)", MOAT);
+        //defenseChooser.addObject("Drawbridge (Type C)", DRAWBRIDGE);
+        //defenseChooser.addObject("Sally Port (Type C)", SALLY_PORT);
+        //defenseChooser.addObject("Rock Wall (Type D)", ROCK_WALL);
+        //defenseChooser.addObject("Rough Terrain (Type D)", ROUGH_TERRAIN);
 	}
 }
