@@ -67,16 +67,7 @@ public class AutoMethods
 	 */
 	public void conquerDefenseInPosition1(int defenseInPosition1)
 	{
-		System.out.println("Automatically conquering the defense in position 1");
-		
-		if (currentStep == 1)
-		{
-			
-		}
-		else if (currentStep == 2)
-		{
-			
-		}
+		System.out.println("Automatically conquering the defense in position 1");	
 	}	
 	
 	/**
