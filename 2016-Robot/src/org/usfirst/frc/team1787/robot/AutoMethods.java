@@ -91,13 +91,31 @@ public class AutoMethods
 		wedge = w;
 	}
 	
+	/*public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
+	{
+    	if (startingPosition == 1)
+    		conquerDefenseInPosition1(defenseInStartingPosition, tryToScore);
+    	else if (startingPosition == 2)
+    		conquerDefenseInPosition2(defenseInStartingPosition, tryToScore);
+    	else if (startingPosition == 3)
+    		conquerDefenseInPosition3(defenseInStartingPosition, tryToScore);
+    	else if (startingPosition == 4)
+    		conquerDefenseInPosition4(defenseInStartingPosition, tryToScore);
+    	else if (startingPosition == 5)
+    		conquerDefenseInPosition5(defenseInStartingPosition, tryToScore);
+    	else if (startingPosition == 6)
+    		justMoveForwards();
+	}*/
+	
+	//public void runAuto()
+	
 	/**
 	 * This method makes the robot perform a series of steps to conquer a given defense in position 1, 
 	 * approach the tower, and shoot a boulder into the low goal during autonomous.
 	 * To work properly, the robot must be correctly aligned with the defense in position 1.
 	 * @param defenseInPosition1 The value indicating the specific type of defense to conquer.
 	 */
-	public void conquerDefenseInPosition1(int defenseInPosition1)
+	public void conquerDefenseInPosition1(int defenseInPosition1, boolean tryToScore)
 	{
 		System.out.println("Automatically conquering the defense in position 1");
 		if (currentStep == 1)
@@ -109,14 +127,14 @@ public class AutoMethods
 			
 		}
 	}	
-	
+	/*
 	/**
 	 * This method makes the robot perform a series of steps to conquer a given defense in position 2, 
 	 * approach the tower, and shoot a boulder into the low goal during autonomous.
 	 * To work properly, the robot must be correctly aligned with the defense in position 2.
 	 * @param defenseInPosition2 The value indicating the specific type of defense to conquer.
 	 */
-	public void conquerDefenseInPosition2(int defenseInPosition2)
+	public void conquerDefenseInPosition2(int defenseInPosition2, boolean tryToScore)
 	{
 		System.out.println("Automatically conquering the defense in position 2");
 	}
@@ -127,7 +145,7 @@ public class AutoMethods
 	 * To work properly, the robot must be correctly aligned with the defense in position 3.
 	 * @param defenseInPosition3 The value indicating the specific type of defense to conquer.
 	 */
-	public void conquerDefenseInPosition3(int defenseInPosition3)
+	public void conquerDefenseInPosition3(int defenseInPosition3, boolean tryToScore)
 	{
 		System.out.println("Automatically conquering the defense in position 3");
 	}
@@ -138,7 +156,7 @@ public class AutoMethods
 	 * To work properly, the robot must be correctly aligned with the defense in position 4.
 	 * @param defenseInPosition4 The value indicating the specific type of defense to conquer.
 	 */
-	public void conquerDefenseInPosition4(int defenseInPosition4)
+	public void conquerDefenseInPosition4(int defenseInPosition4, boolean tryToScore)
 	{
 		System.out.println("Automatically conquering the defense in position 4");
 	}
@@ -149,10 +167,10 @@ public class AutoMethods
 	 * To work properly, the robot must be correctly aligned with the defense in position 5.
 	 * @param defenseInPosition5 The value indicating the specific type of defense to conquer.
 	 */
-	public void conquerDefenseInPosition5(int defenseInPosition5)
+	public void conquerDefenseInPosition5(int defenseInPosition5, boolean tryToScore)
 	{
 		System.out.println("Automatically conquering the defense in position 5");
-	}
+	}*/
 	
 	/**
 	 * This method just makes the robot drive forwards
@@ -231,13 +249,19 @@ public class AutoMethods
 			System.out.println("Invalid Defense ID");
 	}
 	
+	/*
+	 * Each of these autoConquer methods should get the
+	 * back of the bumper lined up with the end of the
+	 * ramp of the defense
+	 */
+	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Low Bar.
 	 * To work properly, the robot must be correctly aligned with the Low Bar.
 	 */
 	public void autoConquerLowBar()
 	{
-		autoDriveDistance(12);
+		autoDriveDistance(7);
 	}
 	
 	/**
@@ -351,5 +375,11 @@ public class AutoMethods
         //defenseChooser.addObject("Sally Port (Type C)", SALLY_PORT);
         //defenseChooser.addObject("Rock Wall (Type D)", ROCK_WALL);
         //defenseChooser.addObject("Rough Terrain (Type D)", ROUGH_TERRAIN);
+	}
+	
+	public void addOptionsToScoreChooser(SendableChooser scoreChooser)
+	{
+		scoreChooser.addDefault("Don't score", false);
+		scoreChooser.addDefault("Score", true);
 	}
 }

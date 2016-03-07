@@ -143,6 +143,8 @@ public class Robot extends IterativeRobot
     /** The SendableChooser object that allows the robot to either score or not in autonomous */
     SendableChooser scoreChooser;
     
+    private boolean tryToScore;
+    
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
@@ -184,9 +186,14 @@ public class Robot extends IterativeRobot
         autonomousDefenseChooser = new SendableChooser();
         autoMethods.addOptionsToDefenseChooser(autonomousDefenseChooser); 
         
+        // Construct the shooter score chooser
+        scoreChooser = new SendableChooser();
+        autoMethods.addOptionsToScoreChooser(scoreChooser);
+        
         // Put the choosers on the SmartDashboard
         SmartDashboard.putData("In which position will the robot start the match?", autonomousPositionChooser);
         SmartDashboard.putData("What defense is in that position?", autonomousDefenseChooser);
+        SmartDashboard.putData("Try to score?", scoreChooser);
     }
     
 	/**
@@ -202,6 +209,9 @@ public class Robot extends IterativeRobot
 		// Get the selected defense to conquer from the driver station
 		defenseInStartingPosition = (int) autonomousDefenseChooser.getSelected();
 		
+		// Get whether or not to try to score
+		tryToScore = (boolean) scoreChooser.getSelected();
+		
 		// Make sure the "conquerDefenseInPosition___" will execute step 1 when initially called
 		autoMethods.resetCurrentStep();
 		
@@ -214,18 +224,7 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	if (startingPosition == 1)
-    		autoMethods.conquerDefenseInPosition1(defenseInStartingPosition);
-    	else if (startingPosition == 2)
-    		autoMethods.conquerDefenseInPosition2(defenseInStartingPosition);
-    	else if (startingPosition == 3)
-    		autoMethods.conquerDefenseInPosition3(defenseInStartingPosition);
-    	else if (startingPosition == 4)
-    		autoMethods.conquerDefenseInPosition4(defenseInStartingPosition);
-    	else if (startingPosition == 5)
-    		autoMethods.conquerDefenseInPosition5(defenseInStartingPosition);
-    	else if (startingPosition == 6)
-    		autoMethods.justMoveForwards();
+    	autoMethods.runAuto(startingPosition, defenseInStartingPosition, tryToScore);
     }
     
     /**
