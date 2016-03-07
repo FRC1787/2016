@@ -38,33 +38,17 @@ public class AutoMethods
 	/** The value that specifies a given defense as the Rough Terrain */
 	public static final int ROUGH_TERRAIN = 9;
 	
-	// Defense count variables
-	/** Count variable for the low bar */
-	private int count_lowbar = 1;
-	/** Count variable for the portcullis */
-	private int count_portcullis = 1;
-	/** Count variable for the cheval de frise */
-	private int count_chevaldefrise = 1;
-	/** Count variable for the ramparts */
-	private int count_ramparts = 1;
-	/** Count variable for the moat */
-	private int count_moat = 1;
-	/** Count variable for the drawbridge */
-	private int count_drawbridge = 1;
-	/** Count variable for the sally port */
-	private int count_sallyport = 1;
-	/** Count variable for the rock wall */
-	private int count_rockwall = 1;
-	/** Count variable for the rough terrain */
-	private int count_roughterrain = 1;
-	
 	// Values used for auto routines
 	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_MOVE_SPEED = 0.5;
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_ROTATE_SPEED = 0.5;
-	/** The current step being performed in an autonomous method */
-	private int currentStep = 1;
+	/** The current step being performed in the runAuto() method */
+	private int runAutoStepCount = 1;
+	/** The current step being performed in a given "conquer defense" method */
+	private int conquerDefenseStepCount = 1;
+	/** The current step being performed in the "move to goal" method */
+	private int moveToGoalStepCount = 1;
 	
 	// Angles for each position to turn towards the tower
 	/** Angle to turn after going through the defense in position 1 */
@@ -91,134 +75,14 @@ public class AutoMethods
 		wedge = w;
 	}
 	
-	/*public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
+	public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
 	{
-    	if (startingPosition == 1)
-    		conquerDefenseInPosition1(defenseInStartingPosition, tryToScore);
-    	else if (startingPosition == 2)
-    		conquerDefenseInPosition2(defenseInStartingPosition, tryToScore);
-    	else if (startingPosition == 3)
-    		conquerDefenseInPosition3(defenseInStartingPosition, tryToScore);
-    	else if (startingPosition == 4)
-    		conquerDefenseInPosition4(defenseInStartingPosition, tryToScore);
-    	else if (startingPosition == 5)
-    		conquerDefenseInPosition5(defenseInStartingPosition, tryToScore);
-    	else if (startingPosition == 6)
-    		justMoveForwards();
-	}*/
-	
-	//public void runAuto()
-	
-	/**
-	 * This method makes the robot perform a series of steps to conquer a given defense in position 1, 
-	 * approach the tower, and shoot a boulder into the low goal during autonomous.
-	 * To work properly, the robot must be correctly aligned with the defense in position 1.
-	 * @param defenseInPosition1 The value indicating the specific type of defense to conquer.
-	 */
-	public void conquerDefenseInPosition1(int defenseInPosition1, boolean tryToScore)
-	{
-		System.out.println("Automatically conquering the defense in position 1");
-		if (currentStep == 1)
-		{
-			autoConquerDefense(defenseInPosition1);
-		}
-		else if (currentStep == 2)
-		{
-			
-		}
-	}	
-	/*
-	/**
-	 * This method makes the robot perform a series of steps to conquer a given defense in position 2, 
-	 * approach the tower, and shoot a boulder into the low goal during autonomous.
-	 * To work properly, the robot must be correctly aligned with the defense in position 2.
-	 * @param defenseInPosition2 The value indicating the specific type of defense to conquer.
-	 */
-	public void conquerDefenseInPosition2(int defenseInPosition2, boolean tryToScore)
-	{
-		System.out.println("Automatically conquering the defense in position 2");
-	}
-	
-	/**
-	 * This method makes the robot perform a series of steps to conquer a given defense in position 3, 
-	 * approach the tower, and shoot a boulder into the low goal during autonomous.
-	 * To work properly, the robot must be correctly aligned with the defense in position 3.
-	 * @param defenseInPosition3 The value indicating the specific type of defense to conquer.
-	 */
-	public void conquerDefenseInPosition3(int defenseInPosition3, boolean tryToScore)
-	{
-		System.out.println("Automatically conquering the defense in position 3");
-	}
-	
-	/**
-	 * This method makes the robot perform a series of steps to conquer a given defense in position 4, 
-	 * approach the tower, and shoot a boulder into the low goal during autonomous.
-	 * To work properly, the robot must be correctly aligned with the defense in position 4.
-	 * @param defenseInPosition4 The value indicating the specific type of defense to conquer.
-	 */
-	public void conquerDefenseInPosition4(int defenseInPosition4, boolean tryToScore)
-	{
-		System.out.println("Automatically conquering the defense in position 4");
-	}
-	
-	/**
-	 * This method makes the robot perform a series of steps to conquer a given defense in position 5, 
-	 * approach the tower, and shoot a boulder into the low goal during autonomous.
-	 * To work properly, the robot must be correctly aligned with the defense in position 5.
-	 * @param defenseInPosition5 The value indicating the specific type of defense to conquer.
-	 */
-	public void conquerDefenseInPosition5(int defenseInPosition5, boolean tryToScore)
-	{
-		System.out.println("Automatically conquering the defense in position 5");
-	}*/
-	
-	/**
-	 * This method just makes the robot drive forwards
-	 */
-	public void justMoveForwards()
-	{
-		if (currentStep == 1)
-			autoDriveDistance(12);
-	}
-	
-	/**
-	 * This method is called when the robot completes a step that is part of an autonomous routine.
-	 * This method stops the robot, resets the encoders, resets the gyro, and advances the currentStep by 1.
-	 */
-	public void completeStep()
-	{
-		driveControl.stop();
-		driveControl.resetEncodersAndGyro();
-		currentStep++;
-	}
-	
-	/**
-	 * This method, when called periodically, makes the robot travel a given distance.
-	 * @param distance How far the robot should travel. 
-	 * Use positive values to move forward, and negative values to move backward.
-	 */
-	public void autoDriveDistance(double distance)
-	{
-		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
-			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, 0);
-		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
-			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, 0);
-		else
-			completeStep();
-	}
-	
-	/**
-	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
-	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
-	 */
-	public void autoTurnDegrees(double degrees)
-	{
-		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
-			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
-		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
-			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
-		else
-			completeStep();
+		if (runAutoStepCount == 1)
+			autoConquerDefense(defenseInStartingPosition);
+		else if (runAutoStepCount == 2)
+			autoMoveToGoalFromPosition(startingPosition);
+		else if (runAutoStepCount == 3 && tryToScore)
+			autoShootLowGoal();
 	}
 	
 	/**
@@ -261,7 +125,10 @@ public class AutoMethods
 	 */
 	public void autoConquerLowBar()
 	{
-		autoDriveDistance(7);
+		if (conquerDefenseStepCount == 1)
+			autoDriveDistance(7, conquerDefenseStepCount);
+		else if (conquerDefenseStepCount == 2)
+			completeStep(runAutoStepCount);
 	}
 	
 	/**
@@ -336,6 +203,34 @@ public class AutoMethods
 		
 	}
 	
+	public void autoMoveToGoalFromPosition(int position)
+	{
+		if (position == 1)
+		{
+			
+		}
+		else if (position == 2)
+		{
+			
+		}
+		else if (position == 3)
+		{
+			
+		}
+		else if (position == 4)
+		{
+			
+		}
+		else if (position == 5)
+		{
+			
+		}
+		else if (position == 6)
+		{
+			
+		}
+	}
+	
 	/**
 	 * This method makes the robot perform a series of steps to shoot a boulder into the low goal.
 	 * To work properly, the robot must be correctly aligned with the tower.
@@ -346,11 +241,53 @@ public class AutoMethods
 	}
 	
 	/**
+	 * This method, when called periodically, makes the robot travel a given distance.
+	 * @param distance How far the robot should travel. 
+	 * Use positive values to move forward, and negative values to move backward.
+	 */
+	public void autoDriveDistance(double distance, int stepToIncrementWhenComplete)
+	{
+		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
+			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, 0);
+		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
+			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, 0);
+		else
+			completeStep(stepToIncrementWhenComplete);
+	}
+	
+	/**
+	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
+	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
+	 */
+	public void autoTurnDegrees(double degrees, int stepToIncrementWhenComplete)
+	{
+		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
+			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
+			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
+		else
+			completeStep(stepToIncrementWhenComplete);
+	}
+	
+	/**
+	 * This method is called when the robot completes a step that is part of an autonomous routine.
+	 * This method stops the robot, resets the encoders, resets the gyro, and advances the currentStep by 1.
+	 */
+	public void completeStep(int stepCounterToIncrement)
+	{
+		driveControl.stop();
+		driveControl.resetEncodersAndGyro();
+		stepCounterToIncrement++;
+	}
+	
+	/**
 	 * Resets currentStep to 1.
 	 */
-	public void resetCurrentStep()
+	public void resetAutoStepCounts()
 	{
-		currentStep = 1;
+		runAutoStepCount = 1;
+		conquerDefenseStepCount = 1;
+		moveToGoalStepCount = 1;
 	}
 	
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)

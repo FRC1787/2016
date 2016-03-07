@@ -139,10 +139,10 @@ public class Robot extends IterativeRobot
     /** The value indicating the specific defense the robot needs to conquer */
     private int defenseInStartingPosition;
     
-    // Used to decide whether or not to score
-    /** The SendableChooser object that allows the robot to either score or not in autonomous */
+    // Used to decide whether or not to attempt a shot in the low goal
+    /** The SendableChooser object that allows someone to set whether or not to attempt a low goal shot from the driver station */
     SendableChooser scoreChooser;
-    
+    /** The value indicating whether or not the robot will attempt to score in the low goal during auto. */
     private boolean tryToScore;
     
     // Miscellaneous objects and variables:
@@ -193,7 +193,7 @@ public class Robot extends IterativeRobot
         // Put the choosers on the SmartDashboard
         SmartDashboard.putData("In which position will the robot start the match?", autonomousPositionChooser);
         SmartDashboard.putData("What defense is in that position?", autonomousDefenseChooser);
-        SmartDashboard.putData("Try to score?", scoreChooser);
+        SmartDashboard.putData("Try to score in the low goal during auto?", scoreChooser);
     }
     
 	/**
@@ -209,11 +209,11 @@ public class Robot extends IterativeRobot
 		// Get the selected defense to conquer from the driver station
 		defenseInStartingPosition = (int) autonomousDefenseChooser.getSelected();
 		
-		// Get whether or not to try to score
+		// Get whether or not to attempt a shot in the low goal
 		tryToScore = (boolean) scoreChooser.getSelected();
 		
-		// Make sure the "conquerDefenseInPosition___" will execute step 1 when initially called
-		autoMethods.resetCurrentStep();
+		// Make sure that all auto processes will execute step 1 when initially called
+		autoMethods.resetAutoStepCounts();
 		
 		// Reset the encoders and the gyro
 		driveControl.resetEncodersAndGyro();
