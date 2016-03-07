@@ -43,12 +43,12 @@ public class AutoMethods
 	private static final double AUTO_MOVE_SPEED = 0.5;
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_ROTATE_SPEED = 0.5;
-	/** The current step being performed in the runAuto() method */
-	private int runAutoStepCount = 1;
-	/** The current step being performed in a given "conquer defense" method */
-	private int conquerDefenseStepCount = 1;
-	/** The current step being performed in the "move to goal" method */
-	private int moveToGoalStepCount = 1;
+	/** A counter variable that keeps track of the step being performed in runAuto() */
+	private int runAutoCurrentStep = 1;
+	/** A counter variable that keeps track of the step being performed in a given "conquer defense" method */
+	private int conquerDefenseCurrentStep = 1;
+	/** A counter variable that keeps track of the step being performed in the "move to goal" method */
+	private int moveToGoalCurrentStep = 1;
 	
 	// Angles for each position to turn towards the tower
 	/** Angle to turn after going through the defense in position 1 */
@@ -77,11 +77,11 @@ public class AutoMethods
 	
 	public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
 	{
-		if (runAutoStepCount == 1)
+		if (runAutoCurrentStep == 1)
 			autoConquerDefense(defenseInStartingPosition);
-		else if (runAutoStepCount == 2)
-			autoMoveToGoalFromPosition(startingPosition);
-		else if (runAutoStepCount == 3 && tryToScore)
+		else if (runAutoCurrentStep == 2)
+			autoMoveToGoal(startingPosition);
+		else if (runAutoCurrentStep == 3 && tryToScore)
 			autoShootLowGoal();
 	}
 	
@@ -125,10 +125,10 @@ public class AutoMethods
 	 */
 	public void autoConquerLowBar()
 	{
-		if (conquerDefenseStepCount == 1)
-			autoDriveDistance(7, conquerDefenseStepCount);
-		else if (conquerDefenseStepCount == 2)
-			completeStep(runAutoStepCount);
+		if (conquerDefenseCurrentStep == 1)
+			autoDriveDistance(7, conquerDefenseCurrentStep);
+		else if (conquerDefenseCurrentStep == 2)
+			completeStep(runAutoCurrentStep);
 	}
 	
 	/**
@@ -203,34 +203,34 @@ public class AutoMethods
 		
 	}
 	
-	public void autoMoveToGoalFromPosition(int position)
+	public void autoMoveToGoal(int startingPosition)
 	{
-		if (position == 1)
+		if (startingPosition == 1)
 		{
-			if (moveToGoalStepCount == 1)
-				autoDriveDistance(0, moveToGoalStepCount);
-			else if (moveToGoalStepCount == 2)
-				autoTurnDegrees(0, moveToGoalStepCount);
-			else if (moveToGoalStepCount == 3)
-				autoDriveDistance(0, moveToGoalStepCount);
+			if (moveToGoalCurrentStep == 1)
+				autoDriveDistance(0, moveToGoalCurrentStep);
+			else if (moveToGoalCurrentStep == 2)
+				autoTurnDegrees(POSITION_1_ANGLE, moveToGoalCurrentStep);
+			else if (moveToGoalCurrentStep == 3)
+				autoDriveDistance(0, moveToGoalCurrentStep);
 		}
-		else if (position == 2)
-		{
-			
-		}
-		else if (position == 3)
+		else if (startingPosition == 2)
 		{
 			
 		}
-		else if (position == 4)
+		else if (startingPosition == 3)
 		{
 			
 		}
-		else if (position == 5)
+		else if (startingPosition == 4)
 		{
 			
 		}
-		else if (position == 6)
+		else if (startingPosition == 5)
+		{
+			
+		}
+		else if (startingPosition == 6)
 		{
 			
 		}
@@ -248,31 +248,31 @@ public class AutoMethods
 	/**
 	 * This method, when called periodically, makes the robot travel a given distance.
 	 * @param distance How far the robot should travel. Use positive values to move forward, and negative values to move backward.
-	 * @param stepToIncrementWhenComplete The step counter to increment when the operation is finished.
+	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public void autoDriveDistance(double distance, int stepToIncrementWhenComplete)
+	public void autoDriveDistance(double distance, int counterToIncrementWhenComplete)
 	{
 		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
 			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, 0);
 		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
 			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, 0);
 		else
-			completeStep(stepToIncrementWhenComplete);
+			completeStep(counterToIncrementWhenComplete);
 	}
 	
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
-	 * @param stepToIncrementWhenComplete The step counter to increment when the operation is finished.
+	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public void autoTurnDegrees(double degrees, int stepToIncrementWhenComplete)
+	public void autoTurnDegrees(double degrees, int counterToIncrementWhenComplete)
 	{
 		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
 			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
 		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
 			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
 		else
-			completeStep(stepToIncrementWhenComplete);
+			completeStep(counterToIncrementWhenComplete);
 	}
 	
 	/**
@@ -292,9 +292,9 @@ public class AutoMethods
 	 */
 	public void resetAutoStepCounts()
 	{
-		runAutoStepCount = 1;
-		conquerDefenseStepCount = 1;
-		moveToGoalStepCount = 1;
+		runAutoCurrentStep = 1;
+		conquerDefenseCurrentStep = 1;
+		moveToGoalCurrentStep = 1;
 	}
 	
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)
