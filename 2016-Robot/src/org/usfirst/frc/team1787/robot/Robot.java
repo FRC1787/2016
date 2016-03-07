@@ -212,6 +212,9 @@ public class Robot extends IterativeRobot
 		// Get whether or not to attempt a shot in the low goal
 		tryToScore = (boolean) scoreChooser.getSelected();
 		
+		// Put the robot in low gear for better control while going over defenses
+    	driveControl.setLowGear();
+		
 		// Make sure that all auto processes will execute step 1 when initially called
 		autoMethods.resetAutoStepCounts();
 		
