@@ -207,7 +207,12 @@ public class AutoMethods
 	{
 		if (position == 1)
 		{
-			
+			if (moveToGoalStepCount == 1)
+				autoDriveDistance(0, moveToGoalStepCount);
+			else if (moveToGoalStepCount == 2)
+				autoTurnDegrees(0, moveToGoalStepCount);
+			else if (moveToGoalStepCount == 3)
+				autoDriveDistance(0, moveToGoalStepCount);
 		}
 		else if (position == 2)
 		{
@@ -242,8 +247,8 @@ public class AutoMethods
 	
 	/**
 	 * This method, when called periodically, makes the robot travel a given distance.
-	 * @param distance How far the robot should travel. 
-	 * Use positive values to move forward, and negative values to move backward.
+	 * @param distance How far the robot should travel. Use positive values to move forward, and negative values to move backward.
+	 * @param stepToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
 	public void autoDriveDistance(double distance, int stepToIncrementWhenComplete)
 	{
@@ -258,6 +263,7 @@ public class AutoMethods
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
+	 * @param stepToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
 	public void autoTurnDegrees(double degrees, int stepToIncrementWhenComplete)
 	{
@@ -271,7 +277,8 @@ public class AutoMethods
 	
 	/**
 	 * This method is called when the robot completes a step that is part of an autonomous routine.
-	 * This method stops the robot, resets the encoders, resets the gyro, and advances the currentStep by 1.
+	 * This method stops the robot, resets the encoders, resets the gyro, and increments the given step counter by 1.
+	 * @param stepCounterToIncrement The step counter to increment.
 	 */
 	public void completeStep(int stepCounterToIncrement)
 	{
