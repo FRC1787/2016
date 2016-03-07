@@ -139,6 +139,10 @@ public class Robot extends IterativeRobot
     /** The value indicating the specific defense the robot needs to conquer */
     private int defenseInStartingPosition;
     
+    // Used to decide whether or not to score
+    /** The SendableChooser object that allows the robot to either score or not in autonomous */
+    SendableChooser scoreChooser;
+    
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
