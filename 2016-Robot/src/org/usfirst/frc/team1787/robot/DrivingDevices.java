@@ -178,23 +178,35 @@ public class DrivingDevices
 		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
 	}
 	
-	
+	/**
+	 * Getter method for the gyro angle.
+	 * @return The gyro angle.
+	 */
 	public double getGyroAngle()
 	{
 		return gyro.getAngle();
 	}
 	
+	/**
+	 * Resets the gyro to a heading of 0
+	 */
 	public void resetGyro()
 	{
 		gyro.reset();
 	}
 	
+	/**
+	 * Resets the gyro to a heading of 0, and the encoders to a distance of 0.
+	 */
 	public void resetEncodersAndGyro()
 	{
 		resetEncoders();
 		resetGyro();
 	}
 	
+	/**
+	 * Puts data related to driving on the SmartDashboard.
+	 */
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());

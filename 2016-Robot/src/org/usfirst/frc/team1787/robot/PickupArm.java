@@ -71,50 +71,55 @@ public class PickupArm
 	private DigitalInput regPickupLS;
 	
 	// Region Info
-	/** Region number of storage position */ 
+	/** Region number associated with the storage position */ 
 	public static final int REG_STORE = 0;
-	/** Region number of area between Store and Approach */
+	/** Region number associated with the area between the Store and Approach positions */
 	public static final int REG_STOREAPPROACH = 1;
-	/** Region number of approach position */
+	/** Region number associated with the approach position */
 	public static final int REG_APPROACH = 2;
-	/** Region number of area between Approach and Pickup */
+	/** Region number associated with the area between the Approach and Pickup positions */
 	public static final int REG_APPROACHPICKUP = 3;
-	/** Region number of pickup position */
+	/** Region number associated with the pickup position */
 	public static final int REG_PICKUP = 4;
-	/** Current region the arm occupies */
+	/** The value that indicates the current region the arm occupies */
 	private int currentRegion;
 	
 	// Arm Motion Info
 	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
 	public static final double MOTOR_SPEED = 0.66;
-	/** Number designating backwards motion of the arm */
+	/** The value designating backwards motion of the arm */
 	public static final int ARM_BACKWARDS = -1;
-	/** Number designating no motion of the arm */
+	/** The value designating no motion of the arm */
 	public static final int ARM_STATIONARY = 0;
-	/** Number designating forwards motion of the arm */
+	/** The value designating forwards motion of the arm */
 	public static final int ARM_FORWARDS = 1;
-	/** Number representing the current motion of the arm */
+	/** The value that indicates the current motion of the arm */
 	private int armDirection = ARM_STATIONARY;
 	
 	// Pickup Wheels Motion Info
-	/** A value indicating the pickup wheels are spinning forwards. */
+	/** The value designating that the pickup-wheels are spinning forwards. */
 	public static final int WHEELS_PICKUP = 1;
-	/** A value indicating the pickup wheels are not spinning. */
+	/** The value designating that the pickup-wheels are not spinning. */
 	public static final int WHEELS_STATIONARY = 0;
-	/** A value indicating the pickup wheels are spinning backwards */
+	/** The value designating that the pickup-wheels are spinning backwards */
 	public static final int WHEELS_EJECT = -1;
-	/** Represents the current motion of the pickup wheels */
+	/** The value that indicates the current motion of the pickup-wheels */
 	private int wheelsDirection = WHEELS_STATIONARY;
 		
 	// Region 2 Timing
+	/** The timer used to determine if the arm is in region 2. */
 	private Timer reg2Timer;
+	/** The time, in seconds, that it takes the arm to move from region 0 to region 2. */
 	private static final double STORE_TO_APPROACH_TIME = 1.17;
+	/** The time, in seconds, that it takes the arm to move from region 4 to region 2. */
 	private static final double PICKUP_TO_APPROACH_TIME = 0.007;
+	/** The value that indicates if the arm is currently moving towards region 2 from region 0. */
 	private boolean movingTowardsApproachFromStore = false;
+	/** The value that indicates if the arm is currently moving towards region 2 from region 4.  */
 	private boolean movingTowardsApproachFromPickup = false;
 	
 	/**
-	 * Takes IDs and port numbers, not objects
+	 * Constructor for the PickupArm class
 	 * @param leftTalonID    ID of the talon on the right of the arm.
 	 * @param rightTalonID   ID of the talon on the left of the arm.
 	 * @param pickupWheelsID ID of the talon that controls the pickup-wheels.
@@ -133,9 +138,8 @@ public class PickupArm
 	}
 	
 	/**
-	 * Method for moving to a specified region
+	 * Moves the arm to a given region when called periodically.
 	 * @param desiredRegion The region to move to.
-	 * @param motorSpeed Desired arm speed.
 	 */
 	 public void moveToRegion(int desiredRegion)
 	 {
@@ -164,10 +168,10 @@ public class PickupArm
 	 }
 	
 	 /**
-	  * Method for moving the arm at a desired speed.
+	  * Moves the arm at a desired speed when called periodically.
 	  * @param motorSpeed The desired speed of the arm.
-	  * A positive value indicates forwards motion.
-	  * A negative value indicates backwards motion.
+	  * Use a positive value for forwards motion.
+	  * Use a negative value for backwards motion.
 	  */
 	private void moveArm(double motorSpeed)
 	{
@@ -195,7 +199,7 @@ public class PickupArm
 	}
 	
 	/**
-	 * Method for making the arm stationary
+	 * Stops the arm.
 	 */
 	private void stopArm()
 	{
@@ -206,9 +210,10 @@ public class PickupArm
 	}
 	
 	/**
-	 * Method that spins the pickup-wheels. A negative value will spin them forwards (to pick up the ball), 
-	 * and a positive value will spin them backwards (to eject the ball).
-	 * @param motorSpeed How fast the wheels spin.
+	 * Spins the pickup-wheels at a desired speed when called periodically.
+	 * @param motorSpeed How fast the pickup-wheels spin.
+	 * A negative value will spin them forwards (to pick up the ball).
+	 * A positive value will spin them backwards (to eject the ball)
 	 */
 	public void spinPickupWheels(double motorSpeed)
 	{
@@ -223,7 +228,7 @@ public class PickupArm
 	
 
 	/**
-	 * Method that stops the pickup wheels.
+	 * Stops the pickup wheels.
 	 */
 	public void stopPickupWheels()
 	{
@@ -232,8 +237,8 @@ public class PickupArm
 	}
 	
 	/**
-	 * Method for manually controlling the arm with a joystick.
-	 * @param stick The joystick being used.
+	 * Allows for manual control of the arm using a joystick when called periodically.
+	 * @param stick The joystick to use.
 	 */
 	public void manualControl(Joystick stick)
 	{
@@ -242,7 +247,7 @@ public class PickupArm
 	}
 	
 	/**
-	 * Method that updates the current region the arm occupies when called.
+	 * Updates the current region the arm occupies.
 	 */
 	private void determineCurrentRegion()
 	{
@@ -274,21 +279,36 @@ public class PickupArm
 		}
 	}
 	
+	/**
+	 * Tells if the region 0 limit switch is activated.
+	 * @return If the region 0 limit switch is activated.
+	 */
 	public boolean reg_Store_LS_Is_Activated()
 	{
 		return regStoreLS.get(); // This switch is normally closed
 	}
 	
+	/**
+	 * Tells if the region 4 limit switch is activated.
+	 * @return If the region 4 limit switch is activated.
+	 */
 	public boolean reg_Pickup_LS_Is_Activated()
 	{
 		return regPickupLS.get(); // This switch is normally closed
 	}
 	
+	/**
+	 * Gets the current region the arm occupies.
+	 * @return The current region the arm occupies.
+	 */
 	public int getCurrentRegion()
 	{
 		return currentRegion;
 	}
 	
+	/**
+	 * Puts data related to the pickup arm on the SmartDashboard.
+	 */
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putNumber("Current Region", currentRegion);
