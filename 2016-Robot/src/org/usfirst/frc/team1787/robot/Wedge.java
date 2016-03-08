@@ -23,13 +23,13 @@ public class Wedge {
 	 *  0 = stationary
 	 * -1 = retracting
 	 */
-	private int wedgeDirection = WEDGE_STATIONARY;
+	private int wedgeDirection = STATIONARY;
 	
-	public static final int WEDGE_DEPLOY = 1;
+	public static final int DEPLOY = 1;
 	
-	public static final int WEDGE_RETRACT = -1;
+	public static final int RETRACT = -1;
 	
-	public static final int WEDGE_STATIONARY = 0;
+	public static final int STATIONARY = 0;
 	
 	/** Speed of motor */
 	public static final double MOTOR_SPEED = 0.6;
@@ -55,7 +55,7 @@ public class Wedge {
 	 */
 	public void deploy()
 	{
-		wedgeDirection = WEDGE_DEPLOY;
+		wedgeDirection = DEPLOY;
 		wedgeTalon.set(-MOTOR_SPEED);
 		wedgeTimer.start();
 	}
@@ -65,19 +65,19 @@ public class Wedge {
 	 */
 	public void retract()
 	{
-		wedgeDirection = WEDGE_RETRACT;
+		wedgeDirection = RETRACT;
 		wedgeTalon.set(MOTOR_SPEED);
 		wedgeTimer.start();
 	}
 	
 	public void checkIfWedgeMotorShouldStop()
 	{
-		if (wedgeDirection == WEDGE_DEPLOY && wedgeTimer.get() >= DEPLOY_TIME)
+		if (wedgeDirection == DEPLOY && wedgeTimer.get() >= DEPLOY_TIME)
 		{
 			stop();
 			wedgeTimer.reset();
 		}
-		else if (wedgeDirection == WEDGE_RETRACT && wedgeTimer.get() >= RETRACT_TIME)
+		else if (wedgeDirection == RETRACT && wedgeTimer.get() >= RETRACT_TIME)
 		{
 			stop();
 			wedgeTimer.reset();
@@ -90,6 +90,11 @@ public class Wedge {
 	public void stop()
 	{
 		wedgeTalon.set(0);
-		wedgeDirection = WEDGE_STATIONARY;
+		wedgeDirection = STATIONARY;
+	}
+	
+	public int getDirection()
+	{
+		return wedgeDirection;
 	}
 }

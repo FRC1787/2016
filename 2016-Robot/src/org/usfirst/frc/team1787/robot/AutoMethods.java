@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1787.robot;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 /**
@@ -61,6 +62,14 @@ public class AutoMethods
 	public static final int POSITION_4_ANGLE = -57;
 	/** Angle to turn after going through the defense in position 5 */
 	public static final int POSITION_5_ANGLE = -57 ;
+	
+	// Variables for spinning wheels
+	/** Timer for timing how long the wheels spin */
+	Timer armWheelsSpinningAtomaticallyTimer = new Timer();
+	/** Time to spin pickupWheels to pick up a boulder */
+	public static final int PICKUP_TIME = 5;
+	/** Time to spin pickupWheels to eject a boulder */
+	public static final int EJECT_TIME = 5;
 	
 	/**
 	 * The AutoMethods constructor passes in objects representing the various subsystems of the robot we want to use in auto.
@@ -250,14 +259,14 @@ public class AutoMethods
 	 * @param distance How far the robot should travel. Use positive values to move forward, and negative values to move backward.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public void autoDriveDistance(double distance, int counterToIncrementWhenComplete)
+	public void autoDriveDistance(double distance, int counter)
 	{
 		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
 			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, 0);
 		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
 			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, 0);
 		else
-			completeStep(counterToIncrementWhenComplete);
+			completeStep(counter);
 	}
 	
 	/**
@@ -265,14 +274,67 @@ public class AutoMethods
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public void autoTurnDegrees(double degrees, int counterToIncrementWhenComplete)
+	public void autoTurnDegrees(double degrees, int counter)
 	{
 		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
 			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
 		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
 			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
 		else
-			completeStep(counterToIncrementWhenComplete);
+			completeStep(counter);
+	}
+	
+	/**
+	 * Automatically move the arm to a region
+	 * @param region region to move the arm to; arm.[one of the regions]
+	 * @param counter the counter to increment when this operation is complete
+	 */
+	public void autoMoveArm(int region, int counter)
+	{
+		if (arm.getCurrentRegion() != region)
+			arm.moveToRegion(region);
+		else
+			completeStep(counter);
+	}
+	
+	/**
+	 * Automatically spin the pickup wheels in a direction
+	 * @param direction the direction to spin the wheels; PickupArm.[one of the wheel directions]
+	 * @param counter the counter to increment when this operation is complete.
+	 */
+	public void autoSpinWheels(int direction, int counter)
+	{
+		armWheelsSpinningAtomaticallyTimer.start();
+		
+		arm.spinPickupWheels(direction);
+		
+		if (direction == PickupArm.WHEELS_EJECT && armWheelsSpinningAtomaticallyTimer.get() >= EJECT_TIME ||
+			direction == PickupArm.WHEELS_PICKUP && armWheelsSpinningAtomaticallyTimer.get() >= PICKUP_TIME ||
+			direction == PickupArm.WHEELS_STATIONARY)
+		{
+			arm.stopPickupWheels();
+			completeStep(counter);
+		}
+	}
+	
+	/**
+	 * Automatically deploy or retract the wedge
+	 * @param direction direction to move the wedge; wedge.DEPLOY or wedge.RETRACT
+	 * @param counter the counter to increment when this operation is complete
+	 */
+	public void autoMoveWedge(int direction, int counter)
+	{
+		if ((direction == Wedge.DEPLOY) && (wedge.getDirection() == Wedge.STATIONARY))
+			wedge.deploy();
+		else if ((direction == Wedge.RETRACT) && (wedge.getDirection() == Wedge.STATIONARY))
+			wedge.retract();
+		else
+		{
+			wedge.checkIfWedgeMotorShouldStop();
+			if (wedge.getDirection() == wedge.STATIONARY)
+				completeStep(counter);
+		}
+			
 	}
 	
 	/**

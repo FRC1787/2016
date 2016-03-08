@@ -88,13 +88,22 @@ public class PickupArm
 	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
 	public static final double MOTOR_SPEED = 0.66;
 	/** Number designating backwards motion of the arm */
-	private static final int ARM_BACKWARDS = -1;
+	public static final int ARM_BACKWARDS = -1;
 	/** Number designating no motion of the arm */
-	private static final int ARM_STATIONARY = 0;
+	public static final int ARM_STATIONARY = 0;
 	/** Number designating forwards motion of the arm */
-	private static final int ARM_FORWARDS = 1;
+	public static final int ARM_FORWARDS = 1;
 	/** Number representing the current motion of the arm */
 	private int armDirection = 0;
+	
+	public static final int WHEELS_PICKUP = 1;
+	
+	public static final int WHEELS_STATIONARY = 0;
+	
+	public static final int WHEELS_EJECT = -1;
+	
+	private int wheelsDirection = WHEELS_STATIONARY;
+	
 	
 	// Region 2 Timing
 	private Timer reg2Timer;
@@ -204,6 +213,12 @@ public class PickupArm
 	public void spinPickupWheels(double motorSpeed)
 	{
 		pickupWheels.set(motorSpeed);
+		if (motorSpeed < 0)
+			wheelsDirection = WHEELS_PICKUP;
+		else if (motorSpeed > 0)
+			wheelsDirection = WHEELS_EJECT;
+		else if (motorSpeed == 0)
+			wheelsDirection = WHEELS_STATIONARY;
 	}
 	
 
@@ -213,6 +228,7 @@ public class PickupArm
 	public void stopPickupWheels()
 	{
 		pickupWheels.set(0);
+		wheelsDirection = WHEELS_STATIONARY;
 	}
 	
 	/**
