@@ -18,7 +18,7 @@ public class Robot extends IterativeRobot
 	// Objects and variables used for driving the robot:
 	
 	// DrivingDevices
-	/** The set of devices used for driving the robot */
+	/** The set of devices used for or involved with driving the robot */
 	private DrivingDevices driveControl;
 	
 	// Talons
@@ -36,18 +36,18 @@ public class Robot extends IterativeRobot
 	public static final int SOL_GEAR_SHIFTING_PCM_PORT = 0;
 	
 	// Encoders
-	/** The port on the DIO where the left encoder's A channel is connected */
+	/** The DIO port on the roboRio where the left encoder's A channel is connected */
 	public static final int LEFT_ENCODER_DIO_PORT_A = 6;
-	/** The port on the DIO where the left encoder's B channel is connected */
+	/** The DIO port on the roboRio where the left encoder's B channel is connected */
 	public static final int LEFT_ENCODER_DIO_PORT_B = 7;
-	/** The port on the DIO where the right encoder's A channel is connected */
+	/** The DIO port on the roboRio where the right encoder's A channel is connected */
 	public static final int RIGHT_ENCODER_DIO_PORT_A = 8;
-	/** The port on the DIO where the right encoder's B channel is connected */
+	/** The DIO port on the roboRio where the right encoder's B channel is connected */
 	public static final int RIGHT_ENCODER_DIO_PORT_B = 9;
 	
 	// Gyro
-	/** Port of Gyro */
-	public static final int GYRO_PORT = 0;
+	/** The Analog port on the roboRio where the gyro is connected */
+	public static final int GYRO_ANALOG_PORT = 0;
 	
 	// Objects and variables used for the PickupArm:
 	
@@ -60,13 +60,13 @@ public class Robot extends IterativeRobot
 	public static final int TALON_PICKUP_ARM_LEFT_ID = 8;
 	/** The ID of the Talon that controls the pickup arm's right motor */
 	public static final int TALON_PICKUP_ARM_RIGHT_ID = 7;
-	/** The ID of the Talon that controls the wheels on the pickup arm. */
-	public static final int TALON_PICKUP_ARM_PICKUP_WHEELS_ID = 6;
+	/** The ID of the Talon that controls the pickup-wheels' motor */
+	public static final int TALON_PICKUP_WHEELS_ID = 6;
 	
 	// Limit Switches
-	/** The port on the DIO where the limit switch in the pickup arm's "Stored Region" is connected */
+	/** The DIO port on the roboRio where the limit switch in the pickup arm's "Stored Region" is connected */
 	public static final int LS_PICKUP_ARM_STORED_DIO_PORT =  0;
-	/** The port on the DIO where the limit switch in the pickup arm's "Pickup Region" is connected */
+	/** The DIO port on the roboRio where the limit switch in the pickup arm's "Pickup Region" is connected */
 	public static final int LS_PICKUP_ARM_PICKUP_DIO_PORT = 4;
 	
 	// Arm Motion
@@ -77,15 +77,15 @@ public class Robot extends IterativeRobot
 	
 	/** The wedge on the robot */
 	private Wedge wedge;
-	/** The ID of the Talon that controls the wedge */
+	/** The ID of the Talon that controls the wedge motor */
 	public static final int TALON_WEDGE_ID = 5;
 	
 	// Objects and variables involving manual control of the robot:
 	
 	// Joystick
-	/** The joystick used to control the robot when the pickup arm is in the front */
+	/** The joystick used to intuitively control the robot when the pickup arm is in the front (default orientation) */
 	private Joystick stickA;
-	/** The joystick used to control the robot when the wedge is in the front */
+	/** The joystick used to intuitively control the robot when the wedge is in the front */
 	private Joystick stickB;
 	/** The USB port on the computer that stickA is connected to. USB port #'s are configured from the driver station */
 	public static final int JOYSTICK_A_USB_PORT = 0;
@@ -119,12 +119,13 @@ public class Robot extends IterativeRobot
 	// Objects and variables involving the robot's autonomous functions:
 	
 	// AutoMethods
+	/** The collection of methods used during auto */
 	private AutoMethods autoMethods;
 	
 	// Used to set the starting position of the robot.
 	/** The SendableChooser object that allows the starting position of the robot to be set from the driver station. */
     SendableChooser autonomousPositionChooser;
-    /** The position where the robot starts the match */
+    /** The position where the robot starts the match. Values range from 1 to 5, with 1 being the far left, and 5 being the far right. */
     private int startingPosition;
     
     // Used to set which defense the robot must conquer.
@@ -156,10 +157,10 @@ public class Robot extends IterativeRobot
     	// Construct the DrivingDevices
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
     			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, 
-    			RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, GYRO_PORT);
+    			RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, GYRO_ANALOG_PORT);
     	
     	// Construct the PickupArm
-    	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_ARM_PICKUP_WHEELS_ID, 
+    	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_WHEELS_ID, 
     			LS_PICKUP_ARM_STORED_DIO_PORT, LS_PICKUP_ARM_PICKUP_DIO_PORT);
     	
     	// Construct the Wedge
@@ -180,7 +181,7 @@ public class Robot extends IterativeRobot
         autonomousDefenseChooser = new SendableChooser();
         autoMethods.addOptionsToDefenseChooser(autonomousDefenseChooser); 
         
-        // Construct the shooter score chooser
+        // Construct the score chooser and all all options to it
         scoreChooser = new SendableChooser();
         autoMethods.addOptionsToScoreChooser(scoreChooser);
         

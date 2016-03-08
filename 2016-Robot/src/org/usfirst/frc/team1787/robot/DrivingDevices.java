@@ -80,7 +80,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Method used for driving the robot with a single joystick.
+	 * Method used for intuitively driving the robot when the pickup arm in front using a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
 	public void arcadeDriveWithPickupArmInFront(Joystick stick)
@@ -89,7 +89,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Method used for driving the robot with a single joystick.
+	 * Method used for intuitively driving the robot when the wedge is in the front using a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
 	public void arcadeDriveWithWedgeInFront(Joystick stick)
@@ -97,23 +97,26 @@ public class DrivingDevices
 		theRobot.arcadeDrive(-stick.getY(), stick.getX());
 	}
 	
+	/**
+	 * Method that allows manual input of motion values. Used for autonomous.
+	 * @param moveValue The value to use for moving forwards(positive value) or backwards(negative value)
+	 * @param rotateValue The value to use for rotating right(positive value) or left(negative value)
+	 */
 	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
 		theRobot.arcadeDrive(moveValue, rotateValue);
 	}
 	
-	public void tankDriveUsingValues(double leftValue, double rightValue)
-	{
-		theRobot.tankDrive(leftValue, rightValue);
-	}
-	
+	/**
+	 * Stops the robot
+	 */
 	public void stop()
 	{
 		theRobot.arcadeDrive(0, 0);
 	}
 	
 	/**
-	 * Method that shifts the robot into high gear
+	 * Shifts the robot into high gear
 	 */
 	public void setHighGear()
 	{
@@ -121,7 +124,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Method that shifts the robot into low gear
+	 * Shifts the robot into low gear
 	 */
 	public void setLowGear()
 	{
@@ -146,17 +149,30 @@ public class DrivingDevices
 		return rightEncoder;
 	}
 	
+	/**
+	 * Resets both encoders.
+	 */
 	public void resetEncoders()
 	{
 		leftEncoder.reset();
 		rightEncoder.reset();
 	}
 	
+	/** 
+	 * Used to track forward motion.
+	 * @param distance The distance to check
+	 * @return If both encoders read greater than the given distance.
+	 */
 	public boolean bothEncodersReadGreaterThan(double distance)
 	{
 		return (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance);
 	}
 	
+	/**
+	 * Used to track backward motion.
+	 * @param distance The distance to check
+	 * @return If both encoders read less than the given distance.
+	 */
 	public boolean bothEncodersReadLessThan(double distance)
 	{
 		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
