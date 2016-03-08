@@ -84,7 +84,7 @@ public class PickupArm
 	/** Current region the arm occupies */
 	private int currentRegion;
 	
-	// Motion Info
+	// Arm Motion Info
 	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
 	public static final double MOTOR_SPEED = 0.66;
 	/** Number designating backwards motion of the arm */
@@ -94,17 +94,18 @@ public class PickupArm
 	/** Number designating forwards motion of the arm */
 	public static final int ARM_FORWARDS = 1;
 	/** Number representing the current motion of the arm */
-	private int armDirection = 0;
+	private int armDirection = ARM_STATIONARY;
 	
+	// Pickup Wheels Motion Info
+	/** A value indicating the pickup wheels are spinning forwards. */
 	public static final int WHEELS_PICKUP = 1;
-	
+	/** A value indicating the pickup wheels are not spinning. */
 	public static final int WHEELS_STATIONARY = 0;
-	
+	/** A value indicating the pickup wheels are spinning backwards */
 	public static final int WHEELS_EJECT = -1;
-	
+	/** Represents the current motion of the pickup wheels */
 	private int wheelsDirection = WHEELS_STATIONARY;
-	
-	
+		
 	// Region 2 Timing
 	private Timer reg2Timer;
 	private static final double STORE_TO_APPROACH_TIME = 1.17;
@@ -114,12 +115,11 @@ public class PickupArm
 	
 	/**
 	 * Takes IDs and port numbers, not objects
-	 * @param rightTalonID    ID of the talon on the right of the arm.
-	 * @param leftTalonID     ID of the talon on the left of the arm.
-	 * @param pickupWheelsID  ID of the talon that controls the pickup-wheels.
-	 * @param region0LSPort   The physical port that the limit switch at region 0 is plugged in to on the roboRio.
-	 * @param region2LSPort   The physical port that the limit switch at region 2 is plugged in to on the roboRio.
-	 * @param region4LSPort   The physical port that the limit switch at region 4 is plugged in to on the roboRio.
+	 * @param leftTalonID    ID of the talon on the right of the arm.
+	 * @param rightTalonID   ID of the talon on the left of the arm.
+	 * @param pickupWheelsID ID of the talon that controls the pickup-wheels.
+	 * @param region0LSPort  The physical port that the limit switch at region 0 is plugged into on the roboRio.
+	 * @param region4LSPort  The physical port that the limit switch at region 4 is plugged into on the roboRio.
 	 */
 	public PickupArm(int leftTalonID, int rightTalonID, int pickupWheelsID, 
 					 int region0LSPort, int region4LSPort)

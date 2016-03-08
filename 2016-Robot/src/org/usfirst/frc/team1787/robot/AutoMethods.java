@@ -51,7 +51,7 @@ public class AutoMethods
 	/** A counter variable that keeps track of the step being performed in the "move to goal" method */
 	private int moveToGoalCurrentStep = 1;
 	
-	// Angles for each position to turn towards the tower
+	// Angle to turn to face the tower for each position
 	/** Angle to turn after going through the defense in position 1 */
 	public static final int POSITION_1_ANGLE = 57;
 	/** Angle to turn after going through the defense in position 2 */
@@ -65,7 +65,7 @@ public class AutoMethods
 	
 	// Variables for spinning wheels
 	/** Timer for timing how long the wheels spin */
-	Timer armWheelsSpinningAtomaticallyTimer = new Timer();
+	Timer pickupWheelsSpinTimer = new Timer();
 	/** Time to spin pickupWheels to pick up a boulder */
 	public static final int PICKUP_TIME = 5;
 	/** Time to spin pickupWheels to eject a boulder */
@@ -304,12 +304,12 @@ public class AutoMethods
 	 */
 	public void autoSpinWheels(int direction, int counter)
 	{
-		armWheelsSpinningAtomaticallyTimer.start();
+		pickupWheelsSpinTimer.start();
 		
 		arm.spinPickupWheels(direction);
 		
-		if (direction == PickupArm.WHEELS_EJECT && armWheelsSpinningAtomaticallyTimer.get() >= EJECT_TIME ||
-			direction == PickupArm.WHEELS_PICKUP && armWheelsSpinningAtomaticallyTimer.get() >= PICKUP_TIME ||
+		if (direction == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME ||
+			direction == PickupArm.WHEELS_PICKUP && pickupWheelsSpinTimer.get() >= PICKUP_TIME ||
 			direction == PickupArm.WHEELS_STATIONARY)
 		{
 			arm.stopPickupWheels();
@@ -331,7 +331,7 @@ public class AutoMethods
 		else
 		{
 			wedge.checkIfWedgeMotorShouldStop();
-			if (wedge.getDirection() == wedge.STATIONARY)
+			if (wedge.getDirection() == Wedge.STATIONARY)
 				completeStep(counter);
 		}
 			
