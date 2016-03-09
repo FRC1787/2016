@@ -98,11 +98,11 @@ public class PickupArm
 	
 	// Pickup Wheels Motion Info
 	/** The value designating that the pickup-wheels are spinning forwards. */
-	public static final int WHEELS_PICKUP = 1;
+	public static final int WHEELS_PICKUP = -1;
 	/** The value designating that the pickup-wheels are not spinning. */
 	public static final int WHEELS_STATIONARY = 0;
 	/** The value designating that the pickup-wheels are spinning backwards */
-	public static final int WHEELS_EJECT = -1;
+	public static final int WHEELS_EJECT = 1;
 	/** The value that indicates the current motion of the pickup-wheels */
 	private int wheelsDirection = WHEELS_STATIONARY;
 		
@@ -213,7 +213,7 @@ public class PickupArm
 	 * Spins the pickup-wheels at a desired speed when called periodically.
 	 * @param motorSpeed How fast the pickup-wheels spin.
 	 * A negative value will spin them forwards (to pick up the ball).
-	 * A positive value will spin them backwards (to eject the ball)
+	 * A positive value will spin them backwards (to eject the ball).
 	 */
 	public void spinPickupWheels(double motorSpeed)
 	{

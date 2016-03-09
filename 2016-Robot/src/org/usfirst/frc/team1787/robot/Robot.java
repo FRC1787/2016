@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * This class represents Team 1787's robot for the 2016 FRC: First Stronghold!
+ * This class represents Team 1787's robot, Hoff 9000, for the 2016 FRC game: First Stronghold!
  * (add a bit more of a description here)
  * @author David Miron
  * @author Simon Wieder
@@ -222,7 +222,8 @@ public class Robot extends IterativeRobot
      */
     public void autonomousPeriodic()
     {
-    	autoMethods.runAuto(startingPosition, defenseInStartingPosition, tryToScore);
+    	if (startingPosition != 0) // A startingPosition of 0 indicates the driver chose "No Autonomous" from the SmartDashboard
+    		autoMethods.runAuto(startingPosition, defenseInStartingPosition, tryToScore);
     }
     
     /**
@@ -230,7 +231,7 @@ public class Robot extends IterativeRobot
      */
     public void teleopInit()
     {
-    	
+    	driveControl.setHighGear();
     }
 
     /**
@@ -272,10 +273,10 @@ public class Robot extends IterativeRobot
     		arm.moveToRegion(pickupArmDesiredRegion);    	
     	
     	// Pickup Wheels
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == 1)
-    		arm.spinPickupWheels(1);
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > 2)
-			arm.spinPickupWheels(-1);
+    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == PickupArm.REG_STOREAPPROACH)
+    		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
+    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > PickupArm.REG_APPROACH)
+			arm.spinPickupWheels(PickupArm.WHEELS_PICKUP);
 		else
     		arm.stopPickupWheels();
     	

@@ -33,8 +33,18 @@ public class DrivingDevices
 	// Encoders
 	/** The encoder on the left side of the robot */
 	private Encoder leftEncoder;
+	/** The distance, in feet, that is equivalent to 1 tick on the left encoder */
+	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.00134409269;
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
+	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
+	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.00134409269;
+	
+	/* 
+	 * Initial testing indicates 35060 encoder ticks per wheel revolution. 1 revolution = (15 * pi) feet. 
+	 * Therefore, if distance is in feet, then distancePerPulse = (feet/revolution) * (revolution/ticks).
+	 * (15 * pi) / 35060 = 0.00134409269 
+	 */
 	
 	// Shifter
 	/** The Shifter object that controls which gear the robot is in */
@@ -65,13 +75,11 @@ public class DrivingDevices
 		talon_FL = new CANTalon(talon_FL_ID);
 		theRobot = new RobotDrive(talon_FL, talon_BL, talon_FR, talon_BR);
 		
-		/* Initial testing indicates 35060 encoder ticks per wheel revolution.
-		Therefore, if distance is in revolutions, then distancePerPulse = 1/35060 = 0.00002852253 */
-		
 		/* COMMENT OUT ENCODERS WHEN THEY ARE NOT WIRED OR ELSE ROBOT WON'T DETECT CODE! */
-		//leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
-		//rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b);
-		//leftEncoder.setDistancePerPulse(0.00002852253);
+		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
+		leftEncoder.setDistancePerPulse(LEFT_ENCODER_DISTANCE_PER_PULSE);
+		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b);
+		rightEncoder.setDistancePerPulse(RIGHT_ENCODER_DISTANCE_PER_PULSE);
 		
 		shifter = new Shifter(sol_shifter_port);
 		
@@ -211,9 +219,9 @@ public class DrivingDevices
 	{
 		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
 		SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
-		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
-		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
-		//SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
-		//SmartDashboard.putNumber("Right Encoder Distance", rightEncoder.getDistance());
+		SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
+		SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
+		SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
+		SmartDashboard.putNumber("Right Encoder Distance", rightEncoder.getDistance());
 	}
 }

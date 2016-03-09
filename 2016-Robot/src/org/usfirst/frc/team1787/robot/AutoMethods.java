@@ -51,18 +51,6 @@ public class AutoMethods
 	/** A counter variable that keeps track of the step being performed in the "move to goal" method */
 	private int moveToGoalCurrentStep = 1;
 	
-	// Angle to turn to face the tower for each position
-	/** Angle to turn after going through the defense in position 1 */
-	public static final int POSITION_1_ANGLE = 57;
-	/** Angle to turn after going through the defense in position 2 */
-	public static final int POSITION_2_ANGLE = 57;
-	/** Angle to turn after going through the defense in position 3 */
-	public static final int POSITION_3_ANGLE = 0;
-	/** Angle to turn after going through the defense in position 4 */
-	public static final int POSITION_4_ANGLE = -57;
-	/** Angle to turn after going through the defense in position 5 */
-	public static final int POSITION_5_ANGLE = -57 ;
-	
 	// Variables for spinning wheels
 	/** Timer for timing how long the wheels spin */
 	Timer pickupWheelsSpinTimer = new Timer();
@@ -219,7 +207,7 @@ public class AutoMethods
 			if (moveToGoalCurrentStep == 1)
 				autoDriveDistance(0, moveToGoalCurrentStep);
 			else if (moveToGoalCurrentStep == 2)
-				autoTurnDegrees(POSITION_1_ANGLE, moveToGoalCurrentStep);
+				autoTurnDegrees(57, moveToGoalCurrentStep);
 			else if (moveToGoalCurrentStep == 3)
 				autoDriveDistance(0, moveToGoalCurrentStep);
 		}
@@ -298,21 +286,25 @@ public class AutoMethods
 	}
 	
 	/**
-	 * Automatically spin the pickup wheels in a direction
-	 * @param direction the direction to spin the wheels; PickupArm.[one of the wheel directions]
-	 * @param counter the counter to increment when this operation is complete.
+	 * Automatically spin the pickup wheels at a desired speed for a set amount of time. 
+	 * The amount of time they spin is determined by the direction they spin.
+	 * @param speed How fast the pickup-wheels spin.
+	 * A negative value will spin them forwards (to pick up the ball).
+	 * A positive value will spin them backwards (to eject the ball).
+	 * @param counter The step counter to increment when this operation is complete.
 	 */
-	public void autoSpinWheels(int direction, int counter)
+	public void autoSpinWheels(double speed, int counter)
 	{
 		pickupWheelsSpinTimer.start();
 		
-		arm.spinPickupWheels(direction);
+		arm.spinPickupWheels(speed);
 		
-		if (direction == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME ||
-			direction == PickupArm.WHEELS_PICKUP && pickupWheelsSpinTimer.get() >= PICKUP_TIME ||
-			direction == PickupArm.WHEELS_STATIONARY)
+		if (speed == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME ||
+			speed == PickupArm.WHEELS_PICKUP && pickupWheelsSpinTimer.get() >= PICKUP_TIME ||
+			speed == PickupArm.WHEELS_STATIONARY)
 		{
 			arm.stopPickupWheels();
+			pickupWheelsSpinTimer.reset();
 			completeStep(counter);
 		}
 	}
@@ -333,8 +325,7 @@ public class AutoMethods
 			wedge.checkIfWedgeMotorShouldStop();
 			if (wedge.getDirection() == Wedge.STATIONARY)
 				completeStep(counter);
-		}
-			
+		}		
 	}
 	
 	/**
@@ -361,13 +352,12 @@ public class AutoMethods
 	
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)
 	{
-		positionChooser.addDefault("No Autonomous", 0);
+		positionChooser.addDefault("It doesn't matter cuz we're just not gonna do anything during auto trololololol", 0);
 		positionChooser.addObject("Position 1 (far left)", 1);
         //positionChooser.addObject("Position 2 (second from the left)", 2);
         //positionChooser.addObject("Position 3 (in the middle)", 3);
         //positionChooser.addObject("Position 4 (second from the right)", 4);
         //positionChooser.addObject("Position 5 (far right)", 5);
-		//positionChooser.addObject("Just Move Forwards", 5);
 	}
 	
 	public void addOptionsToDefenseChooser(SendableChooser defenseChooser)
