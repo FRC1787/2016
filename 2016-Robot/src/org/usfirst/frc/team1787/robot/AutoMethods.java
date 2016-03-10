@@ -45,7 +45,7 @@ public class AutoMethods
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_ROTATE_SPEED = 0.5;
 	/** A counter variable that keeps track of the step being performed in runAuto() */
-	private int runAutoCurrentStep = 1;
+	private int mainStep = 1;
 	/** A counter variable that keeps track of the step being performed in a given "conquer defense" method */
 	private int conquerDefenseCurrentStep = 1;
 	/** A counter variable that keeps track of the step being performed in the "move to goal" method */
@@ -74,37 +74,37 @@ public class AutoMethods
 	
 	public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
 	{
-		if (runAutoCurrentStep == 1)
+		if (mainStep == 1)
 			autoConquerDefense(defenseInStartingPosition);
-		else if (runAutoCurrentStep == 2)
+		else if (mainStep == 2 && tryToScore)
 			autoMoveToGoal(startingPosition);
-		else if (runAutoCurrentStep == 3 && tryToScore)
+		else if (mainStep == 3 && tryToScore)
 			autoShootLowGoal();
 	}
 	
 	/**
 	 * This method calls the "autoConquer" method associated with the given defense.
-	 * @param defenseToConquer The value that specifies which defense to conquer
+	 * @param defense The value that specifies which defense to conquer
 	 */
-	public void autoConquerDefense(int defenseToConquer)
+	public void autoConquerDefense(int defense)
 	{
-		if (defenseToConquer == LOW_BAR)
+		if (defense == LOW_BAR)
 			autoConquerLowBar();
-		else if (defenseToConquer == PORTCULLIS)
+		else if (defense == PORTCULLIS)
 			autoConquerPortcullis();
-		else if (defenseToConquer == CHEVAL_DE_FRISE)
+		else if (defense == CHEVAL_DE_FRISE)
 			autoConquerChevalDeFrise();
-		else if (defenseToConquer == RAMPARTS)
+		else if (defense == RAMPARTS)
 			autoConquerRamparts();
-		else if (defenseToConquer == MOAT)
+		else if (defense == MOAT)
 			autoConquerMoat();
-		else if (defenseToConquer == DRAWBRIDGE)
+		else if (defense == DRAWBRIDGE)
 			autoConquerDrawbridge();
-		else if (defenseToConquer == SALLY_PORT)
+		else if (defense == SALLY_PORT)
 			autoConquerSallyPort();
-		else if (defenseToConquer == ROCK_WALL)
+		else if (defense == ROCK_WALL)
 			autoConquerRockWall();
-		else if (defenseToConquer == ROUGH_TERRAIN)
+		else if (defense == ROUGH_TERRAIN)
 			autoConquerRoughTerrain();
 		else
 			System.out.println("Invalid Defense ID");
@@ -122,10 +122,8 @@ public class AutoMethods
 	 */
 	public void autoConquerLowBar()
 	{
-		if (conquerDefenseCurrentStep == 1)
-			autoDriveDistance(7, conquerDefenseCurrentStep);
-		else if (conquerDefenseCurrentStep == 2)
-			completeStep(runAutoCurrentStep);
+		if (autoDriveDistance(7))
+			mainStep++;
 	}
 	
 	/**
@@ -201,15 +199,15 @@ public class AutoMethods
 	}
 	
 	public void autoMoveToGoal(int startingPosition)
-	{
+	{/*
 		if (startingPosition == 1)
 		{
 			if (moveToGoalCurrentStep == 1)
-				autoDriveDistance(0, moveToGoalCurrentStep);
+				autoDriveDistance(0);
 			else if (moveToGoalCurrentStep == 2)
-				autoTurnDegrees(57, moveToGoalCurrentStep);
+				autoTurnDegrees(57);
 			else if (moveToGoalCurrentStep == 3)
-				autoDriveDistance(0, moveToGoalCurrentStep);
+				autoDriveDistance(0);
 		}
 		else if (startingPosition == 2)
 		{
@@ -230,7 +228,7 @@ public class AutoMethods
 		else if (startingPosition == 6)
 		{
 			
-		}
+		}*/
 	}
 	
 	/**
@@ -247,14 +245,22 @@ public class AutoMethods
 	 * @param distance How far the robot should travel. Use positive values to move forward, and negative values to move backward.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public void autoDriveDistance(double distance, int counter)
+	public boolean autoDriveDistance(double distance)
 	{
 		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
+		{
 			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, 0);
+			return false;
+		}
 		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
+		{
 			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, 0);
+			return false;
+		}
 		else
-			completeStep(counter);
+		{
+			return true;
+		}
 	}
 	
 	/**
@@ -262,27 +268,40 @@ public class AutoMethods
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public void autoTurnDegrees(double degrees, int counter)
+	/*public boolean autoTurnDegrees(double degrees)
 	{
 		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
+		{
 			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+			return false;
+		}
 		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
+		{
 			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
+			return false;
+		}
 		else
-			completeStep(counter);
-	}
+		{
+			return true;
+		}
+	}*/
 	
 	/**
 	 * Automatically move the arm to a region
 	 * @param region region to move the arm to; arm.[one of the regions]
 	 * @param counter the counter to increment when this operation is complete
 	 */
-	public void autoMoveArm(int region, int counter)
+	public boolean autoMoveArm(int region)
 	{
 		if (arm.getCurrentRegion() != region)
+		{
 			arm.moveToRegion(region);
+			return false;
+		}
 		else
-			completeStep(counter);
+		{
+			return true;
+		}
 	}
 	
 	/**
@@ -293,7 +312,7 @@ public class AutoMethods
 	 * A positive value will spin them backwards (to eject the ball).
 	 * @param counter The step counter to increment when this operation is complete.
 	 */
-	public void autoSpinWheels(double speed, int counter)
+	public boolean autoSpinWheels(double speed)
 	{
 		pickupWheelsSpinTimer.start();
 		
@@ -305,7 +324,11 @@ public class AutoMethods
 		{
 			arm.stopPickupWheels();
 			pickupWheelsSpinTimer.reset();
-			completeStep(counter);
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	
@@ -314,7 +337,7 @@ public class AutoMethods
 	 * @param direction direction to move the wedge; wedge.DEPLOY or wedge.RETRACT
 	 * @param counter the counter to increment when this operation is complete
 	 */
-	public void autoMoveWedge(int direction, int counter)
+	/*public void autoMoveWedge(int direction)
 	{
 		if ((direction == Wedge.DEPLOY) && (wedge.getDirection() == Wedge.STATIONARY))
 			wedge.deploy();
@@ -324,9 +347,9 @@ public class AutoMethods
 		{
 			wedge.checkIfWedgeMotorShouldStop();
 			if (wedge.getDirection() == Wedge.STATIONARY)
-				completeStep(counter);
+				return
 		}		
-	}
+	}*/
 	
 	/**
 	 * This method is called when the robot completes a step that is part of an autonomous routine.
@@ -345,7 +368,7 @@ public class AutoMethods
 	 */
 	public void resetAutoStepCounts()
 	{
-		runAutoCurrentStep = 1;
+		mainStep = 1;
 		conquerDefenseCurrentStep = 1;
 		moveToGoalCurrentStep = 1;
 	}

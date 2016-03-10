@@ -52,7 +52,7 @@ public class DrivingDevices
 	
 	//Gyro
 	/** The gyro */
-	Gyro gyro;
+	//Gyro gyro;
 	
 	/**
 	 * Constructor for the DrivingDevices class
@@ -83,8 +83,8 @@ public class DrivingDevices
 		
 		shifter = new Shifter(sol_shifter_port);
 		
-		gyro = new AnalogGyro(gyro_port);
-		resetGyro();
+		//gyro = new AnalogGyro(gyro_port);
+		//resetGyro();
 	}
 	
 	/**
@@ -185,11 +185,11 @@ public class DrivingDevices
 	{
 		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
 	}
-	
+	/*
 	/**
 	 * Getter method for the gyro angle.
 	 * @return The gyro angle.
-	 */
+	 *
 	public double getGyroAngle()
 	{
 		return gyro.getAngle();
@@ -197,11 +197,11 @@ public class DrivingDevices
 	
 	/**
 	 * Resets the gyro to a heading of 0
-	 */
+	 *
 	public void resetGyro()
 	{
 		gyro.reset();
-	}
+	}*/
 	
 	/**
 	 * Resets the gyro to a heading of 0, and the encoders to a distance of 0.
@@ -209,7 +209,7 @@ public class DrivingDevices
 	public void resetEncodersAndGyro()
 	{
 		resetEncoders();
-		resetGyro();
+		//resetGyro();
 	}
 	
 	/**
@@ -218,7 +218,7 @@ public class DrivingDevices
 	public void putDataOnSmartDashboard()
 	{
 		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
-		SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
+		//SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
 		SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
 		SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
 		SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
