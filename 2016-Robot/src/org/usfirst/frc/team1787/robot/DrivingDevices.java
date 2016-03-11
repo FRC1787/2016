@@ -34,11 +34,11 @@ public class DrivingDevices
 	/** The encoder on the left side of the robot */
 	private Encoder leftEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the left encoder */
-	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.00134409269;
+	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.000114220445460;
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
-	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.00134409269;
+	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211;
 	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per wheel revolution. 1 revolution = (15 * pi) feet. 
@@ -77,9 +77,9 @@ public class DrivingDevices
 		
 		/* COMMENT OUT ENCODERS WHEN THEY ARE NOT WIRED OR ELSE ROBOT WON'T DETECT CODE! */
 		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b, false);
-		//leftEncoder.setDistancePerPulse(LEFT_ENCODER_DISTANCE_PER_PULSE);
-		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b, false);
-		//rightEncoder.setDistancePerPulse(RIGHT_ENCODER_DISTANCE_PER_PULSE);
+		leftEncoder.setDistancePerPulse(LEFT_ENCODER_DISTANCE_PER_PULSE);
+		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b, true);
+		rightEncoder.setDistancePerPulse(RIGHT_ENCODER_DISTANCE_PER_PULSE);
 		
 		shifter = new Shifter(sol_shifter_port);
 		
@@ -112,7 +112,12 @@ public class DrivingDevices
 	 */
 	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
-		theRobot.arcadeDrive(moveValue, rotateValue);
+		theRobot.arcadeDrive(-moveValue, rotateValue);
+	}
+	
+	public void driveWithABsoluteValues(double left, double right)
+	{
+		theRobot.tankDrive(left, right);
 	}
 	
 	/**
@@ -217,7 +222,10 @@ public class DrivingDevices
 	 */
 	public void putDataOnSmartDashboard()
 	{
-		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
+		if (shifter.getCurrentGear())
+			SmartDashboard.putString("Gear:", "High");
+		else
+			SmartDashboard.putString("Gear:", "Low");
 		//SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
 		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
 		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());

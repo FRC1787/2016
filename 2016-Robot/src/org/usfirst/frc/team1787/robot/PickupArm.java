@@ -310,9 +310,9 @@ public class PickupArm
 	 */
 	public void putDataOnSmartDashboard()
 	{
-		SmartDashboard.putNumber("Current Region", currentRegion);
-		SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
-		SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
+		//SmartDashboard.putNumber("Current Region", currentRegion);
+		//SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
+		//SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
 		// SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);
 		// SmartDashboard.putBoolean("movingTowardsApproachFromPickup", movingTowardsApproachFromPickup);
 	}

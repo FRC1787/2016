@@ -58,6 +58,10 @@ public class AutoMethods
 	public static final int PICKUP_TIME = 5;
 	/** Time to spin pickupWheels to eject a boulder */
 	public static final int EJECT_TIME = 5;
+	/** Boolean for runing things only once */
+	private boolean runOnce = true;
+	
+	Timer extraTimer = new Timer();
 	
 	/**
 	 * The AutoMethods constructor passes in objects representing the various subsystems of the robot we want to use in auto.
@@ -122,8 +126,11 @@ public class AutoMethods
 	 */
 	public void autoConquerLowBar()
 	{
-		if (autoDriveDistance(7))
+		/*if (autoDriveDistance(7))
+			mainStep++;*/
+		if (moveForwardsWithTimer(4, 0.8))
 			mainStep++;
+		
 	}
 	
 	/**
@@ -150,7 +157,8 @@ public class AutoMethods
 	 */
 	public void autoConquerRamparts()
 	{
-		
+		if (moveForwardsWithTimer(4, 0.8))
+			mainStep++;
 	}
 	
 	/**
@@ -159,7 +167,8 @@ public class AutoMethods
 	 */
 	public void autoConquerMoat()
 	{
-		
+		if (moveForwardsWithTimer(4, 0.8))
+			mainStep++;
 	}
 	
 	/**
@@ -186,7 +195,8 @@ public class AutoMethods
 	 */
 	public void autoConquerRockWall()
 	{
-		
+		if (moveForwardsWithTimer(4, 0.8))
+			mainStep++;
 	}
 	
 	/**
@@ -195,7 +205,8 @@ public class AutoMethods
 	 */
 	public void autoConquerRoughTerrain()
 	{
-		
+		if (moveForwardsWithTimer(4, 0.8))
+			mainStep++;
 	}
 	
 	public void autoMoveToGoal(int startingPosition)
@@ -351,6 +362,38 @@ public class AutoMethods
 		}		
 	}*/
 	
+	public boolean moveForwardsWithTimer(double revolutions, double speed)
+	{
+		/*if(driveControl.getRightEncoder().get() < 34611 && driveControl.getRightEncoder().get() < 34611)
+			driveControl.arcadeDriveUsingValues(0.6, 0);
+		else
+			driveControl.stop();*/
+		if (runOnce)
+			extraTimer.start();
+		runOnce = false;
+		
+		//int encoderLticks = driveControl.getLeftEncoder().get();
+		//int encoderRticks = driveControl.getRightEncoder().get();
+		//int difference = Math.abs(encoderRticks - encoderLticks);
+		
+		if (driveControl.getRightEncoder().get() < (34611 * revolutions))
+		{/*
+			if (difference < 100)
+				driveControl.arcadeDriveUsingValues(0.4, 0);
+			else if (encoderLticks < encoderRticks)
+				driveControl.arcadeDriveUsingValues(0.4, -0.1);
+			else if (encoderLticks > encoderRticks)
+				driveControl.arcadeDriveUsingValues(0.4, 0.1);*/
+			driveControl.arcadeDriveUsingValues(speed, 0.085);
+			return false;
+		}
+		else
+		{
+			driveControl.stop();
+			return true;
+		}
+	}
+	
 	/**
 	 * This method is called when the robot completes a step that is part of an autonomous routine.
 	 * This method stops the robot, resets the encoders, resets the gyro, and increments the given step counter by 1.
@@ -377,10 +420,10 @@ public class AutoMethods
 	{
 		positionChooser.addDefault("It doesn't matter cuz we're just not gonna do anything during auto trololololol", 0);
 		positionChooser.addObject("Position 1 (far left)", 1);
-        //positionChooser.addObject("Position 2 (second from the left)", 2);
-        //positionChooser.addObject("Position 3 (in the middle)", 3);
-        //positionChooser.addObject("Position 4 (second from the right)", 4);
-        //positionChooser.addObject("Position 5 (far right)", 5);
+        positionChooser.addObject("Position 2 (second from the left)", 2);
+        positionChooser.addObject("Position 3 (in the middle)", 3);
+        positionChooser.addObject("Position 4 (second from the right)", 4);
+        positionChooser.addObject("Position 5 (far right)", 5);
 	}
 	
 	public void addOptionsToDefenseChooser(SendableChooser defenseChooser)
@@ -388,12 +431,12 @@ public class AutoMethods
 		defenseChooser.addDefault("Low Bar", LOW_BAR);
         //defenseChooser.addObject("Portcullis (Type A)", PORTCULLIS);
         //defenseChooser.addObject("Cheval-De-Frise (Type A)", CHEVAL_DE_FRISE);
-        //defenseChooser.addObject("Ramparts (Type B)", RAMPARTS);
-        //defenseChooser.addObject("Moat (Type B)", MOAT);
+        defenseChooser.addObject("Ramparts (Type B)", RAMPARTS);
+        defenseChooser.addObject("Moat (Type B)", MOAT);
         //defenseChooser.addObject("Drawbridge (Type C)", DRAWBRIDGE);
         //defenseChooser.addObject("Sally Port (Type C)", SALLY_PORT);
-        //defenseChooser.addObject("Rock Wall (Type D)", ROCK_WALL);
-        //defenseChooser.addObject("Rough Terrain (Type D)", ROUGH_TERRAIN);
+        defenseChooser.addObject("Rock Wall (Type D)", ROCK_WALL);
+        defenseChooser.addObject("Rough Terrain (Type D)", ROUGH_TERRAIN);
 	}
 	
 	public void addOptionsToScoreChooser(SendableChooser scoreChooser)

@@ -2,6 +2,7 @@ package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -145,6 +146,10 @@ public class Robot extends IterativeRobot
 	/** Don't ask. */
 	protected int farfar37;
 
+	/** An extra timer */
+	Timer extraTimer = new Timer();
+	/** An extra boolean */
+	boolean extraBoolean = true;
 	
 	// Methods:
 	
@@ -215,8 +220,10 @@ public class Robot extends IterativeRobot
 		
 		// Reset the encoders and the gyro
 		driveControl.resetEncodersAndGyro();
+		
+		extraBoolean = true;
     }
-
+    
     /** 
      * This function is called periodically while the robot is in autonomous mode.
      */
@@ -224,6 +231,9 @@ public class Robot extends IterativeRobot
     {
     	if (startingPosition != 0) // A startingPosition of 0 indicates the driver chose "No Autonomous" from the SmartDashboard
     		autoMethods.runAuto(startingPosition, defenseInStartingPosition, tryToScore);
+    	
+    	
+    	
     }
     
     /**
@@ -248,7 +258,10 @@ public class Robot extends IterativeRobot
     		driveControl.arcadeDriveWithPickupArmInFront(stickA);
     	if (stickA.getX() == 0 && stickA.getY() == 0) // Lets stickB be used only if stickA is in the neutral position.
     		driveControl.arcadeDriveWithWedgeInFront(stickB);*/
-    	
+    	if (Math.abs(stickA.getY()) > Math.abs(stickB.getY()))
+    		driveControl.arcadeDriveWithPickupArmInFront(stickA);
+    	else
+    		driveControl.arcadeDriveWithWedgeInFront(stickB);
     	
     	// Shifting Gears
     	if (stickA.getRawButton(JOYSTICK_HIGH_GEAR) || stickB.getRawButton(JOYSTICK_HIGH_GEAR))
@@ -261,6 +274,7 @@ public class Robot extends IterativeRobot
     	
     	// Functions specific to Joystick A
     	
+    	
     	// Pickup Arm
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_STORE))
     		pickupArmDesiredRegion = PickupArm.REG_STORE;
@@ -271,16 +285,20 @@ public class Robot extends IterativeRobot
     		arm.moveToRegion(PickupArm.REG_PICKUP);
     		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
     	}
+
     	if (!stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
     		arm.moveToRegion(pickupArmDesiredRegion);    	
     	
+    	
     	// Pickup Wheels
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == PickupArm.REG_STOREAPPROACH)
+    	
+    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > PickupArm.REG_APPROACH)
+    		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP);
+    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == PickupArm.REG_STOREAPPROACH)
     		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > PickupArm.REG_APPROACH)
-			arm.spinPickupWheels(PickupArm.WHEELS_PICKUP);
-		else
+    	else
     		arm.stopPickupWheels();
+    	
     	
     	// Arm Data
     	arm.putDataOnSmartDashboard();
@@ -311,16 +329,19 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    	arm.manualControl(stickA); // This is for testing the pickup arm
-    	
+    	//arm.manualControl(stickA); // This is for testing the pickup arm
+    	/*
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS)) // This is for testing the pickup arm
     		arm.spinPickupWheels(-1);
     	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS)) // This is for testing the pickup arm
     		arm.spinPickupWheels(1);
     	else
-    		arm.stopPickupWheels();
+    		arm.stopPickupWheels();*/
     	
-    	System.out.println("Left" + driveControl.getLeftEncoder().get());
-    	System.out.println("Right" + driveControl.getRightEncoder().get());
+    	//driveControl.driveWithABsoluteValues(0.5, 0.5);
+    	
+    	driveControl.arcadeDriveUsingValues(-stickA.getY(), 0);
+    	System.out.println("Left" + driveControl.getLeftEncoder().getDistance());
+    	System.out.println("Right" + driveControl.getRightEncoder().getDistance());
     }   
 }

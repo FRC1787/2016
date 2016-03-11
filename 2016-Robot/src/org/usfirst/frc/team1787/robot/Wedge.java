@@ -19,7 +19,7 @@ public class Wedge
 	
 	// Wedge Motion Info
 	/** How fast the wedge will move in relation to its max speed (a value of 0.6 means 60% of max speed) */
-	public static final double MOTOR_SPEED = 0.357;
+	public static final double MOTOR_SPEED = 0.7;
 	/** The value that indicates the wedge is being deployed */
 	public static final int DEPLOY = 1;
 	/** The value that indicates the wedge is being retracted */
