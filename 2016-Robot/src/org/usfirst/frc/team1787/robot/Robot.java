@@ -157,7 +157,7 @@ public class Robot extends IterativeRobot
     	// Construct the DrivingDevices
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
     			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, 
-    			RIGHT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, GYRO_ANALOG_PORT);
+    			RIGHT_ENCODER_DIO_PORT_A, RIGHT_ENCODER_DIO_PORT_B, GYRO_ANALOG_PORT);
     	
     	// Construct the PickupArm
     	arm = new PickupArm(TALON_PICKUP_ARM_LEFT_ID, TALON_PICKUP_ARM_RIGHT_ID, TALON_PICKUP_WHEELS_ID, 
@@ -232,6 +232,7 @@ public class Robot extends IterativeRobot
     public void teleopInit()
     {
     	driveControl.setHighGear();
+    	driveControl.resetEncoders();
     }
 
     /**
@@ -243,10 +244,11 @@ public class Robot extends IterativeRobot
     	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
     	// Driving
-    	if (stickB.getX() == 0 && stickB.getY() == 0) // Lets stickA be used only if stickB is in the neutral position.
+    	/*if (stickB.getX() >= -0.05 && stickB.getY() == 0) // Lets stickA be used only if stickB is in the neutral position.
     		driveControl.arcadeDriveWithPickupArmInFront(stickA);
     	if (stickA.getX() == 0 && stickA.getY() == 0) // Lets stickB be used only if stickA is in the neutral position.
-    		driveControl.arcadeDriveWithWedgeInFront(stickB);
+    		driveControl.arcadeDriveWithWedgeInFront(stickB);*/
+    	
     	
     	// Shifting Gears
     	if (stickA.getRawButton(JOYSTICK_HIGH_GEAR) || stickB.getRawButton(JOYSTICK_HIGH_GEAR))
@@ -291,6 +293,9 @@ public class Robot extends IterativeRobot
     	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_RETRACT))
     		wedge.retract();
     	wedge.checkIfWedgeMotorShouldStop();
+    	
+    	System.out.println("Right: " + driveControl.getRightEncoder().get());
+    	System.out.println("Left: " + driveControl.getLeftEncoder().get());
     }
     
     /**
@@ -314,5 +319,8 @@ public class Robot extends IterativeRobot
     		arm.spinPickupWheels(1);
     	else
     		arm.stopPickupWheels();
+    	
+    	System.out.println("Left" + driveControl.getLeftEncoder().get());
+    	System.out.println("Right" + driveControl.getRightEncoder().get());
     }   
 }

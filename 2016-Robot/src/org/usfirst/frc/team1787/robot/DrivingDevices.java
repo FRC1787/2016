@@ -76,10 +76,10 @@ public class DrivingDevices
 		theRobot = new RobotDrive(talon_FL, talon_BL, talon_FR, talon_BR);
 		
 		/* COMMENT OUT ENCODERS WHEN THEY ARE NOT WIRED OR ELSE ROBOT WON'T DETECT CODE! */
-		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b);
-		leftEncoder.setDistancePerPulse(LEFT_ENCODER_DISTANCE_PER_PULSE);
-		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b);
-		rightEncoder.setDistancePerPulse(RIGHT_ENCODER_DISTANCE_PER_PULSE);
+		leftEncoder = new Encoder(left_encoder_port_a, left_encoder_port_b, false);
+		//leftEncoder.setDistancePerPulse(LEFT_ENCODER_DISTANCE_PER_PULSE);
+		rightEncoder = new Encoder(right_encoder_port_a, right_encoder_port_b, false);
+		//rightEncoder.setDistancePerPulse(RIGHT_ENCODER_DISTANCE_PER_PULSE);
 		
 		shifter = new Shifter(sol_shifter_port);
 		
@@ -219,9 +219,9 @@ public class DrivingDevices
 	{
 		SmartDashboard.putBoolean("Current Gear (true = high, false = low)", shifter.getCurrentGear());
 		//SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
-		SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
-		SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
-		SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
-		SmartDashboard.putNumber("Right Encoder Distance", rightEncoder.getDistance());
+		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
+		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
+		//SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
+		//SmartDashboard.putNumber("Right Encoder Distance", rightEncoder.getDistance());
 	}
 }
