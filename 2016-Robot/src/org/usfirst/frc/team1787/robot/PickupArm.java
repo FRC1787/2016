@@ -112,7 +112,7 @@ public class PickupArm
 	/** The time, in seconds, that it takes the arm to move from region 0 to region 2. */
 	private static final double STORE_TO_APPROACH_TIME = 1.17;
 	/** The time, in seconds, that it takes the arm to move from region 4 to region 2. */
-	private static final double PICKUP_TO_APPROACH_TIME = 0.007;
+	private static final double PICKUP_TO_APPROACH_TIME = 0.006; //From 0.007
 	/** The value that indicates if the arm is currently moving towards region 2 from region 0. */
 	private boolean movingTowardsApproachFromStore = false;
 	/** The value that indicates if the arm is currently moving towards region 2 from region 4.  */

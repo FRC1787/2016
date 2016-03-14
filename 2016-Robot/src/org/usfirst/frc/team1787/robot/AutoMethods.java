@@ -418,8 +418,8 @@ public class AutoMethods
 	
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)
 	{
-		positionChooser.addDefault("It doesn't matter cuz we're just not gonna do anything during auto trololololol", 0);
-		positionChooser.addObject("Position 1 (far left)", 1);
+		positionChooser.addObject("It doesn't matter cuz we're just not gonna do anything during auto trololololol", 0);
+		positionChooser.addDefault("Position 1 (far left)", 1);
         positionChooser.addObject("Position 2 (second from the left)", 2);
         positionChooser.addObject("Position 3 (in the middle)", 3);
         positionChooser.addObject("Position 4 (second from the right)", 4);

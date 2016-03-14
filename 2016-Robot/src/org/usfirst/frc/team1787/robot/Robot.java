@@ -321,7 +321,7 @@ public class Robot extends IterativeRobot
      */
     public void testInit()
     {
-    	
+    	driveControl.resetEncoders();
     }
     
     /**
@@ -340,8 +340,14 @@ public class Robot extends IterativeRobot
     	
     	//driveControl.driveWithABsoluteValues(0.5, 0.5);
     	
-    	driveControl.arcadeDriveUsingValues(-stickA.getY(), 0);
-    	System.out.println("Left" + driveControl.getLeftEncoder().getDistance());
-    	System.out.println("Right" + driveControl.getRightEncoder().getDistance());
+    	if (driveControl.getLeftEncoder().getDistance() < 4)
+    		driveControl.arcadeDriveUsingValues(0.5, 0.085);
+    	else
+    		driveControl.stop();
+    	
+    	//driveControl.arcadeDriveUsingValues(-stickA.getY(), 0);
+    	System.out.println("Left: " + driveControl.getLeftEncoder().getDistance());
+    	System.out.println("Right: " + driveControl.getRightEncoder().getDistance());
+    	System.out.println();
     }   
 }
