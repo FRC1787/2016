@@ -348,19 +348,27 @@ public class AutoMethods
 	 * @param direction direction to move the wedge; wedge.DEPLOY or wedge.RETRACT
 	 * @param counter the counter to increment when this operation is complete
 	 */
-	/*public void autoMoveWedge(int direction)
+	public boolean autoMoveWedge(int direction)
 	{
 		if ((direction == Wedge.DEPLOY) && (wedge.getDirection() == Wedge.STATIONARY))
+		{
 			wedge.deploy();
+			return false;
+		}
 		else if ((direction == Wedge.RETRACT) && (wedge.getDirection() == Wedge.STATIONARY))
+		{
 			wedge.retract();
+			return false;
+		}
 		else
 		{
 			wedge.checkIfWedgeMotorShouldStop();
 			if (wedge.getDirection() == Wedge.STATIONARY)
-				return
+				return true;
+			else
+				return false;
 		}		
-	}*/
+	}
 	
 	public boolean moveForwardsWithTimer(double revolutions, double speed)
 	{
