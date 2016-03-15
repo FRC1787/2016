@@ -76,7 +76,6 @@ public class Wedge
 		{
 			stop();
 			wedgeTimer.reset();
-			wedgeDirection = STATIONARY;
 		}
 	}
 	
