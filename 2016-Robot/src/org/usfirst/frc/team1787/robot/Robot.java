@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1787.robot;
 
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
@@ -141,6 +142,10 @@ public class Robot extends IterativeRobot
     /** The value indicating whether or not the robot will attempt to score in the low goal during auto. */
     private boolean tryToScore;
     
+    // Objects and variables involving the camera on the robot
+    CameraServer cameraServer;
+    private static final String CAMERA_NAME = "cam0";
+    
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
@@ -158,7 +163,7 @@ public class Robot extends IterativeRobot
      * This function is run once when the robot is first started up and should be used for any initialization code.
      */
     public void robotInit()
-    {
+    {    	
     	// Construct the DrivingDevices
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
     			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, 
@@ -194,6 +199,11 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("In which position will the robot start the match?", autonomousPositionChooser);
         SmartDashboard.putData("What defense is in that position?", autonomousDefenseChooser);
         SmartDashboard.putData("Try to score in the low goal during auto?", scoreChooser);
+        
+        // Set up the camera
+        cameraServer = CameraServer.getInstance();
+    	cameraServer.setQuality(50);
+    	cameraServer.startAutomaticCapture(CAMERA_NAME);
     }
     
 	/**
@@ -291,11 +301,10 @@ public class Robot extends IterativeRobot
     	
     	
     	// Pickup Wheels
-    	
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > PickupArm.REG_APPROACH)
-    		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP);
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == PickupArm.REG_STOREAPPROACH)
+    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == PickupArm.REG_STOREAPPROACH)
     		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
+    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > PickupArm.REG_APPROACH)
+    		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP); 
     	else
     		arm.stopPickupWheels();
     	
