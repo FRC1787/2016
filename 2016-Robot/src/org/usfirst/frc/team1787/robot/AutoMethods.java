@@ -128,7 +128,7 @@ public class AutoMethods
 	{
 		/*if (autoDriveDistance(7))
 			mainStep++;*/
-		if (moveForwardsWithTimer(4, 0.8))
+		if (moveForwardsRevolutions(4, 0.8))
 			mainStep++;
 		
 	}
@@ -157,7 +157,7 @@ public class AutoMethods
 	 */
 	public void autoConquerRamparts()
 	{
-		if (moveForwardsWithTimer(4, 0.8))
+		if (moveForwardsRevolutions(4, 0.8))
 			mainStep++;
 	}
 	
@@ -167,7 +167,7 @@ public class AutoMethods
 	 */
 	public void autoConquerMoat()
 	{
-		if (moveForwardsWithTimer(4, 0.8))
+		if (moveForwardsRevolutions(4, 0.8))
 			mainStep++;
 	}
 	
@@ -195,7 +195,7 @@ public class AutoMethods
 	 */
 	public void autoConquerRockWall()
 	{
-		if (moveForwardsWithTimer(4, 0.8))
+		if (moveForwardsRevolutions(4, 0.8))
 			mainStep++;
 	}
 	
@@ -205,24 +205,33 @@ public class AutoMethods
 	 */
 	public void autoConquerRoughTerrain()
 	{
-		if (moveForwardsWithTimer(4, 0.8))
+		if (moveForwardsRevolutions(4, 0.8))
 			mainStep++;
 	}
 	
 	public void autoMoveToGoal(int startingPosition)
-	{/*
+	{
 		if (startingPosition == 1)
 		{
 			if (moveToGoalCurrentStep == 1)
-				autoDriveDistance(0);
+			{
+				if (autoDriveDistance(0))
+					moveToGoalCurrentStep++;
+			}
 			else if (moveToGoalCurrentStep == 2)
-				autoTurnDegrees(57);
+			{
+				if (autoTurnWithEncoders(57))
+					moveToGoalCurrentStep++;
+			}
 			else if (moveToGoalCurrentStep == 3)
-				autoDriveDistance(0);
+			{
+				if (autoDriveDistance(0))
+					moveToGoalCurrentStep++;
+			}
 		}
 		else if (startingPosition == 2)
 		{
-			
+
 		}
 		else if (startingPosition == 3)
 		{
@@ -236,19 +245,15 @@ public class AutoMethods
 		{
 			
 		}
-		else if (startingPosition == 6)
-		{
-			
-		}*/
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to shoot a boulder into the low goal.
 	 * To work properly, the robot must be correctly aligned with the tower.
 	 */
-	public void autoShootLowGoal()
+	public boolean autoShootLowGoal()
 	{
-		
+		return true;
 	}
 	
 	/**
@@ -270,16 +275,18 @@ public class AutoMethods
 		}
 		else
 		{
+			driveControl.stop();
 			return true;
 		}
 	}
 	
+	/*
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
-	 */
-	/*public boolean autoTurnDegrees(double degrees)
+	 *
+	public boolean autoTurnDegrees(double degrees)
 	{
 		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
 		{
@@ -295,7 +302,35 @@ public class AutoMethods
 		{
 			return true;
 		}
-	}*/
+	}
+	*/
+	
+	/**
+	 * This method, when called periodically, makes the robot turn a given amount of degrees in place. 
+	 * Encoders are used to measure the turn.
+	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
+	 * @return If the robot has turned degrees
+	 */
+	public boolean autoTurnWithEncoders(double degrees)
+	{
+		if (!driveControl.hasTurnedDegrees(degrees) && degrees < 0)
+		{
+			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
+			return false;
+		}
+		else if (!driveControl.hasTurnedDegrees(degrees) && degrees > 0)
+		{
+			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+			return false;
+		}
+		else
+		{
+			driveControl.stop();
+			driveControl.resetEncodersAndGyro();
+			return true;
+		}
+	}
+	
 	
 	/**
 	 * Automatically move the arm to a region
@@ -370,28 +405,14 @@ public class AutoMethods
 		}		
 	}
 	
-	public boolean moveForwardsWithTimer(double revolutions, double speed)
+	public boolean moveForwardsRevolutions(double revolutions, double speed)
 	{
-		/*if(driveControl.getRightEncoder().get() < 34611 && driveControl.getRightEncoder().get() < 34611)
-			driveControl.arcadeDriveUsingValues(0.6, 0);
-		else
-			driveControl.stop();*/
 		if (runOnce)
 			extraTimer.start();
 		runOnce = false;
 		
-		//int encoderLticks = driveControl.getLeftEncoder().get();
-		//int encoderRticks = driveControl.getRightEncoder().get();
-		//int difference = Math.abs(encoderRticks - encoderLticks);
-		
 		if (driveControl.getRightEncoder().get() < (34611 * revolutions))
-		{/*
-			if (difference < 100)
-				driveControl.arcadeDriveUsingValues(0.4, 0);
-			else if (encoderLticks < encoderRticks)
-				driveControl.arcadeDriveUsingValues(0.4, -0.1);
-			else if (encoderLticks > encoderRticks)
-				driveControl.arcadeDriveUsingValues(0.4, 0.1);*/
+		{
 			driveControl.arcadeDriveUsingValues(speed, 0.085);
 			return false;
 		}

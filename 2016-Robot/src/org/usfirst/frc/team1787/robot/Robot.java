@@ -117,6 +117,10 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_B_WEDGE_DEPLOY = 3;
 	/** The button on stickB that will retract the wedge */
 	public static final int JOYSTICK_B_WEDGE_RETRACT = 2;
+	/** The button to run autonomous */
+	public static final int JOYSTICK_B_RUNAUTO = 11;
+	/** The button to stop running autonomous in teleop */
+	public static final int JOYSTICK_B_STOPAUTO = 10;
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
@@ -142,6 +146,8 @@ public class Robot extends IterativeRobot
     /** The value indicating whether or not the robot will attempt to score in the low goal during auto. */
     private boolean tryToScore;
     
+    private boolean runningAutoInTeleop = false;
+    
     // Objects and variables involving the camera on the robot
     CameraServer cameraServer;
     private static final String CAMERA_NAME = "cam0";
@@ -150,11 +156,6 @@ public class Robot extends IterativeRobot
     
 	/** Don't ask. */
 	protected int farfar37;
-
-	/** An extra timer */
-	Timer extraTimer = new Timer();
-	/** An extra boolean */
-	boolean extraBoolean = true;
 	
 	// Methods:
 	
@@ -230,8 +231,6 @@ public class Robot extends IterativeRobot
 		
 		// Reset the encoders and the gyro
 		driveControl.resetEncodersAndGyro();
-		
-		extraBoolean = true;
     }
     
     /** 
@@ -241,9 +240,6 @@ public class Robot extends IterativeRobot
     {
     	if (startingPosition != 0) // A startingPosition of 0 indicates the driver chose "No Autonomous" from the SmartDashboard
     		autoMethods.runAuto(startingPosition, defenseInStartingPosition, tryToScore);
-    	
-    	
-    	
     }
     
     /**
@@ -252,7 +248,7 @@ public class Robot extends IterativeRobot
     public void teleopInit()
     {
     	driveControl.setHighGear();
-    	driveControl.resetEncoders();
+    	driveControl.resetEncodersAndGyro();
     }
 
     /**
@@ -260,18 +256,28 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
+    	// Check if running autonomous
+    	if (stickB.getRawButton(JOYSTICK_B_RUNAUTO) && !runningAutoInTeleop)
+    	{
+    		autonomousInit();
+    		runningAutoInTeleop = true;
+    	}
+    	if (stickB.getRawButton(JOYSTICK_B_STOPAUTO))
+    		runningAutoInTeleop = false;
+    	if (runningAutoInTeleop)
+    	{
+    		autonomousPeriodic();
+    	}
+    	
+    	
     	// Let's try to keep this to simply method calls triggered by buttons.
     	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
     	// Driving
-    	/*if (stickB.getX() >= -0.05 && stickB.getY() == 0) // Lets stickA be used only if stickB is in the neutral position.
-    		driveControl.arcadeDriveWithPickupArmInFront(stickA);
-    	if (stickA.getX() == 0 && stickA.getY() == 0) // Lets stickB be used only if stickA is in the neutral position.
-    		driveControl.arcadeDriveWithWedgeInFront(stickB);*/
-    	if (Math.abs(stickA.getY()) > Math.abs(stickB.getY()))
+    	if (Math.abs(stickA.getY()) > Math.abs(stickB.getY())) // Lets stick A only be used when the magnitude of its y value is greater than that of stick b
     		driveControl.arcadeDriveWithPickupArmInFront(stickA);
     	else
-    		driveControl.arcadeDriveWithWedgeInFront(stickB);
+    		driveControl.arcadeDriveWithWedgeInFront(stickB); // Lets stick B be used when the above condition isn't met
     	
     	// Shifting Gears
     	if (stickA.getRawButton(JOYSTICK_HIGH_GEAR) || stickB.getRawButton(JOYSTICK_HIGH_GEAR))
@@ -283,7 +289,6 @@ public class Robot extends IterativeRobot
     	driveControl.putDataOnSmartDashboard();
     	
     	// Functions specific to Joystick A
-    	
     	
     	// Pickup Arm
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_STORE))
@@ -307,8 +312,7 @@ public class Robot extends IterativeRobot
     		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP); 
     	else
     		arm.stopPickupWheels();
-    	
-    	
+    	    	
     	// Arm Data
     	arm.putDataOnSmartDashboard();
     	

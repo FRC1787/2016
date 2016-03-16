@@ -35,10 +35,14 @@ public class DrivingDevices
 	private Encoder leftEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the left encoder */
 	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.000114220445460;
+	/** The amount of degrees that is equivalent to 1 tick on the left encoder */
+	public static final double LEFT_ENCODER_DEGREES_PER_PULSE = 0.1;
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
 	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211;
+	/** The amount of degrees that is equivalent to 1 tick on the right encoder */
+	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE = 0.1;
 	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per wheel revolution. 1 revolution = (15 * pi) feet. 
@@ -189,6 +193,21 @@ public class DrivingDevices
 	public boolean bothEncodersReadLessThan(double distance)
 	{
 		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
+	}
+	
+	public boolean hasTurnedDegrees(double degrees)
+	{
+		if (degrees < 0)
+		{
+			if ( (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE > degrees) && (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE < degrees) )
+				return false;
+		}
+		if (degrees > 0)
+		{
+			if ( (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE < degrees) && (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE > degrees) )
+				return false;
+		}
+		return true;
 	}
 	/*
 	/**
