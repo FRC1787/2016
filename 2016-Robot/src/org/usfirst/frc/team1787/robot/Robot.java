@@ -257,19 +257,20 @@ public class Robot extends IterativeRobot
     public void teleopPeriodic()
     {
     	// Check if running autonomous
-    	if (stickB.getRawButton(JOYSTICK_B_RUNAUTO) && !runningAutoInTeleop)
+    	if (stickB.getRawButton(JOYSTICK_B_STOPAUTO))
+    		runningAutoInTeleop = false;
+    	else if (stickB.getRawButton(JOYSTICK_B_RUNAUTO) && !runningAutoInTeleop)
     	{
     		autonomousInit();
     		runningAutoInTeleop = true;
     	}
-    	if (stickB.getRawButton(JOYSTICK_B_STOPAUTO))
-    		runningAutoInTeleop = false;
+    	
     	if (runningAutoInTeleop)
     	{
     		autonomousPeriodic();
     	}
-    	
-    	
+    	else
+    	{
     	// Let's try to keep this to simply method calls triggered by buttons.
     	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
@@ -327,6 +328,7 @@ public class Robot extends IterativeRobot
     	
     	System.out.println("Right: " + driveControl.getRightEncoder().get());
     	System.out.println("Left: " + driveControl.getLeftEncoder().get());
+    	}
     }
     
     /**

@@ -253,7 +253,7 @@ public class AutoMethods
 	 */
 	public boolean autoShootLowGoal()
 	{
-		return true;
+		return autoSpinWheels(PickupArm.WHEELS_EJECT);
 	}
 	
 	/**
