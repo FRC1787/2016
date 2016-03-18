@@ -41,7 +41,7 @@ public class AutoMethods
 	
 	// Values used for auto routines
 	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.8 = 80% max speed). */
-	private static final double AUTO_MOVE_SPEED = 0.8;
+	private static final double AUTO_MOVE_SPEED = 0.7;
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_ROTATE_SPEED = 0.5;
 	/** Tested value to turn while moving to move in a straight line */
@@ -57,9 +57,9 @@ public class AutoMethods
 	/** Timer for timing how long the wheels spin */
 	Timer pickupWheelsSpinTimer = new Timer();
 	/** Time to spin pickupWheels to pick up a boulder */
-	public static final int PICKUP_TIME = 5;
+	public static final int PICKUP_TIME = 7;
 	/** Time to spin pickupWheels to eject a boulder */
-	public static final int EJECT_TIME = 5;
+	public static final int EJECT_TIME = 7;
 	
 	// Methods:
 	
@@ -147,7 +147,7 @@ public class AutoMethods
 		}
 		else if (conquerDefenseStep == 2)
 		{
-			if (autoDriveDistance(16))
+			if (autoDriveDistance(10, AUTO_MOVE_SPEED)) // F 12.7, F 3.5, T 35deg, F 13
 			{
 				conquerDefenseStep++;
 				return true;
@@ -171,7 +171,7 @@ public class AutoMethods
 		}
 		else if (conquerDefenseStep == 2)
 		{
-			if (autoDriveDistance(-6))
+			if (autoDriveDistance(-6, AUTO_MOVE_SPEED))
 				conquerDefenseStep++;
 			return false;
 		}
@@ -201,7 +201,7 @@ public class AutoMethods
 	{
 		if (conquerDefenseStep == 1)
 		{
-			if (autoDriveDistance(-5))
+			if (autoDriveDistance(-5, AUTO_MOVE_SPEED))
 				conquerDefenseStep++;
 			return false;
 		}
@@ -213,7 +213,7 @@ public class AutoMethods
 		}
 		else if (conquerDefenseStep == 3)
 		{
-			if (autoDriveDistance(-4))
+			if (autoDriveDistance(-4, AUTO_MOVE_SPEED))
 				conquerDefenseStep++;
 			return false;
 		}
@@ -241,7 +241,7 @@ public class AutoMethods
 	 */
 	public boolean autoConquerRamparts()
 	{
-		return autoDriveDistance(16);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED);
 	}
 	
 	/**
@@ -250,7 +250,7 @@ public class AutoMethods
 	 */
 	public boolean autoConquerMoat()
 	{
-		return autoDriveDistance(16);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED);
 	}
 	
 	/**
@@ -277,7 +277,7 @@ public class AutoMethods
 	 */
 	public boolean autoConquerRockWall()
 	{
-		return autoDriveDistance(16);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED);
 	}
 	
 	/**
@@ -286,7 +286,7 @@ public class AutoMethods
 	 */
 	public boolean autoConquerRoughTerrain()
 	{
-		return autoDriveDistance(16);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED);
 	}
 	
 	public boolean autoMoveToGoal(int startingPosition)
@@ -295,19 +295,25 @@ public class AutoMethods
 		{
 			if (moveToGoalStep == 1)
 			{
-				if (autoDriveDistance(5))
+				if(autoTurnWithEncoders(10))
 					moveToGoalStep++;
 				return false;
 			}
 			else if (moveToGoalStep == 2)
 			{
-				if (autoTurnWithEncoders(57))
+				if (autoDriveDistance(14.5, AUTO_MOVE_SPEED))
 					moveToGoalStep++;
 				return false;
 			}
 			else if (moveToGoalStep == 3)
 			{
-				if (autoDriveDistance(3.5))
+				if (autoTurnWithEncoders(20))
+					moveToGoalStep++;
+				return false;
+			}
+			else if (moveToGoalStep == 4)
+			{
+				if (autoDriveDistance(6, AUTO_MOVE_SPEED))
 				{
 					moveToGoalStep++;
 					return true;
@@ -319,19 +325,19 @@ public class AutoMethods
 		{
 			if (moveToGoalStep == 1)
 			{
-				if (autoDriveDistance(5))
+				if (autoDriveDistance(5, AUTO_MOVE_SPEED))
 					moveToGoalStep++;
 				return false;
 			}
 			else if (moveToGoalStep == 2)
 			{
-				if (autoTurnWithEncoders(57))
+				if (autoTurnWithEncoders(35))
 					moveToGoalStep++;
 				return false;
 			}
 			else if (moveToGoalStep == 3)
 			{
-				if (autoDriveDistance(3.5))
+				if (autoDriveDistance(6, AUTO_MOVE_SPEED))
 				{
 					moveToGoalStep++;
 					return true;
@@ -351,19 +357,19 @@ public class AutoMethods
 		{
 			if (moveToGoalStep == 1)
 			{
-				if (autoDriveDistance(5))
+				if (autoDriveDistance(5, AUTO_MOVE_SPEED))
 					moveToGoalStep++;
 				return false;
 			}
 			else if (moveToGoalStep == 2)
 			{
-				if (autoTurnWithEncoders(-57))
+				if (autoTurnWithEncoders(-35))
 					moveToGoalStep++;
 				return false;
 			}
 			else if (moveToGoalStep == 3)
 			{
-				if (autoDriveDistance(3.5))
+				if (autoDriveDistance(3.5, AUTO_MOVE_SPEED))
 				{
 					moveToGoalStep++;
 					return true;
@@ -389,16 +395,16 @@ public class AutoMethods
 	 * @param distance How far the robot should travel. Use positive values to move forward, and negative values to move backward.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
 	 */
-	public boolean autoDriveDistance(double distance)
+	public boolean autoDriveDistance(double distance, double absValSpeed)
 	{
 		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
 		{
-			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, CURVE_CORRECTION_VALUE);
+			driveControl.arcadeDriveUsingValues(absValSpeed, CURVE_CORRECTION_VALUE);
 			return false;
 		}
 		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
 		{
-			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, CURVE_CORRECTION_VALUE);
+			driveControl.arcadeDriveUsingValues(-absValSpeed, CURVE_CORRECTION_VALUE);
 			return false;
 		}
 		else

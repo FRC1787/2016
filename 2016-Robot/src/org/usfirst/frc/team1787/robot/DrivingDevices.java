@@ -120,7 +120,8 @@ public class DrivingDevices
 	 */
 	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
-		theRobot.arcadeDrive(-moveValue, rotateValue); // WHY IS THE MOVE VALUE NEGATIVE???
+		theRobot.arcadeDrive(-moveValue, rotateValue);
+		// WHY IS THE MOVE VALUE NEGATIVE??? Cuz joysticks read the y axis wrong. You dummy
 	}
 	
 	/**

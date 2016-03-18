@@ -333,6 +333,8 @@ public class Robot extends IterativeRobot
     	
     	if (!done)
     		done = autoMethods.autoTurnWithEncoders(360);
+    	if (stickA.getRawButton(8))
+    		done = false;
     	
     	
     	double leftDegreesRightTurn = driveControl.getLeftEncoderDegreesRightTurn();
