@@ -3,7 +3,6 @@ package org.usfirst.frc.team1787.robot;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -73,7 +72,7 @@ public class Robot extends IterativeRobot
 	
 	// Arm Motion
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
-	private int pickupArmDesiredRegion = -1; // Starts at -1 so that the arm doesn't move upon entering teleop unless it is told to.
+	private int pickupArmDesiredRegion = -1; // Starts at -1 so that the arm doesn't move upon entering teleop unless it's told to.
 	
 	// Objects and variables used for the Wedge:
 	
@@ -87,10 +86,10 @@ public class Robot extends IterativeRobot
 	// Joystick
 	/** The joystick used to intuitively control the robot when the pickup arm is in the front (default orientation) */
 	private Joystick stickA;
-	/** The joystick used to intuitively control the robot when the wedge is in the front */
-	private Joystick stickB;
 	/** The USB port on the computer that stickA is connected to. USB port #'s are configured from the driver station */
 	public static final int JOYSTICK_A_USB_PORT = 0;
+	/** The joystick used to intuitively control the robot when the wedge is in the front */
+	private Joystick stickB;
 	/** The USB port on the computer that stickB is connected to. USB port #'s are configured from the driver station */
 	public static final int JOSTICK_B_USB_PORT = 1;
 	
@@ -142,7 +141,8 @@ public class Robot extends IterativeRobot
     /** The value indicating whether or not the robot will attempt to score in the low goal during auto. */
     private boolean tryToScore;
     
-    // Objects and variables involving the camera
+    // Objects and variables involving the camera:
+    
     CameraServer cameraServer;
     private static final String CAMERA_NAME = "cam1";
     
@@ -152,6 +152,7 @@ public class Robot extends IterativeRobot
 	protected int farfar37;
 	
 	// Methods:
+	
 	
 	
     /** 
@@ -175,7 +176,7 @@ public class Robot extends IterativeRobot
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
     	
-    	// Construct the AutoRoutines
+    	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
     	
     	// Construct the position chooser and add all options to it
@@ -210,7 +211,7 @@ public class Robot extends IterativeRobot
     {
     	// Get the selected starting position from the driver station
     	startingPosition =  (int) autonomousPositionChooser.getSelected();
-		
+    	
 		// Get the selected defense to conquer from the driver station
 		defenseInStartingPosition = (int) autonomousDefenseChooser.getSelected();
 		
@@ -313,7 +314,7 @@ public class Robot extends IterativeRobot
     /**
      * This function is called periodically while the robot is in test mode.
      */
-    boolean done = false;
+    boolean done = false; // <- REMEMBER TO GET RID OF THIS WHEN DONE TESTING
     public void testPeriodic()
     {
     	// PICKUP ARM TEST
@@ -334,16 +335,21 @@ public class Robot extends IterativeRobot
     		done = autoMethods.autoTurnWithEncoders(360);
     	
     	
-    	double leftDegrees = driveControl.getLeftEncoder().get() * DrivingDevices.LEFT_ENCODER_DEGREES_PER_PULSE;
-    	double rightDegrees = driveControl.getRightEncoder().get() * DrivingDevices.RIGHT_ENCODER_DEGREES_PER_PULSE;
+    	double leftDegreesRightTurn = driveControl.getLeftEncoderDegreesRightTurn();
+    	double rightDegreesRightTurn = driveControl.getRightEncoderDegreesRightTurn();
+    	
+    	double leftDegreesLeftTurn = driveControl.getLeftEncoderDegreesLeftTurn();
+    	double rightDegreesLeftTurn = driveControl.getRightEncoderDegreesLeftTurn();
     	
     	System.out.println("Left Ticks: " + driveControl.getLeftEncoder().get());
     	//System.out.println("Left Distance: " + driveControl.getLeftEncoder().getDistance());
-    	System.out.println("Left Degrees: " + leftDegrees);
+    	System.out.println("Left Degrees (Right Turn): " + leftDegreesRightTurn);
+    	System.out.println("Left Degrees (Left Turn): " + leftDegreesLeftTurn);
     	//System.out.println();
     	System.out.println("Right Ticks: " + driveControl.getRightEncoder().get());
     	//System.out.println("Right Distance: " + driveControl.getRightEncoder().getDistance());
-    	System.out.println("Right Degrees: " + rightDegrees);
+    	System.out.println("Right Degrees (Right Turn): " + rightDegreesRightTurn);
+    	System.out.println("Right Degrees (Left Turn): " + rightDegreesLeftTurn);
     	System.out.println();
     }   
 }

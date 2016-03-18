@@ -40,7 +40,7 @@ public class AutoMethods
 	public static final int ROUGH_TERRAIN = 9;
 	
 	// Values used for auto routines
-	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
+	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.8 = 80% max speed). */
 	private static final double AUTO_MOVE_SPEED = 0.8;
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_ROTATE_SPEED = 0.5;
@@ -60,10 +60,9 @@ public class AutoMethods
 	public static final int PICKUP_TIME = 5;
 	/** Time to spin pickupWheels to eject a boulder */
 	public static final int EJECT_TIME = 5;
-	/** Boolean for runing things only once */
-	private boolean runOnce = true;
 	
-	Timer extraTimer = new Timer();
+	// Methods:
+	
 	
 	/**
 	 * The AutoMethods constructor passes in objects representing the various subsystems of the robot we want to use in auto.
@@ -82,19 +81,16 @@ public class AutoMethods
 	{
 		if (mainStep == 1)
 		{
-			System.out.println("Main Step 1");
 			if (autoConquerDefense(defenseInStartingPosition))
 				mainStep++;
 		}
 		else if (mainStep == 2 && tryToScore)
 		{
-			System.out.println("Main Step 2");
 			if (autoMoveToGoal(startingPosition))
 				mainStep++;
 		}
 		else if (mainStep == 3 && tryToScore)
 		{
-			System.out.println("Main Step 3");
 			if (autoShootLowGoal())
 				mainStep++;
 		}
@@ -345,11 +341,11 @@ public class AutoMethods
 		}
 		else if (startingPosition == 3)
 		{
-			
+			return false;
 		}
 		else if (startingPosition == 4)
 		{
-			
+			return false;
 		}
 		else if (startingPosition == 5)
 		{
@@ -374,8 +370,8 @@ public class AutoMethods
 				}
 				return false;
 			}
-		}
-		System.out.println("autoMoveToGoalError exception : Java 268\n(At the time of writing this sentence");
+		} // <- Putting an else here for the following statements doesn't work. Idk why tho.
+		System.out.println("Invalid Starting Position");
 		return false;
 	}
 	
@@ -437,8 +433,7 @@ public class AutoMethods
 			driveControl.resetEncodersAndGyro();
 			return true;
 		}
-	}
-	*/
+	}*/
 	
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place. 
@@ -448,17 +443,30 @@ public class AutoMethods
 	 */
 	public boolean autoTurnWithEncoders(double degrees)
 	{
-		System.out.println("Turning");
+		/*
 		if (!driveControl.hasTurnedDegrees(degrees) && degrees > 0)
 		{
-			System.out.println("TRYING TO TURN LEFT");
 			driveControl.tankDriveWithValues(-AUTO_ROTATE_SPEED, AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else if (!driveControl.hasTurnedDegrees(degrees) && degrees < 0)
 		{
-			System.out.println("TRYING TO TURN RIGHT");
 			driveControl.tankDriveWithValues(AUTO_ROTATE_SPEED, -AUTO_ROTATE_SPEED);
+			return false;
+		}
+		else
+		{
+			driveControl.stop();
+			driveControl.resetEncodersAndGyro();
+			return true;
+		}*/
+		
+		if (!driveControl.hasTurnedDegrees(degrees))
+		{
+			if (degrees > 0) // If turning right
+				driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+			else if (degrees < 0) // If turning left
+				driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else
@@ -468,7 +476,6 @@ public class AutoMethods
 			return true;
 		}
 	}
-	
 	
 	/**
 	 * Automatically move the arm to a region
@@ -485,8 +492,8 @@ public class AutoMethods
 	 * Automatically spin the pickup wheels at a desired speed for a set amount of time. 
 	 * The amount of time they spin is determined by the direction they spin.
 	 * @param speed How fast the pickup-wheels spin.
-	 * A negative value will spin them forwards (to pick up the ball).
-	 * A positive value will spin them backwards (to eject the ball).
+	 * A positive value will spin them forwards (to pick up the ball).
+	 * A negative value will spin them backwards (to eject the ball).
 	 * @param counter The step counter to increment when this operation is complete.
 	 */
 	public boolean autoSpinWheels(double speed)
@@ -509,17 +516,17 @@ public class AutoMethods
 	
 	/**
 	 * Automatically deploy or retract the wedge
-	 * @param direction direction to move the wedge; wedge.DEPLOY or wedge.RETRACT
+	 * @param desiredDirection direction to move the wedge; wedge.DEPLOY or wedge.RETRACT
 	 * @param counter the counter to increment when this operation is complete
 	 */
-	public boolean autoMoveWedge(int direction)
+	public boolean autoMoveWedge(int desiredDirection)
 	{
-		if ((direction == Wedge.DEPLOY) && (wedge.getDirection() == Wedge.STATIONARY))
+		if ((desiredDirection == Wedge.DEPLOY) && (wedge.getDirection() == Wedge.STATIONARY))
 		{
 			wedge.deploy();
 			return false;
 		}
-		else if ((direction == Wedge.RETRACT) && (wedge.getDirection() == Wedge.STATIONARY))
+		else if ((desiredDirection == Wedge.RETRACT) && (wedge.getDirection() == Wedge.STATIONARY))
 		{
 			wedge.retract();
 			return false;
@@ -527,32 +534,9 @@ public class AutoMethods
 		else
 		{
 			wedge.checkIfWedgeMotorShouldStop();
-			if (wedge.getDirection() == Wedge.STATIONARY)
-				return true;
-			else
-				return false;
+			return (wedge.getDirection() == Wedge.STATIONARY);
 		}		
 	}
-	
-	/*
-	public boolean moveForwardsRevolutions(double revolutions, double speed)
-	{
-		if (runOnce)
-			extraTimer.start();
-		runOnce = false;
-		
-		if (driveControl.getRightEncoder().get() < (34611 * revolutions))
-		{
-			driveControl.arcadeDriveUsingValues(speed, 0.085);
-			return false;
-		}
-		else
-		{
-			driveControl.stop();
-			return true;
-		}
-	}
-	*/
 	
 	/**
 	 * This method is called when the robot completes a step that is part of an autonomous routine.
@@ -567,7 +551,7 @@ public class AutoMethods
 	}
 	
 	/**
-	 * Resets currentStep to 1.
+	 * Resets all steps to 1.
 	 */
 	public void resetAutoStepCounts()
 	{

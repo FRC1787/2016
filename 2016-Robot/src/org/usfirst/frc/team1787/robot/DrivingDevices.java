@@ -35,14 +35,18 @@ public class DrivingDevices
 	private Encoder leftEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the left encoder */
 	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.000114220445460;
-	/** The amount of degrees that is equivalent to 1 tick on the left encoder */
-	public static final double LEFT_ENCODER_DEGREES_PER_PULSE = 0.007936022752788;
+	/** The amount of degrees that is equivalent to 1 tick on the left encoder when turning right. */
+	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN = 0.007936022752788;
+	/** The amount of degrees that is equivalent to 1 tick on the left encoder when turning left. */
+	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
-	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211; //8824
-	/** The amount of degrees that is equivalent to 1 tick on the right encoder */
-	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE = 0.007091687581379;
+	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211;
+	/** The amount of degrees that is equivalent to 1 tick on the right encoder when turning right. */
+	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN = 0.007091687581379;
+	/** The amount of degrees that is equivalent to 1 tick on the right encoder when turning left. */
+	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
 	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per wheel revolution. 1 revolution = (15 * pi) feet. 
@@ -116,9 +120,14 @@ public class DrivingDevices
 	 */
 	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
-		theRobot.arcadeDrive(-moveValue, rotateValue);
+		theRobot.arcadeDrive(-moveValue, rotateValue); // WHY IS THE MOVE VALUE NEGATIVE???
 	}
 	
+	/**
+	 * Method that allows manual input of motion values. Used for autonomous.
+	 * @param left The value used for moving the wheels on the left.
+	 * @param right The value used for moving the wheels on the right.
+	 */
 	public void tankDriveWithValues(double left, double right)
 	{
 		theRobot.tankDrive(left, right);
@@ -195,19 +204,67 @@ public class DrivingDevices
 		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
 	}
 	
+	/**
+	 * Gets the degree reading from the left encoder when turning right.
+	 * @return
+	 */
+	public double getLeftEncoderDegreesRightTurn()
+	{
+		return (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
+	}
+	
+	/**
+	 * Gets the degree reading from the left encoder when turning left.
+	 * @return
+	 */
+	public double getLeftEncoderDegreesLeftTurn()
+	{
+		return (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN);
+	}
+	
+	/**
+	 * Gets the degree reading from the right encoder when turning right.
+	 * @return
+	 */
+	public double getRightEncoderDegreesRightTurn()
+	{
+		return (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
+	}
+	
+	public double getRightEncoderDegreesLeftTurn()
+	{
+		return (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
+	}
+	
+	/**
+	 * Used to track turning motion.
+	 * @param degrees the amount of degrees to check. Positive value for turning right, negative value for turning left.
+	 * @return If the robot has turned the given amount of degrees.
+	 */
 	public boolean hasTurnedDegrees(double degrees)
 	{
+		/*
 		if (degrees < 0)
 		{
-			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && (Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
+			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && 
+			(Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
 				return false;
 		}
 		if (degrees > 0)
 		{
-			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && (Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
+			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && 
+			(Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
 				return false;
 		}
 		return true;
+		*/
+		
+		if (degrees > 0) // If turning right
+			return (getLeftEncoderDegreesRightTurn() >= degrees && getRightEncoderDegreesRightTurn() <= -degrees);
+		else if (degrees < 0) // If turning left
+			return (getLeftEncoderDegreesLeftTurn() <= degrees && getRightEncoderDegreesLeftTurn() >= -degrees);
+		else
+			return true;	
 	}
 	/*
 	/**
@@ -248,7 +305,11 @@ public class DrivingDevices
 		//SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
 		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
 		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
+		//SmartDashboard.putNumber("Left Encoder Degrees (Right Turn)", getLeftEncoderDegreesRightTurn());
+		//SmartDashboard.putNumber("Left Encoder Degrees (Left Turn)", getLeftEncoderDegreesLeftTurn());
 		//SmartDashboard.putNumber("Right Encoder Ticks", rightEncoder.get());
 		//SmartDashboard.putNumber("Right Encoder Distance", rightEncoder.getDistance());
+		//SmartDashboard.putNumber("Right Encoder Degrees (Right Turn)", getRightEncoderDegreesRightTurn());
+		//SmartDashboard.putNumber("Right Encoder Degrees (Left Turn)", getRightEncoderDegreesLeftTurn());
 	}
 }

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.Solenoid;
  */
 public class Shifter
 {
-	/** the solenoid that controls which gear the robot is in */
+	/** The solenoid that controls which gear the robot is in */
 	private Solenoid sol_shifter;
 	
 	/**
@@ -43,7 +43,8 @@ public class Shifter
 	/**
 	 * Returns a boolean value indicating the current gear of the robot. 
 	 * True indicates the robot is in high gear. False indicates the robot is in low gear.
-	 * @return
+	 * @return The current gear of the robot. 
+	 * True indicates the robot is in high gear. False indicates the robot is in low gear.
 	 */
 	public boolean getCurrentGear()
 	{

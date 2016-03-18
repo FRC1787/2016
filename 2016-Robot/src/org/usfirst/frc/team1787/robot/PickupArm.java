@@ -112,7 +112,7 @@ public class PickupArm
 	/** The time, in seconds, that it takes the arm to move from region 0 to region 2. */
 	private static final double STORE_TO_APPROACH_TIME = 0.3;
 	/** The time, in seconds, that it takes the arm to move from region 4 to region 2. */
-	private static final double PICKUP_TO_APPROACH_TIME = 0.737; //From 0.007
+	private static final double PICKUP_TO_APPROACH_TIME = 0.737;
 	/** The value that indicates if the arm is currently moving towards region 2 from region 0. */
 	private boolean movingTowardsApproachFromStore = false;
 	/** The value that indicates if the arm is currently moving towards region 2 from region 4.  */
@@ -175,14 +175,14 @@ public class PickupArm
 	  */
 	private void moveArm(double motorSpeed)
 	{
-		if((motorSpeed > 0 && reg_Pickup_LS_Is_Activated()) || (motorSpeed < 0 && reg_Store_LS_Is_Activated()))
+		if( (motorSpeed > 0 && reg_Pickup_LS_Is_Activated()) || (motorSpeed < 0 && reg_Store_LS_Is_Activated()) )
 		{
 			stopArm();
 		}
 		else
 		{
-			rightTalon.set(motorSpeed);
-			leftTalon.set(motorSpeed);
+			rightTalon.set(motorSpeed); // One would think one of the motors would need -motorSpeed, but they don't.
+			leftTalon.set(motorSpeed); // We think this is because of how they were wired.
 			if (motorSpeed > 0)
 			{
 				armDirection = ARM_FORWARDS;
@@ -218,9 +218,9 @@ public class PickupArm
 	public void spinPickupWheels(double motorSpeed)
 	{
 		pickupWheels.set(motorSpeed);
-		if (motorSpeed < 0)
+		if (motorSpeed > 0)
 			wheelsDirection = WHEELS_PICKUP;
-		else if (motorSpeed > 0)
+		else if (motorSpeed < 0)
 			wheelsDirection = WHEELS_EJECT;
 		else if (motorSpeed == 0)
 			wheelsDirection = WHEELS_STATIONARY;
@@ -232,8 +232,7 @@ public class PickupArm
 	 */
 	public void stopPickupWheels()
 	{
-		pickupWheels.set(0);
-		wheelsDirection = WHEELS_STATIONARY;
+		spinPickupWheels(0);
 	}
 	
 	/**
@@ -242,7 +241,7 @@ public class PickupArm
 	 */
 	public void manualControl(Joystick stick)
 	{
-		moveArm(-stick.getY() * 0.66);
+		moveArm(-stick.getY() * 0.66); // Testing indicates the move value must the opposite sign of the y value from the stick.
 		determineCurrentRegion(); // This method is included to keep the currentRegion updated for when not using arm manually.
 	}
 	
@@ -251,21 +250,23 @@ public class PickupArm
 	 */
 	private void determineCurrentRegion()
 	{
-		
 		if (reg_Store_LS_Is_Activated()) // If the LS @ region 0 is activated, the arm is in region 0.
 			currentRegion = REG_STORE;
 		else if (reg_Pickup_LS_Is_Activated()) // If the LS @ region 4 is activated, the arm is in region 4.
 			currentRegion = REG_PICKUP;		
-		else if ( (movingTowardsApproachFromStore && reg2Timer.get() >= STORE_TO_APPROACH_TIME) || (movingTowardsApproachFromPickup && reg2Timer.get() >= PICKUP_TO_APPROACH_TIME))
+		else if ( (movingTowardsApproachFromStore && reg2Timer.get() >= STORE_TO_APPROACH_TIME) || 
+				(movingTowardsApproachFromPickup && reg2Timer.get() >= PICKUP_TO_APPROACH_TIME))
 		{
 			currentRegion = REG_APPROACH;
 			movingTowardsApproachFromStore = false;
 			movingTowardsApproachFromPickup = false;
 			reg2Timer.reset();
 		}
-		else if ( (movingTowardsApproachFromStore && reg2Timer.get() < STORE_TO_APPROACH_TIME) || (currentRegion == REG_STORE && !reg_Store_LS_Is_Activated()) ) // if movingToApproachFromStore, but the time it takes to move from region 0 to region 2 hasn't passed, the arm is in region 1.
+		else if ( (movingTowardsApproachFromStore && reg2Timer.get() < STORE_TO_APPROACH_TIME) || 
+				(currentRegion == REG_STORE && !reg_Store_LS_Is_Activated()) ) // if movingToApproachFromStore, but the time it takes to move from region 0 to region 2 hasn't passed, the arm is in region 1.
 			currentRegion = REG_STOREAPPROACH;
-		else if ( (movingTowardsApproachFromPickup && reg2Timer.get() < PICKUP_TO_APPROACH_TIME) || (currentRegion == REG_PICKUP && !reg_Pickup_LS_Is_Activated())) // if movingToApproachFromPickup, but the time it takes to move from region 4 to region 2 hasn't passed, the arm is in region 3.
+		else if ( (movingTowardsApproachFromPickup && reg2Timer.get() < PICKUP_TO_APPROACH_TIME) || 
+				(currentRegion == REG_PICKUP && !reg_Pickup_LS_Is_Activated())) // if movingToApproachFromPickup, but the time it takes to move from region 4 to region 2 hasn't passed, the arm is in region 3.
 			currentRegion = REG_APPROACHPICKUP;
 		
 		
