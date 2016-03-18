@@ -98,11 +98,11 @@ public class PickupArm
 	
 	// Pickup Wheels Motion Info
 	/** The value designating that the pickup-wheels are spinning forwards. */
-	public static final int WHEELS_PICKUP = -1;
+	public static final int WHEELS_PICKUP = 1;
 	/** The value designating that the pickup-wheels are not spinning. */
 	public static final int WHEELS_STATIONARY = 0;
 	/** The value designating that the pickup-wheels are spinning backwards */
-	public static final int WHEELS_EJECT = 1;
+	public static final int WHEELS_EJECT = -1;
 	/** The value that indicates the current motion of the pickup-wheels */
 	private int wheelsDirection = WHEELS_STATIONARY;
 		
@@ -110,9 +110,9 @@ public class PickupArm
 	/** The timer used to determine if the arm is in region 2. */
 	private Timer reg2Timer;
 	/** The time, in seconds, that it takes the arm to move from region 0 to region 2. */
-	private static final double STORE_TO_APPROACH_TIME = 1.17;
+	private static final double STORE_TO_APPROACH_TIME = 0.3;
 	/** The time, in seconds, that it takes the arm to move from region 4 to region 2. */
-	private static final double PICKUP_TO_APPROACH_TIME = 0.006; //From 0.007
+	private static final double PICKUP_TO_APPROACH_TIME = 0.737; //From 0.007
 	/** The value that indicates if the arm is currently moving towards region 2 from region 0. */
 	private boolean movingTowardsApproachFromStore = false;
 	/** The value that indicates if the arm is currently moving towards region 2 from region 4.  */
@@ -212,8 +212,8 @@ public class PickupArm
 	/**
 	 * Spins the pickup-wheels at a desired speed when called periodically.
 	 * @param motorSpeed How fast the pickup-wheels spin.
-	 * A negative value will spin them forwards (to pick up the ball).
-	 * A positive value will spin them backwards (to eject the ball).
+	 * A positive value will spin them forwards (to pick up the ball).
+	 * A negative value will spin them backwards (to eject the ball).
 	 */
 	public void spinPickupWheels(double motorSpeed)
 	{
@@ -310,10 +310,10 @@ public class PickupArm
 	 */
 	public void putDataOnSmartDashboard()
 	{
-		//SmartDashboard.putNumber("Current Region", currentRegion);
-		//SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
-		//SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
-		// SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);
-		// SmartDashboard.putBoolean("movingTowardsApproachFromPickup", movingTowardsApproachFromPickup);
+		SmartDashboard.putNumber("Current Region", currentRegion);
+		SmartDashboard.putBoolean("Region 0 LS Reading", reg_Store_LS_Is_Activated());
+		SmartDashboard.putBoolean("Region 4 LS Reading", reg_Pickup_LS_Is_Activated());
+		SmartDashboard.putBoolean("movingTowardsApproachFromStore", movingTowardsApproachFromStore);
+		SmartDashboard.putBoolean("movingTowardsApproachFromPickup", movingTowardsApproachFromPickup);
 	}
 }

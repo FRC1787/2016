@@ -41,15 +41,17 @@ public class AutoMethods
 	
 	// Values used for auto routines
 	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
-	private static final double AUTO_MOVE_SPEED = 0.5;
+	private static final double AUTO_MOVE_SPEED = 0.8;
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
 	private static final double AUTO_ROTATE_SPEED = 0.5;
+	/** Tested value to turn while moving to move in a straight line */
+	private static final double CURVE_CORRECTION_VALUE = 0.085;
 	/** A counter variable that keeps track of the step being performed in runAuto() */
 	private int mainStep = 1;
 	/** A counter variable that keeps track of the step being performed in a given "conquer defense" method */
-	private int conquerDefenseCurrentStep = 1;
+	private int conquerDefenseStep = 1;
 	/** A counter variable that keeps track of the step being performed in the "move to goal" method */
-	private int moveToGoalCurrentStep = 1;
+	private int moveToGoalStep = 1;
 	
 	// Variables for spinning wheels
 	/** Timer for timing how long the wheels spin */
@@ -79,39 +81,54 @@ public class AutoMethods
 	public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
 	{
 		if (mainStep == 1)
-			autoConquerDefense(defenseInStartingPosition);
+		{
+			System.out.println("Main Step 1");
+			if (autoConquerDefense(defenseInStartingPosition))
+				mainStep++;
+		}
 		else if (mainStep == 2 && tryToScore)
-			autoMoveToGoal(startingPosition);
+		{
+			System.out.println("Main Step 2");
+			if (autoMoveToGoal(startingPosition))
+				mainStep++;
+		}
 		else if (mainStep == 3 && tryToScore)
-			autoShootLowGoal();
+		{
+			System.out.println("Main Step 3");
+			if (autoShootLowGoal())
+				mainStep++;
+		}
 	}
 	
 	/**
 	 * This method calls the "autoConquer" method associated with the given defense.
 	 * @param defense The value that specifies which defense to conquer
 	 */
-	public void autoConquerDefense(int defense)
+	public boolean autoConquerDefense(int defense)
 	{
 		if (defense == LOW_BAR)
-			autoConquerLowBar();
+			return autoConquerLowBar();
 		else if (defense == PORTCULLIS)
-			autoConquerPortcullis();
+			return autoConquerPortcullis();
 		else if (defense == CHEVAL_DE_FRISE)
-			autoConquerChevalDeFrise();
+			return autoConquerChevalDeFrise();
 		else if (defense == RAMPARTS)
-			autoConquerRamparts();
+			return autoConquerRamparts();
 		else if (defense == MOAT)
-			autoConquerMoat();
+			return autoConquerMoat();
 		else if (defense == DRAWBRIDGE)
-			autoConquerDrawbridge();
+			return autoConquerDrawbridge();
 		else if (defense == SALLY_PORT)
-			autoConquerSallyPort();
+			return autoConquerSallyPort();
 		else if (defense == ROCK_WALL)
-			autoConquerRockWall();
+			return autoConquerRockWall();
 		else if (defense == ROUGH_TERRAIN)
-			autoConquerRoughTerrain();
+			return autoConquerRoughTerrain();
 		else
+		{
 			System.out.println("Invalid Defense ID");
+			return false;
+		}
 	}
 	
 	/*
@@ -124,114 +141,207 @@ public class AutoMethods
 	 * This method makes the robot perform a series of steps to conquer the Low Bar.
 	 * To work properly, the robot must be correctly aligned with the Low Bar.
 	 */
-	public void autoConquerLowBar()
+	public boolean autoConquerLowBar()
 	{
-		/*if (autoDriveDistance(7))
-			mainStep++;*/
-		if (moveForwardsRevolutions(4, 0.8))
-			mainStep++;
-		
+		if (conquerDefenseStep == 1)
+		{
+			if (autoMoveArm(PickupArm.REG_PICKUP))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 2)
+		{
+			if (autoDriveDistance(16))
+			{
+				conquerDefenseStep++;
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Portcullis.
 	 * To work properly, the robot must be correctly aligned with the Portcullis.
 	 */
-	public void autoConquerPortcullis()
+	public boolean autoConquerPortcullis()
 	{
-		
+		if (conquerDefenseStep == 1)
+		{
+			if (autoMoveWedge(Wedge.DEPLOY))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 2)
+		{
+			if (autoDriveDistance(-6))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 3)
+		{
+			if (autoMoveWedge(Wedge.RETRACT))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 4)
+		{
+			if (autoTurnWithEncoders(180))
+			{
+				conquerDefenseStep++;
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Cheval-De-Frise.
 	 * To work properly, the robot must be correctly aligned with the Cheval-De-Frise.
 	 */
-	public void autoConquerChevalDeFrise()
+	public boolean autoConquerChevalDeFrise()
 	{
-		
+		if (conquerDefenseStep == 1)
+		{
+			if (autoDriveDistance(-5))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 2)
+		{
+			if (autoMoveWedge(Wedge.DEPLOY))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 3)
+		{
+			if (autoDriveDistance(-4))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 4)
+		{
+			if (autoMoveWedge(Wedge.RETRACT))
+				conquerDefenseStep++;
+			return false;
+		}
+		else if (conquerDefenseStep == 5)
+		{
+			if (autoTurnWithEncoders(180))
+			{
+				conquerDefenseStep++;
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Ramparts.
 	 * To work properly, the robot must be correctly aligned with the Ramparts.
 	 */
-	public void autoConquerRamparts()
+	public boolean autoConquerRamparts()
 	{
-		if (moveForwardsRevolutions(4, 0.8))
-			mainStep++;
+		return autoDriveDistance(16);
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Moat.
 	 * To work properly, the robot must be correctly aligned with the Moat.
 	 */
-	public void autoConquerMoat()
+	public boolean autoConquerMoat()
 	{
-		if (moveForwardsRevolutions(4, 0.8))
-			mainStep++;
+		return autoDriveDistance(16);
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Drawbridge.
 	 * To work properly, the robot must be correctly aligned with the Drawbridge.
 	 */
-	public void autoConquerDrawbridge()
+	public boolean autoConquerDrawbridge()
 	{
-		
+		return false;
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Sally Port.
 	 * To work properly, the robot must be correctly aligned with the Sally Port.
 	 */
-	public void autoConquerSallyPort()
+	public boolean autoConquerSallyPort()
 	{
-		
+		return false;
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Rock Wall.
 	 * To work properly, the robot must be correctly aligned with the Rock Wall.
 	 */
-	public void autoConquerRockWall()
+	public boolean autoConquerRockWall()
 	{
-		if (moveForwardsRevolutions(4, 0.8))
-			mainStep++;
+		return autoDriveDistance(16);
 	}
 	
 	/**
 	 * This method makes the robot perform a series of steps to conquer the Rough Terrain.
 	 * To work properly, the robot must be correctly aligned with the Rough Terrain.
 	 */
-	public void autoConquerRoughTerrain()
+	public boolean autoConquerRoughTerrain()
 	{
-		if (moveForwardsRevolutions(4, 0.8))
-			mainStep++;
+		return autoDriveDistance(16);
 	}
 	
-	public void autoMoveToGoal(int startingPosition)
+	public boolean autoMoveToGoal(int startingPosition)
 	{
 		if (startingPosition == 1)
 		{
-			if (moveToGoalCurrentStep == 1)
+			if (moveToGoalStep == 1)
 			{
-				if (autoDriveDistance(0))
-					moveToGoalCurrentStep++;
+				if (autoDriveDistance(5))
+					moveToGoalStep++;
+				return false;
 			}
-			else if (moveToGoalCurrentStep == 2)
+			else if (moveToGoalStep == 2)
 			{
 				if (autoTurnWithEncoders(57))
-					moveToGoalCurrentStep++;
+					moveToGoalStep++;
+				return false;
 			}
-			else if (moveToGoalCurrentStep == 3)
+			else if (moveToGoalStep == 3)
 			{
-				if (autoDriveDistance(0))
-					moveToGoalCurrentStep++;
+				if (autoDriveDistance(3.5))
+				{
+					moveToGoalStep++;
+					return true;
+				}
+				return false;
 			}
 		}
 		else if (startingPosition == 2)
 		{
-
+			if (moveToGoalStep == 1)
+			{
+				if (autoDriveDistance(5))
+					moveToGoalStep++;
+				return false;
+			}
+			else if (moveToGoalStep == 2)
+			{
+				if (autoTurnWithEncoders(57))
+					moveToGoalStep++;
+				return false;
+			}
+			else if (moveToGoalStep == 3)
+			{
+				if (autoDriveDistance(3.5))
+				{
+					moveToGoalStep++;
+					return true;
+				}
+				return false;
+			}
 		}
 		else if (startingPosition == 3)
 		{
@@ -243,8 +353,30 @@ public class AutoMethods
 		}
 		else if (startingPosition == 5)
 		{
-			
+			if (moveToGoalStep == 1)
+			{
+				if (autoDriveDistance(5))
+					moveToGoalStep++;
+				return false;
+			}
+			else if (moveToGoalStep == 2)
+			{
+				if (autoTurnWithEncoders(-57))
+					moveToGoalStep++;
+				return false;
+			}
+			else if (moveToGoalStep == 3)
+			{
+				if (autoDriveDistance(3.5))
+				{
+					moveToGoalStep++;
+					return true;
+				}
+				return false;
+			}
 		}
+		System.out.println("autoMoveToGoalError exception : Java 268\n(At the time of writing this sentence");
+		return false;
 	}
 	
 	/**
@@ -265,17 +397,18 @@ public class AutoMethods
 	{
 		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
 		{
-			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, 0);
+			driveControl.arcadeDriveUsingValues(AUTO_MOVE_SPEED, CURVE_CORRECTION_VALUE);
 			return false;
 		}
 		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
 		{
-			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, 0);
+			driveControl.arcadeDriveUsingValues(-AUTO_MOVE_SPEED, CURVE_CORRECTION_VALUE);
 			return false;
 		}
 		else
 		{
 			driveControl.stop();
+			driveControl.resetEncodersAndGyro();
 			return true;
 		}
 	}
@@ -300,6 +433,8 @@ public class AutoMethods
 		}
 		else
 		{
+			driveControl.stop();
+			driveControl.resetEncodersAndGyro();
 			return true;
 		}
 	}
@@ -313,14 +448,17 @@ public class AutoMethods
 	 */
 	public boolean autoTurnWithEncoders(double degrees)
 	{
-		if (!driveControl.hasTurnedDegrees(degrees) && degrees < 0)
+		System.out.println("Turning");
+		if (!driveControl.hasTurnedDegrees(degrees) && degrees > 0)
 		{
-			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
+			System.out.println("TRYING TO TURN LEFT");
+			driveControl.tankDriveWithValues(-AUTO_ROTATE_SPEED, AUTO_ROTATE_SPEED);
 			return false;
 		}
-		else if (!driveControl.hasTurnedDegrees(degrees) && degrees > 0)
+		else if (!driveControl.hasTurnedDegrees(degrees) && degrees < 0)
 		{
-			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+			System.out.println("TRYING TO TURN RIGHT");
+			driveControl.tankDriveWithValues(AUTO_ROTATE_SPEED, -AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else
@@ -339,15 +477,8 @@ public class AutoMethods
 	 */
 	public boolean autoMoveArm(int region)
 	{
-		if (arm.getCurrentRegion() != region)
-		{
-			arm.moveToRegion(region);
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		arm.moveToRegion(region);		
+		return (arm.getCurrentRegion() == region);
 	}
 	
 	/**
@@ -373,9 +504,7 @@ public class AutoMethods
 			return true;
 		}
 		else
-		{
 			return false;
-		}
 	}
 	
 	/**
@@ -405,6 +534,7 @@ public class AutoMethods
 		}		
 	}
 	
+	/*
 	public boolean moveForwardsRevolutions(double revolutions, double speed)
 	{
 		if (runOnce)
@@ -422,6 +552,7 @@ public class AutoMethods
 			return true;
 		}
 	}
+	*/
 	
 	/**
 	 * This method is called when the robot completes a step that is part of an autonomous routine.
@@ -441,8 +572,8 @@ public class AutoMethods
 	public void resetAutoStepCounts()
 	{
 		mainStep = 1;
-		conquerDefenseCurrentStep = 1;
-		moveToGoalCurrentStep = 1;
+		conquerDefenseStep = 1;
+		moveToGoalStep = 1;
 	}
 	
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)
@@ -458,8 +589,8 @@ public class AutoMethods
 	public void addOptionsToDefenseChooser(SendableChooser defenseChooser)
 	{
 		defenseChooser.addDefault("Low Bar", LOW_BAR);
-        //defenseChooser.addObject("Portcullis (Type A)", PORTCULLIS);
-        //defenseChooser.addObject("Cheval-De-Frise (Type A)", CHEVAL_DE_FRISE);
+        defenseChooser.addObject("Portcullis (Type A)", PORTCULLIS);
+        defenseChooser.addObject("Cheval-De-Frise (Type A)", CHEVAL_DE_FRISE);
         defenseChooser.addObject("Ramparts (Type B)", RAMPARTS);
         defenseChooser.addObject("Moat (Type B)", MOAT);
         //defenseChooser.addObject("Drawbridge (Type C)", DRAWBRIDGE);
@@ -471,6 +602,6 @@ public class AutoMethods
 	public void addOptionsToScoreChooser(SendableChooser scoreChooser)
 	{
 		scoreChooser.addDefault("Don't score", false);
-		scoreChooser.addDefault("Score", true);
+		scoreChooser.addObject ("Score", true);
 	}
 }

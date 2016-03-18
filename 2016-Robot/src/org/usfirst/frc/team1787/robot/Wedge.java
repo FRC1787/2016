@@ -31,7 +31,7 @@ public class Wedge
 	
 	// Wedge Timing
 	/** The time, in seconds, that the motor will run when retracting the wedge. */
-	public static final double RETRACT_TIME = 2.5;
+	public static final double RETRACT_TIME = 1.5;
 	/** The time, in seconds, that the motor will run when deploying the wedge. */
 	public static final double DEPLOY_TIME = 2;
 	

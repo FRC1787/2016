@@ -73,7 +73,7 @@ public class Robot extends IterativeRobot
 	
 	// Arm Motion
 	/** The region that the pickup arm will move to. During teleop, this value is set by buttons on the joystick */
-	private int pickupArmDesiredRegion = 0; // Set to 0 automatically, unless changed
+	private int pickupArmDesiredRegion = -1; // Starts at -1 so that the arm doesn't move upon entering teleop unless it is told to.
 	
 	// Objects and variables used for the Wedge:
 	
@@ -108,19 +108,15 @@ public class Robot extends IterativeRobot
 	/** The button on stickA that will set pickupArmDesiredRegion to 4 */
 	public static final int JOYSTICK_A_PICKUP_ARM_PICKUP = 1;
 	/** The button on stickA that will spin the pickup wheels forward */
-	public static final int JOYSTICK_A_PICKUP_WHEELS_FORWARDS = 5;
+	public static final int JOYSTICK_A_PICKUP_WHEELS_FORWARDS = 4;
 	/** The button on stickA that will spin the pickup wheels backward */
-	public static final int JOYSTICK_A_PICKUP_WHEELS_BACKWARDS = 4;
+	public static final int JOYSTICK_A_PICKUP_WHEELS_BACKWARDS = 5;
 	
 	// stickB Button Mapping
 	/** The button on stickB that will deploy the wedge */
 	public static final int JOYSTICK_B_WEDGE_DEPLOY = 3;
 	/** The button on stickB that will retract the wedge */
 	public static final int JOYSTICK_B_WEDGE_RETRACT = 2;
-	/** The button to run autonomous */
-	public static final int JOYSTICK_B_RUNAUTO = 11;
-	/** The button to stop running autonomous in teleop */
-	public static final int JOYSTICK_B_STOPAUTO = 10;
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
@@ -146,11 +142,9 @@ public class Robot extends IterativeRobot
     /** The value indicating whether or not the robot will attempt to score in the low goal during auto. */
     private boolean tryToScore;
     
-    private boolean runningAutoInTeleop = false;
-    
-    // Objects and variables involving the camera on the robot
+    // Objects and variables involving the camera
     CameraServer cameraServer;
-    private static final String CAMERA_NAME = "cam0";
+    private static final String CAMERA_NAME = "cam1";
     
     // Miscellaneous objects and variables:
     
@@ -247,7 +241,7 @@ public class Robot extends IterativeRobot
      */
     public void teleopInit()
     {
-    	driveControl.setHighGear();
+    	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     }
 
@@ -256,21 +250,6 @@ public class Robot extends IterativeRobot
      */
     public void teleopPeriodic()
     {
-    	// Check if running autonomous
-    	if (stickB.getRawButton(JOYSTICK_B_STOPAUTO))
-    		runningAutoInTeleop = false;
-    	else if (stickB.getRawButton(JOYSTICK_B_RUNAUTO) && !runningAutoInTeleop)
-    	{
-    		autonomousInit();
-    		runningAutoInTeleop = true;
-    	}
-    	
-    	if (runningAutoInTeleop)
-    	{
-    		autonomousPeriodic();
-    	}
-    	else
-    	{
     	// Let's try to keep this to simply method calls triggered by buttons.
     	// Remember to have any mildly complicated operation occur in the class the operation is associated with.
     	
@@ -292,30 +271,26 @@ public class Robot extends IterativeRobot
     	// Functions specific to Joystick A
     	
     	// Pickup Arm
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_STORE))
-    		pickupArmDesiredRegion = PickupArm.REG_STORE;
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_APPROACH))
-    		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
-    	{
-    		arm.moveToRegion(PickupArm.REG_PICKUP);
-    		pickupArmDesiredRegion = PickupArm.REG_APPROACH;
-    	}
-
-    	if (!stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
-    		arm.moveToRegion(pickupArmDesiredRegion);    	
-    	
+		if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_STORE))
+			pickupArmDesiredRegion = PickupArm.REG_STORE;
+		else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_APPROACH))
+			pickupArmDesiredRegion = PickupArm.REG_APPROACH;
+		else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
+			pickupArmDesiredRegion = PickupArm.REG_PICKUP;
+		
+		if (pickupArmDesiredRegion >= 0) // Used to see if an arm region button has been pressed in teleop yet.
+			arm.moveToRegion(pickupArmDesiredRegion);
     	
     	// Pickup Wheels
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) || arm.getCurrentRegion() == PickupArm.REG_STOREAPPROACH)
-    		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || arm.getCurrentRegion() > PickupArm.REG_APPROACH)
+    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS))
     		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP); 
+    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS))
+    		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
     	else
     		arm.stopPickupWheels();
     	    	
     	// Arm Data
-    	arm.putDataOnSmartDashboard();
+    	// arm.putDataOnSmartDashboard(); // <- Used for testing arm stuff.
     	
     	// Functions specific to Joystick B
     	
@@ -325,10 +300,6 @@ public class Robot extends IterativeRobot
     	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_RETRACT))
     		wedge.retract();
     	wedge.checkIfWedgeMotorShouldStop();
-    	
-    	System.out.println("Right: " + driveControl.getRightEncoder().get());
-    	System.out.println("Left: " + driveControl.getLeftEncoder().get());
-    	}
     }
     
     /**
@@ -342,27 +313,37 @@ public class Robot extends IterativeRobot
     /**
      * This function is called periodically while the robot is in test mode.
      */
+    boolean done = false;
     public void testPeriodic()
     {
-    	//arm.manualControl(stickA); // This is for testing the pickup arm
+    	// PICKUP ARM TEST
     	/*
+    	arm.manualControl(stickA); // This is for testing the pickup arm
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS)) // This is for testing the pickup arm
-    		arm.spinPickupWheels(-1);
+    		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP);
     	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS)) // This is for testing the pickup arm
-    		arm.spinPickupWheels(1);
+    		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
     	else
-    		arm.stopPickupWheels();*/
-    	
-    	//driveControl.driveWithABsoluteValues(0.5, 0.5);
-    	
-    	if (driveControl.getLeftEncoder().getDistance() < 4)
-    		driveControl.arcadeDriveUsingValues(0.5, 0.085);
-    	else
-    		driveControl.stop();
+    		arm.stopPickupWheels();
+    	*/
+		
     	
     	//driveControl.arcadeDriveUsingValues(-stickA.getY(), 0);
-    	System.out.println("Left: " + driveControl.getLeftEncoder().getDistance());
-    	System.out.println("Right: " + driveControl.getRightEncoder().getDistance());
+    	
+    	if (!done)
+    		done = autoMethods.autoTurnWithEncoders(360);
+    	
+    	
+    	double leftDegrees = driveControl.getLeftEncoder().get() * DrivingDevices.LEFT_ENCODER_DEGREES_PER_PULSE;
+    	double rightDegrees = driveControl.getRightEncoder().get() * DrivingDevices.RIGHT_ENCODER_DEGREES_PER_PULSE;
+    	
+    	System.out.println("Left Ticks: " + driveControl.getLeftEncoder().get());
+    	//System.out.println("Left Distance: " + driveControl.getLeftEncoder().getDistance());
+    	System.out.println("Left Degrees: " + leftDegrees);
+    	//System.out.println();
+    	System.out.println("Right Ticks: " + driveControl.getRightEncoder().get());
+    	//System.out.println("Right Distance: " + driveControl.getRightEncoder().getDistance());
+    	System.out.println("Right Degrees: " + rightDegrees);
     	System.out.println();
     }   
 }

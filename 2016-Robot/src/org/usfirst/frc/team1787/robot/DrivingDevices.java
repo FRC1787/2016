@@ -36,13 +36,13 @@ public class DrivingDevices
 	/** The distance, in feet, that is equivalent to 1 tick on the left encoder */
 	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.000114220445460;
 	/** The amount of degrees that is equivalent to 1 tick on the left encoder */
-	public static final double LEFT_ENCODER_DEGREES_PER_PULSE = 0.1;
+	public static final double LEFT_ENCODER_DEGREES_PER_PULSE = 0.007936022752788;
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
-	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211;
+	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211; //8824
 	/** The amount of degrees that is equivalent to 1 tick on the right encoder */
-	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE = 0.1;
+	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE = 0.007091687581379;
 	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per wheel revolution. 1 revolution = (15 * pi) feet. 
@@ -119,7 +119,7 @@ public class DrivingDevices
 		theRobot.arcadeDrive(-moveValue, rotateValue);
 	}
 	
-	public void driveWithABsoluteValues(double left, double right)
+	public void tankDriveWithValues(double left, double right)
 	{
 		theRobot.tankDrive(left, right);
 	}
@@ -199,12 +199,12 @@ public class DrivingDevices
 	{
 		if (degrees < 0)
 		{
-			if ( (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE > degrees) && (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE < degrees) )
+			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && (Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
 				return false;
 		}
 		if (degrees > 0)
 		{
-			if ( (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE < degrees) && (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE > degrees) )
+			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && (Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
 				return false;
 		}
 		return true;
@@ -242,9 +242,9 @@ public class DrivingDevices
 	public void putDataOnSmartDashboard()
 	{
 		if (shifter.getCurrentGear())
-			SmartDashboard.putString("Gear:", "High");
+			SmartDashboard.putString("Gear:", " High");
 		else
-			SmartDashboard.putString("Gear:", "Low");
+			SmartDashboard.putString("Gear:", " Low");
 		//SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
 		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
 		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
