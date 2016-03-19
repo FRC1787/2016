@@ -323,27 +323,7 @@ public class AutoMethods
 		}
 		else if (startingPosition == 2)
 		{
-			if (moveToGoalStep == 1)
-			{
-				if (autoDriveDistance(5, AUTO_MOVE_SPEED))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 2)
-			{
-				if (autoTurnWithEncoders(35))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 3)
-			{
-				if (autoDriveDistance(6, AUTO_MOVE_SPEED))
-				{
-					moveToGoalStep++;
-					return true;
-				}
-				return false;
-			}
+			return false;
 		}
 		else if (startingPosition == 3)
 		{
@@ -355,27 +335,7 @@ public class AutoMethods
 		}
 		else if (startingPosition == 5)
 		{
-			if (moveToGoalStep == 1)
-			{
-				if (autoDriveDistance(5, AUTO_MOVE_SPEED))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 2)
-			{
-				if (autoTurnWithEncoders(-35))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 3)
-			{
-				if (autoDriveDistance(3.5, AUTO_MOVE_SPEED))
-				{
-					moveToGoalStep++;
-					return true;
-				}
-				return false;
-			}
+			return false;
 		} // <- Putting an else here for the following statements doesn't work. Idk why tho.
 		System.out.println("Invalid Starting Position");
 		return false;
@@ -448,25 +408,7 @@ public class AutoMethods
 	 * @return If the robot has turned degrees
 	 */
 	public boolean autoTurnWithEncoders(double degrees)
-	{
-		/*
-		if (!driveControl.hasTurnedDegrees(degrees) && degrees > 0)
-		{
-			driveControl.tankDriveWithValues(-AUTO_ROTATE_SPEED, AUTO_ROTATE_SPEED);
-			return false;
-		}
-		else if (!driveControl.hasTurnedDegrees(degrees) && degrees < 0)
-		{
-			driveControl.tankDriveWithValues(AUTO_ROTATE_SPEED, -AUTO_ROTATE_SPEED);
-			return false;
-		}
-		else
-		{
-			driveControl.stop();
-			driveControl.resetEncodersAndGyro();
-			return true;
-		}*/
-		
+	{	
 		if (!driveControl.hasTurnedDegrees(degrees))
 		{
 			if (degrees > 0) // If turning right

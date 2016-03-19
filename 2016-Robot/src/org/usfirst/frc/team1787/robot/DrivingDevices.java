@@ -243,23 +243,7 @@ public class DrivingDevices
 	 * @return If the robot has turned the given amount of degrees.
 	 */
 	public boolean hasTurnedDegrees(double degrees)
-	{
-		/*
-		if (degrees < 0)
-		{
-			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && 
-			(Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
-				return false;
-		}
-		if (degrees > 0)
-		{
-			if ( (Math.abs(leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) && 
-			(Math.abs(rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE) < Math.abs(degrees)) )
-				return false;
-		}
-		return true;
-		*/
-		
+	{	
 		if (degrees > 0) // If turning right
 			return (getLeftEncoderDegreesRightTurn() >= degrees && getRightEncoderDegreesRightTurn() <= -degrees);
 		else if (degrees < 0) // If turning left
