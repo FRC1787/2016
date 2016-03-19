@@ -147,7 +147,7 @@ public class AutoMethods
 		}
 		else if (conquerDefenseStep == 2)
 		{
-			if (autoDriveDistance(10, AUTO_MOVE_SPEED)) // F 12.7, F 3.5, T 35deg, F 13
+			if (autoDriveDistance(11.565, AUTO_MOVE_SPEED))
 			{
 				conquerDefenseStep++;
 				return true;
@@ -292,52 +292,67 @@ public class AutoMethods
 	public boolean autoMoveToGoal(int startingPosition)
 	{
 		if (startingPosition == 1)
-		{
-			if (moveToGoalStep == 1)
-			{
-				if(autoTurnWithEncoders(10))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 2)
-			{
-				if (autoDriveDistance(14.5, AUTO_MOVE_SPEED))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 3)
-			{
-				if (autoTurnWithEncoders(20))
-					moveToGoalStep++;
-				return false;
-			}
-			else if (moveToGoalStep == 4)
-			{
-				if (autoDriveDistance(6, AUTO_MOVE_SPEED))
-				{
-					moveToGoalStep++;
-					return true;
-				}
-				return false;
-			}
-		}
+			return moveToGoalPos1();
 		else if (startingPosition == 2)
-		{
-			return false;
-		}
+			return moveToGoalPos2();
 		else if (startingPosition == 3)
-		{
-			return false;
-		}
+			return moveToGoalPos3();
 		else if (startingPosition == 4)
+			return moveToGoalPos4();
+		else if (startingPosition == 5)
+			return moveToGoalPos5();
+		else
 		{
+			System.out.println("Invalid Starting Position");
 			return false;
 		}
-		else if (startingPosition == 5)
+	}
+	
+	public boolean moveToGoalPos1()
+	{
+		if (moveToGoalStep == 1)
 		{
-			return false;
-		} // <- Putting an else here for the following statements doesn't work. Idk why tho.
-		System.out.println("Invalid Starting Position");
+			if (autoTurnWithEncoders(10))
+				moveToGoalStep++;
+		}
+		else if (moveToGoalStep == 2)
+		{
+			if (autoDriveDistance(13, AUTO_MOVE_SPEED))
+				moveToGoalStep++;
+		}
+		else if (moveToGoalStep == 3)
+		{
+			if (autoTurnWithEncoders(20))
+				moveToGoalStep++;
+		}
+		else if (moveToGoalStep == 4)
+		{
+			if (autoDriveDistance(6, AUTO_MOVE_SPEED))
+			{
+				moveToGoalStep++;
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean moveToGoalPos2()
+	{
+		return false;
+	}
+	
+	public boolean moveToGoalPos3()
+	{
+		return false;
+	}
+	
+	public boolean moveToGoalPos4()
+	{
+		return false;
+	}
+	
+	public boolean moveToGoalPos5()
+	{
 		return false;
 	}
 	
