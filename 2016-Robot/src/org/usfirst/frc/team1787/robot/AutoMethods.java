@@ -60,6 +60,9 @@ public class AutoMethods
 	public static final int PICKUP_TIME = 7;
 	/** Time to spin pickupWheels to eject a boulder */
 	public static final int EJECT_TIME = 7;
+	private boolean pickupWheelsTimerStarted = false;
+	
+	private Timer sweepCurveTimer = new Timer();
 	
 	// Methods:
 	
@@ -129,8 +132,7 @@ public class AutoMethods
 	
 	/*
 	 * Each of these autoConquer methods should get the
-	 * back of the bumper lined up with the end of the
-	 * ramp of the defense
+	 * front of the bumper lined up with the outside edge of the alignment line.
 	 */
 	
 	/**
@@ -317,17 +319,17 @@ public class AutoMethods
 		}
 		else if (moveToGoalStep == 2)
 		{
-			if (autoDriveDistance(13, AUTO_MOVE_SPEED))
+			if (autoDriveDistance(12.25, AUTO_MOVE_SPEED))
 				moveToGoalStep++;
 		}
 		else if (moveToGoalStep == 3)
 		{
-			if (autoTurnWithEncoders(20))
+			if (autoTurnWithEncoders(15))
 				moveToGoalStep++;
 		}
 		else if (moveToGoalStep == 4)
 		{
-			if (autoDriveDistance(6, AUTO_MOVE_SPEED))
+			if (autoDriveDistance(2, AUTO_MOVE_SPEED))
 			{
 				moveToGoalStep++;
 				return true;
@@ -440,6 +442,23 @@ public class AutoMethods
 		}
 	}
 	
+	public boolean autoTimedSweepCurve(double moveValue, double curveValue, double time)
+	{
+		sweepCurveTimer.start();
+		
+		if (sweepCurveTimer.get() < time)
+			driveControl.arcadeDriveUsingValues(moveValue, curveValue);
+		else
+		{
+			driveControl.stop();
+			driveControl.resetEncodersAndGyro();
+			sweepCurveTimer.reset();
+			return true;
+		}
+		
+		return false;
+	}
+	
 	/**
 	 * Automatically move the arm to a region
 	 * @param region region to move the arm to; arm.[one of the regions]
@@ -461,16 +480,24 @@ public class AutoMethods
 	 */
 	public boolean autoSpinWheels(double speed)
 	{
-		pickupWheelsSpinTimer.start();
+		if (!pickupWheelsTimerStarted)
+		{
+			pickupWheelsSpinTimer.start();
+			pickupWheelsTimerStarted = true;
+		}
 		
 		arm.spinPickupWheels(speed);
+		System.out.println("Pickup Wheel Speed: " + speed);
+		System.out.println("Pickup Wheel Timer: " + pickupWheelsSpinTimer.get());
 		
 		if (speed == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME ||
 			speed == PickupArm.WHEELS_PICKUP && pickupWheelsSpinTimer.get() >= PICKUP_TIME ||
 			speed == PickupArm.WHEELS_STATIONARY)
 		{
 			arm.stopPickupWheels();
+			pickupWheelsSpinTimer.stop();
 			pickupWheelsSpinTimer.reset();
+			pickupWheelsTimerStarted = false;
 			return true;
 		}
 		else

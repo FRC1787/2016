@@ -244,6 +244,7 @@ public class Robot extends IterativeRobot
     {
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
+    	pickupArmDesiredRegion = -1;
     }
 
     /**
