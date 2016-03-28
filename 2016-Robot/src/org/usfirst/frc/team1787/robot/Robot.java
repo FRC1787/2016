@@ -284,7 +284,7 @@ public class Robot extends IterativeRobot
 			arm.moveToRegion(pickupArmDesiredRegion);
     	
     	// Pickup Wheels
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS))
+    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || (arm.getCurrentRegion() == 4 && stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP)))
     		arm.spinPickupWheels(PickupArm.WHEELS_PICKUP); 
     	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS))
     		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
