@@ -310,6 +310,7 @@ public class Robot extends IterativeRobot
     public void testInit()
     {
     	driveControl.resetEncoders();
+    	driveControl.getGyro().calibrate();
     }
     
     /**
@@ -332,11 +333,12 @@ public class Robot extends IterativeRobot
     	
     	//driveControl.arcadeDriveUsingValues(-stickA.getY(), 0);
     	
+    	/*
     	if (!done)
     		done = autoMethods.autoTurnWithEncoders(360);
     	if (stickA.getRawButton(8))
     		done = false;
-    	
+    	*/
     	
     	double leftDegreesRightTurn = driveControl.getLeftEncoderDegreesRightTurn();
     	double rightDegreesRightTurn = driveControl.getRightEncoderDegreesRightTurn();

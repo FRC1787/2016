@@ -270,6 +270,14 @@ public class DrivingDevices
 	}
 	
 	/**
+	 * Gets the gyro
+	 */
+	public Gyro getGyro()
+	{
+		return gyro;
+	}
+	
+	/**
 	 * Resets the gyro to a heading of 0, and the encoders to a distance of 0.
 	 */
 	public void resetEncodersAndGyro()
