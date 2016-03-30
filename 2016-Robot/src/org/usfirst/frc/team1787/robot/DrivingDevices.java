@@ -60,7 +60,7 @@ public class DrivingDevices
 	
 	//Gyro
 	/** The gyro */
-	//Gyro gyro;
+	Gyro gyro;
 	
 	/**
 	 * Constructor for the DrivingDevices class
@@ -91,8 +91,8 @@ public class DrivingDevices
 		
 		shifter = new Shifter(sol_shifter_port);
 		
-		//gyro = new AnalogGyro(gyro_port);
-		//resetGyro();
+		gyro = new AnalogGyro(gyro_port);
+		gyro.calibrate();
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public class DrivingDevices
 	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
 		theRobot.arcadeDrive(-moveValue, rotateValue);
-		// WHY IS THE MOVE VALUE NEGATIVE??? Cuz joysticks read the y axis wrong. You dummy
+		// Q: WHY IS THE MOVE VALUE NEGATIVE??? A: Cuz joysticks read the y axis wrong. You dummy.
 	}
 	
 	/**
@@ -251,11 +251,11 @@ public class DrivingDevices
 		else
 			return true;	
 	}
-	/*
+
 	/**
 	 * Getter method for the gyro angle.
 	 * @return The gyro angle.
-	 *
+	 */
 	public double getGyroAngle()
 	{
 		return gyro.getAngle();
@@ -263,11 +263,11 @@ public class DrivingDevices
 	
 	/**
 	 * Resets the gyro to a heading of 0
-	 *
+	 */
 	public void resetGyro()
 	{
 		gyro.reset();
-	}*/
+	}
 	
 	/**
 	 * Resets the gyro to a heading of 0, and the encoders to a distance of 0.
@@ -275,7 +275,7 @@ public class DrivingDevices
 	public void resetEncodersAndGyro()
 	{
 		resetEncoders();
-		//resetGyro();
+		resetGyro();
 	}
 	
 	/**
@@ -287,7 +287,7 @@ public class DrivingDevices
 			SmartDashboard.putString("Gear:", " High");
 		else
 			SmartDashboard.putString("Gear:", " Low");
-		//SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
+		SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
 		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
 		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
 		//SmartDashboard.putNumber("Left Encoder Degrees (Right Turn)", getLeftEncoderDegreesRightTurn());

@@ -392,12 +392,11 @@ public class AutoMethods
 		}
 	}
 	
-	/*
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
 	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
-	 *
+	 */
 	public boolean autoTurnDegrees(double degrees)
 	{
 		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
@@ -416,7 +415,7 @@ public class AutoMethods
 			driveControl.resetEncodersAndGyro();
 			return true;
 		}
-	}*/
+	}
 	
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place. 
