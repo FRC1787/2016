@@ -248,6 +248,7 @@ public class Robot extends IterativeRobot
     public void teleopInit()
     {
     	driveControl.setLowGear();
+    	driveControl.getGyro().calibrate();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
     }
@@ -340,8 +341,6 @@ public class Robot extends IterativeRobot
         		arm.spinPickupWheels(PickupArm.WHEELS_EJECT);
         	else
         		arm.stopPickupWheels();
-        	
-        	arm.putDataOnSmartDashboard();
     	}
     	else if (testMode == 2) // Auto turn 360 degrees using encoders
     	{
