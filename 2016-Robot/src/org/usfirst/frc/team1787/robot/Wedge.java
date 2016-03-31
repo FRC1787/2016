@@ -11,22 +11,22 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class Wedge
 {
-	/** The Talon that controls the wedge motor */
+	/** The Talon that controls the wedge motor. */
 	private CANTalon wedgeTalon;
 	
-	/** Timer for retracting and deploying wedge */
+	/** Timer used for retracting and deploying wedge. */
 	private Timer wedgeTimer;
 	
 	// Wedge Motion Info
-	/** How fast the wedge will move in relation to its max speed (a value of 0.6 means 60% of max speed) */
+	/** How fast the wedge will move in relation to its max speed (a value of 0.7 means 70% of max speed). */
 	public static final double MOTOR_SPEED = 0.7;
-	/** The value that indicates the wedge is being deployed */
+	/** The value that indicates the wedge is being deployed. */
 	public static final int DEPLOY = 1;
-	/** The value that indicates the wedge is being retracted */
+	/** The value that indicates the wedge is being retracted. */
 	public static final int RETRACT = -1;
-	/** The value that indicates the wedge is stationary */
+	/** The value that indicates the wedge is stationary. */
 	public static final int STATIONARY = 0;
-	/** The value that represents the motion of the wedge */
+	/** The value that represents the motion of the wedge. */
 	private int wedgeDirection = STATIONARY;
 	
 	// Wedge Timing
@@ -36,8 +36,8 @@ public class Wedge
 	public static final double DEPLOY_TIME = 2;
 	
 	/**
-	 * Constructor for the wedge
-	 * @param talonId ID of the Talon controlling the wedge's motor
+	 * Constructor for the wedge.
+	 * @param talonId The ID of the talon controlling the wedge's motor.
 	 */
 	public Wedge(int talonId)
 	{
@@ -53,6 +53,12 @@ public class Wedge
 		wedgeTalon.set(-MOTOR_SPEED);
 		wedgeDirection = DEPLOY;
 		wedgeTimer.start();
+		/*
+		 * while (wedgeTimer.get() < DEPLOY_TIME)
+		 * { }
+		 * stop();
+		 * wedgeTimer.reset();
+		 */
 	}
 	
 	/**
@@ -69,7 +75,7 @@ public class Wedge
 	 * Stops the wedge when (a)the wedge is deploying and the wedgeTimer reads equal to or greater than the deploy time, or 
 	 * (b)the wedge is retracting and the wedgeTimer reads equal to or greater than the retract time.
 	 */
-	public void checkIfWedgeMotorShouldStop()
+	public void checkWedgeTimer()
 	{
 		if ( (wedgeDirection == DEPLOY && wedgeTimer.get() >= DEPLOY_TIME) ||
 			 (wedgeDirection == RETRACT && wedgeTimer.get() >= RETRACT_TIME) )
@@ -80,7 +86,7 @@ public class Wedge
 	}
 	
 	/**
-	 * Stops the wedge
+	 * Stops the wedge.
 	 */
 	public void stop()
 	{

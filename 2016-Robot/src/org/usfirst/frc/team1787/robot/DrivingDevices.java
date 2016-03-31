@@ -1,16 +1,18 @@
 package org.usfirst.frc.team1787.robot;
 
-import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.Encoder;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is a collection of all the mechanisms used for driving the robot.
- * These include the talons that control the driving motors, the solenoid that controls the gear-shifter, and the encoders.
+ * These include the talons that control the driving motors, the solenoid that controls the gear-shifter, 
+ * the encoders, and the gyro.
  * This class was made to organize the code for these devices in one place 
  * so the Robot class can have one object that controls all aspects of driving.
  * @author David Miron
@@ -39,6 +41,7 @@ public class DrivingDevices
 	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN = 0.007936022752788;
 	/** The amount of degrees that is equivalent to 1 tick on the left encoder when turning left. */
 	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
+	
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
@@ -49,30 +52,31 @@ public class DrivingDevices
 	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
 	
 	/* 
-	 * Initial testing indicates 35060 encoder ticks per wheel revolution. 1 revolution = (15 * pi) feet. 
-	 * Therefore, if distance is in feet, then distancePerPulse = (feet/revolution) * (revolution/ticks).
-	 * (15 * pi) / 35060 = 0.00134409269 
+	 * Initial testing indicates 35060 encoder ticks per big wheel revolution. The big ass wheels are 15 inches in diameter. 
+	 * ((15 * pi) inches/1 revolution) * (1 foot/12 inches) * (1 revolution/35060 ticks) = (15 * pi)/(12 * 35060) feet per tick.
+	 * (15 * pi)/(12 * 35060) = 0.00011200772. 
 	 */
 	
 	// Shifter
-	/** The Shifter object that controls which gear the robot is in */
+	/** The Shifter object that controls which gear the robot is in. */
 	Shifter shifter;
 	
 	//Gyro
-	/** The gyro */
+	/** The gyro. */
 	Gyro gyro;
 	
 	/**
 	 * Constructor for the DrivingDevices class
-	 * @param talon_BR_ID The ID of the Talon connected to the back-right motor
-	 * @param motor_BL_ID The ID of the Talon connected to the back-left motor
-	 * @param motor_FR_ID The ID of the Talon connected to the front-right motor
-	 * @param motor_FL_ID The ID of the Talon connected to the front-left motor
-	 * @param sol_shifter_port The port on the PCM where the solenoid that controls gear-shifting is connected
-	 * @param left_encoder_port_a
-	 * @param left_encoder_port_b
-	 * @param right_encoder_port_a
-	 * @param right_encoder_port_b
+	 * @param talon_BR_ID The ID of the talon connected to the back-right motor.
+	 * @param motor_BL_ID The ID of the talon connected to the back-left motor.
+	 * @param motor_FR_ID The ID of the talon connected to the front-right motor.
+	 * @param motor_FL_ID The ID of the talon connected to the front-left motor.
+	 * @param sol_shifter_port The port on the PCM where the solenoid that controls the shifter is connected.
+	 * @param left_encoder_port_a The DIO port on the roborio where the left encoder's A channel is connected.
+	 * @param left_encoder_port_b The DIO port on the roborio where the left encoder's B channel is connected.
+	 * @param right_encoder_port_a The DIO port on the roborio where the right encoder's A channel is connected.
+	 * @param right_encoder_port_b The DIO port on the roborio where the right encoder's B channel is connected.
+	 * @param gyro_port The Analog port on the roborio where the gyro is connected.
 	 */
 	public DrivingDevices(int talon_BR_ID, int talon_BL_ID, int talon_FR_ID, int talon_FL_ID, int sol_shifter_port, 
 			int left_encoder_port_a, int left_encoder_port_b, int right_encoder_port_a, int right_encoder_port_b, int gyro_port)
@@ -121,21 +125,11 @@ public class DrivingDevices
 	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
 	{
 		theRobot.arcadeDrive(-moveValue, rotateValue);
-		// Q: WHY IS THE MOVE VALUE NEGATIVE??? A: Cuz joysticks read the y axis wrong. You dummy.
+		// Q: WHY IS THE MOVE VALUE NEGATIVE??? A: Cuz our joysticks read the y axis unintuitively.
 	}
 	
 	/**
-	 * Method that allows manual input of motion values. Used for autonomous.
-	 * @param left The value used for moving the wheels on the left.
-	 * @param right The value used for moving the wheels on the right.
-	 */
-	public void tankDriveWithValues(double left, double right)
-	{
-		theRobot.tankDrive(left, right);
-	}
-	
-	/**
-	 * Stops the robot
+	 * Stops the robot.
 	 */
 	public void stop()
 	{
@@ -143,7 +137,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Shifts the robot into high gear
+	 * Shifts the robot into high gear.
 	 */
 	public void setHighGear()
 	{
@@ -151,7 +145,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Shifts the robot into low gear
+	 * Shifts the robot into low gear.
 	 */
 	public void setLowGear()
 	{
@@ -187,7 +181,7 @@ public class DrivingDevices
 	
 	/** 
 	 * Used to track forward motion.
-	 * @param distance The distance to check
+	 * @param distance The distance to check.
 	 * @return If both encoders read greater than the given distance.
 	 */
 	public boolean bothEncodersReadGreaterThan(double distance)
@@ -197,7 +191,7 @@ public class DrivingDevices
 	
 	/**
 	 * Used to track backward motion.
-	 * @param distance The distance to check
+	 * @param distance The distance to check.
 	 * @return If both encoders read less than the given distance.
 	 */
 	public boolean bothEncodersReadLessThan(double distance)
@@ -232,6 +226,10 @@ public class DrivingDevices
 		return (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
 	}
 	
+	/**
+	 * Gets the degree reading from the right encoder when turning left.
+	 * @return
+	 */
 	public double getRightEncoderDegreesLeftTurn()
 	{
 		return (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
@@ -239,7 +237,7 @@ public class DrivingDevices
 	
 	/**
 	 * Used to track turning motion.
-	 * @param degrees the amount of degrees to check. Positive value for turning right, negative value for turning left.
+	 * @param degrees The amount of degrees to check. Positive value for turning right, negative value for turning left.
 	 * @return If the robot has turned the given amount of degrees.
 	 */
 	public boolean hasTurnedDegrees(double degrees)
@@ -262,7 +260,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Resets the gyro to a heading of 0
+	 * Resets the gyro to a heading of 0.
 	 */
 	public void resetGyro()
 	{
@@ -270,7 +268,7 @@ public class DrivingDevices
 	}
 	
 	/**
-	 * Gets the gyro
+	 * Gets the gyro.
 	 */
 	public Gyro getGyro()
 	{

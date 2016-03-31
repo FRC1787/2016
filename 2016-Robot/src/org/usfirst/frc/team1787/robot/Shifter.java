@@ -9,18 +9,19 @@ import edu.wpi.first.wpilibj.Solenoid;
  */
 public class Shifter
 {
-	/** The solenoid that controls which gear the robot is in */
+	/** The solenoid that controls which gear the robot is in. */
 	private Solenoid sol_shifter;
 	
 	/**
-	 * Constructor for the Shifter class
+	 * Constructor for the Shifter class.
 	 * @param sol_shifter_port The port on the PCM that the gear-shifting solenoid is connected to.
 	 */
 	public Shifter(int sol_shifter_port)
 	{
 		sol_shifter = new Solenoid(sol_shifter_port);
 		/* Note that by using the Solenoid constructor that only takes the port number as a parameter, it is assumed that the
-		 * ID of the solenoid is 0. We make the assumption because there are no other pneumatics systems on the robot currently.
+		 * ID of the solenoid is 0. We make the assumption because there are no other pneumatics systems on the robot
+		 * at the time of writing this comment.
 		 */
 	}
 	

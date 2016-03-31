@@ -57,43 +57,43 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class PickupArm
 {
 	// Talons
-	/** Talon that controls the motor on the left side of the pickup arm */
+	/** The talon that controls the motor on the left side of the pickup arm. */
 	private CANTalon leftTalon;
-	/** Talon that controls the motor on the right side of the pickup arm */
+	/** The talon that controls the motor on the right side of the pickup arm. */
 	private CANTalon rightTalon;
-	/** Talon that controls the motor which spins the pickup-wheels */
+	/** The talon that controls the motor which spins the pickup-wheels. */
 	private CANTalon pickupWheels;
 	
 	// Limit Switches
-	/** Limit Switch located at the arm's "default/stored" position (Region 0) */
+	/** Limit Switch located at the arm's "default/stored" position (Region 0). */
 	private DigitalInput regStoreLS;
-	/** Limit Switch located at the arm's "pickup" position (Region 4) */
+	/** Limit Switch located at the arm's "pickup" position (Region 4). */
 	private DigitalInput regPickupLS;
 	
 	// Region Info
-	/** Region number associated with the storage position */ 
+	/** Region number associated with the storage position. */ 
 	public static final int REG_STORE = 0;
-	/** Region number associated with the area between the Store and Approach positions */
+	/** Region number associated with the area between the Store and Approach positions. */
 	public static final int REG_STOREAPPROACH = 1;
-	/** Region number associated with the approach position */
+	/** Region number associated with the approach position. */
 	public static final int REG_APPROACH = 2;
-	/** Region number associated with the area between the Approach and Pickup positions */
+	/** Region number associated with the area between the Approach and Pickup positions. */
 	public static final int REG_APPROACHPICKUP = 3;
-	/** Region number associated with the pickup position */
+	/** Region number associated with the pickup position. */
 	public static final int REG_PICKUP = 4;
-	/** The value that indicates the current region the arm occupies */
+	/** The value that indicates the current region the arm occupies. */
 	private int currentRegion;
 	
 	// Arm Motion Info
-	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed) */
+	/** The speed the pickup arm will move in relation to its max speed (i.e. a value of 0.2 means 20% of max speed). */
 	public static final double MOTOR_SPEED = 0.66;
-	/** The value designating backwards motion of the arm */
+	/** The value designating backwards motion of the arm. */
 	public static final int ARM_BACKWARDS = -1;
-	/** The value designating no motion of the arm */
+	/** The value designating no motion of the arm. */
 	public static final int ARM_STATIONARY = 0;
-	/** The value designating forwards motion of the arm */
+	/** The value designating forwards motion of the arm. */
 	public static final int ARM_FORWARDS = 1;
-	/** The value that indicates the current motion of the arm */
+	/** The value that indicates the current motion of the arm. */
 	private int armDirection = ARM_STATIONARY;
 	
 	// Pickup Wheels Motion Info
@@ -101,9 +101,9 @@ public class PickupArm
 	public static final int WHEELS_PICKUP = 1;
 	/** The value designating that the pickup-wheels are not spinning. */
 	public static final int WHEELS_STATIONARY = 0;
-	/** The value designating that the pickup-wheels are spinning backwards */
+	/** The value designating that the pickup-wheels are spinning backwards. */
 	public static final int WHEELS_EJECT = -1;
-	/** The value that indicates the current motion of the pickup-wheels */
+	/** The value that indicates the current motion of the pickup-wheels. */
 	private int wheelsDirection = WHEELS_STATIONARY;
 		
 	// Region 2 Timing
@@ -176,9 +176,7 @@ public class PickupArm
 	private void moveArm(double motorSpeed)
 	{
 		if( (motorSpeed > 0 && reg_Pickup_LS_Is_Activated()) || (motorSpeed < 0 && reg_Store_LS_Is_Activated()) )
-		{
-			stopArm();
-		}
+			stopArm(); // Stops the arm if it's attempting to move past its forward or backward limit.
 		else
 		{
 			rightTalon.set(motorSpeed); // One would think one of the motors would need -motorSpeed, but they don't.
@@ -263,20 +261,13 @@ public class PickupArm
 			reg2Timer.reset();
 		}
 		else if ( (movingTowardsApproachFromStore && reg2Timer.get() < STORE_TO_APPROACH_TIME) || 
-				(currentRegion == REG_STORE && !reg_Store_LS_Is_Activated()) ) // if movingToApproachFromStore, but the time it takes to move from region 0 to region 2 hasn't passed, the arm is in region 1.
+				  (currentRegion == REG_STORE && !reg_Store_LS_Is_Activated()) ||
+				  (currentRegion == REG_APPROACH && armDirection == ARM_BACKWARDS)) // if movingToApproachFromStore, but the time it takes to move from region 0 to region 2 hasn't passed, the arm is in region 1.
 			currentRegion = REG_STOREAPPROACH;
 		else if ( (movingTowardsApproachFromPickup && reg2Timer.get() < PICKUP_TO_APPROACH_TIME) || 
-				(currentRegion == REG_PICKUP && !reg_Pickup_LS_Is_Activated())) // if movingToApproachFromPickup, but the time it takes to move from region 4 to region 2 hasn't passed, the arm is in region 3.
+				  (currentRegion == REG_PICKUP && !reg_Pickup_LS_Is_Activated()) || 
+				  (currentRegion == REG_APPROACH && armDirection == ARM_FORWARDS)) // if movingToApproachFromPickup, but the time it takes to move from region 4 to region 2 hasn't passed, the arm is in region 3.
 			currentRegion = REG_APPROACHPICKUP;
-		
-		
-		else if (currentRegion == REG_APPROACH) // if the currentRegion is 2 and...
-		{
-			if (armDirection == ARM_FORWARDS) // the arm is moving forwards, then arm is in region 3
-				currentRegion = REG_APPROACHPICKUP;
-			else if (armDirection == ARM_BACKWARDS) // the arm is moving backwards, then the arm is in region 1
-				currentRegion = REG_STOREAPPROACH;
-		}
 	}
 	
 	/**

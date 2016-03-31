@@ -522,7 +522,7 @@ public class AutoMethods
 		}
 		else
 		{
-			wedge.checkIfWedgeMotorShouldStop();
+			wedge.checkWedgeTimer();
 			return (wedge.getDirection() == Wedge.STATIONARY);
 		}		
 	}
@@ -542,7 +542,7 @@ public class AutoMethods
 	/**
 	 * Resets all steps to 1.
 	 */
-	public void resetAutoStepCounts()
+	public void resetStepCounts()
 	{
 		mainStep = 1;
 		conquerDefenseStep = 1;
