@@ -262,9 +262,9 @@ public class Robot extends IterativeRobot
     	
     	// Driving
     	if (stickA.getMagnitude() > stickB.getMagnitude()) // Lets only one stick be used to drive at a time.
-    		driveControl.arcadeDriveWithPickupArmInFront(stickA);
+    		driveControl.arcadeDrivePickupArmInFront(stickA);
     	else
-    		driveControl.arcadeDriveWithWedgeInFront(stickB); 
+    		driveControl.arcadeDriveWedgeInFront(stickB); 
     	
     	// Shifting Gears
     	if (stickA.getRawButton(JOYSTICK_HIGH_GEAR) || stickB.getRawButton(JOYSTICK_HIGH_GEAR))
@@ -349,7 +349,7 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 3)
     	{
-    		driveControl.arcadeDriveWithPickupArmInFront(stickA);
+    		driveControl.arcadeDrivePickupArmInFront(stickA);
     	}
     }   
 }

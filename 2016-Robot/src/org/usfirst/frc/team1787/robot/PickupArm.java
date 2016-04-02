@@ -209,7 +209,8 @@ public class PickupArm
 	
 	/**
 	 * Spins the pickup-wheels at a desired speed when called periodically.
-	 * @param motorSpeed How fast the pickup-wheels spin.
+	 * @param motorSpeed How fast the pickup-wheels spin. 
+	 * It is recommended to use the constants defined in the PickupArm class for this value
 	 * A positive value will spin them forwards (to pick up the ball).
 	 * A negative value will spin them backwards (to eject the ball).
 	 */

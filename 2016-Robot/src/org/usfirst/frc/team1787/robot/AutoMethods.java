@@ -12,31 +12,31 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 public class AutoMethods
 {
 	// Robot Mechanisms
-	/** The set of devices used for driving the robot */
+	/** The set of devices used for driving the robot. */
 	private DrivingDevices driveControl;
-	/** The pickup arm on the robot */
+	/** The pickup arm on the robot. */
 	private PickupArm arm;
-	/** The wedge on the robot */
+	/** The wedge on the robot. */
 	private Wedge wedge;
 	
 	// Defense Specification Values
-	/** The value that specifies a given defense as the Low Bar */
+	/** The value that specifies a given defense as the Low Bar. */
 	public static final int LOW_BAR = 1;
-	/** The value that specifies a given defense as the Portcullis */
+	/** The value that specifies a given defense as the Portcullis. */
 	public static final int PORTCULLIS = 2;
-	/** The value that specifies a given defense as the Cheval-De-Frise */
+	/** The value that specifies a given defense as the Cheval-De-Frise. */
 	public static final int CHEVAL_DE_FRISE = 3;
-	/** The value that specifies a given defense as the Rampart */
+	/** The value that specifies a given defense as the Ramparts. */
 	public static final int RAMPARTS = 4;
-	/** The value that specifies a given defense as the Moat */
+	/** The value that specifies a given defense as the Moat. */
 	public static final int MOAT = 5;
-	/** The value that specifies a given defense as the Drawbridge */
+	/** The value that specifies a given defense as the Drawbridge. */
 	public static final int DRAWBRIDGE = 6;
-	/** The value that specifies a given defense as the Sally Port */
+	/** The value that specifies a given defense as the Sally Port. */
 	public static final int SALLY_PORT = 7;
-	/** The value that specifies a given defense as the Rock Wall */
+	/** The value that specifies a given defense as the Rock Wall. */
 	public static final int ROCK_WALL = 8;
-	/** The value that specifies a given defense as the Rough Terrain */
+	/** The value that specifies a given defense as the Rough Terrain. */
 	public static final int ROUGH_TERRAIN = 9;
 	
 	// Values used for auto routines
@@ -54,17 +54,19 @@ public class AutoMethods
 	private int moveToGoalStep = 1;
 	
 	// Variables for spinning wheels
-	/** Timer for timing how long the wheels spin */
+	/** Timer for timing how long the wheels spin. */
 	Timer pickupWheelsSpinTimer = new Timer();
-	/** Time to spin pickupWheels to pick up a boulder */
+	/** Time to spin pickupWheels to pick up a boulder. */
 	public static final int PICKUP_TIME = 7;
-	/** Time to spin pickupWheels to eject a boulder */
+	/** Time to spin pickupWheels to eject a boulder. */
 	public static final int EJECT_TIME = 7;
+	/** Value indicating if the pickupWheelsTimer has started. */
 	private boolean pickupWheelsTimerStarted = false;
-	
+	/** Timer for timing a sweep curve. */
 	private Timer sweepCurveTimer = new Timer();
 	
 	// Methods:
+	
 	
 	
 	/**
@@ -100,8 +102,9 @@ public class AutoMethods
 	}
 	
 	/**
-	 * This method calls the "autoConquer" method associated with the given defense.
-	 * @param defense The value that specifies which defense to conquer
+	 * This method calls the specific "autoConquer" method for the given defense.
+	 * @param defense The value that specifies which defense to conquer.
+	 * @return If the given defense has been conquered.
 	 */
 	public boolean autoConquerDefense(int defense)
 	{
@@ -136,128 +139,123 @@ public class AutoMethods
 	 */
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Low Bar.
+	 * This method makes the robot perform a series of steps to conquer the Low Bar and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Low Bar.
+	 * @return If the robot has finished conquering the Low Bar and has made it to the alignment line.
 	 */
 	public boolean autoConquerLowBar()
 	{
-		if (conquerDefenseStep == 1)
+		if (conquerDefenseStep == 1) // Move the arm to the pickup position so we can fit under the low bar with a boulder
 		{
 			if (autoMoveArm(PickupArm.REG_PICKUP))
 				conquerDefenseStep++;
-			return false;
 		}
-		else if (conquerDefenseStep == 2)
+		else if (conquerDefenseStep == 2) // Move under the low bar and get to the alignment line
 		{
 			if (autoDriveDistance(11.565, AUTO_MOVE_SPEED))
 			{
 				conquerDefenseStep++;
 				return true;
 			}
-			return false;
 		}
 		return false;
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Portcullis.
+	 * This method makes the robot perform a series of steps to conquer the Portcullis and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Portcullis.
+	 * @return If the robot has finished conquering the Portcullis and has made it to the alignment line.
 	 */
 	public boolean autoConquerPortcullis()
 	{
-		if (conquerDefenseStep == 1)
+		if (conquerDefenseStep == 1) // Deploy the wedge (starts with wedge facing portcullis)
 		{
 			if (autoMoveWedge(Wedge.DEPLOY))
 				conquerDefenseStep++;
-			return false;
 		}
-		else if (conquerDefenseStep == 2)
+		else if (conquerDefenseStep == 2) // Move under the portcullis
 		{
-			if (autoDriveDistance(-6, AUTO_MOVE_SPEED))
+			if (autoDriveDistance(-6, AUTO_MOVE_SPEED)) // A negative distance is used because the wedge is in the back, so we're technically driving backwards
 				conquerDefenseStep++;
-			return false;
 		}
 		else if (conquerDefenseStep == 3)
 		{
-			if (autoMoveWedge(Wedge.RETRACT))
+			if (autoMoveWedge(Wedge.RETRACT)) // Retract the wedge
 				conquerDefenseStep++;
-			return false;
 		}
 		else if (conquerDefenseStep == 4)
 		{
-			if (autoTurnWithEncoders(180))
+			if (autoTurnWithEncoders(180)) // Turn around so the pickup arm is in the front
 			{
 				conquerDefenseStep++;
 				return true;
 			}
-			return false;
 		}
 		return false;
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Cheval-De-Frise.
+	 * This method makes the robot perform a series of steps to conquer the Cheval-De-Frise and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Cheval-De-Frise.
+	 * @return If the robot has finished conquering the Cheval-De-Frise and has made it to the alignment line.
 	 */
 	public boolean autoConquerChevalDeFrise()
 	{
-		if (conquerDefenseStep == 1)
+		if (conquerDefenseStep == 1) // Approach the cheval-de-frise (starts with wedge facing cheval-de-frise)
 		{
-			if (autoDriveDistance(-5, AUTO_MOVE_SPEED))
+			if (autoDriveDistance(-5, AUTO_MOVE_SPEED)) // A negative distance is used because the wedge is in the back, so we're technically driving backwards
 				conquerDefenseStep++;
-			return false;
 		}
-		else if (conquerDefenseStep == 2)
+		else if (conquerDefenseStep == 2) // Deploy the wedge to push one of the cheval-de-frise boards down
 		{
 			if (autoMoveWedge(Wedge.DEPLOY))
 				conquerDefenseStep++;
-			return false;
 		}
-		else if (conquerDefenseStep == 3)
+		else if (conquerDefenseStep == 3) // Drive over the cheval-de-frise
 		{
 			if (autoDriveDistance(-4, AUTO_MOVE_SPEED))
 				conquerDefenseStep++;
-			return false;
 		}
-		else if (conquerDefenseStep == 4)
+		else if (conquerDefenseStep == 4) // Retract the wedge
 		{
 			if (autoMoveWedge(Wedge.RETRACT))
 				conquerDefenseStep++;
-			return false;
 		}
-		else if (conquerDefenseStep == 5)
+		else if (conquerDefenseStep == 5) // Turn around so the pickup arm is in the front
 		{
 			if (autoTurnWithEncoders(180))
 			{
 				conquerDefenseStep++;
 				return true;
 			}
-			return false;
 		}
 		return false;
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Ramparts.
+	 * This method makes the robot perform a series of steps to conquer the Ramparts and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Ramparts.
+	 * @return If the robot has finished conquering the ramparts and has made it to the alignment line.
 	 */
 	public boolean autoConquerRamparts()
 	{
-		return autoDriveDistance(16, AUTO_MOVE_SPEED);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED); // Move over the ramparts and get to the alignment line
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Moat.
+	 * This method makes the robot perform a series of steps to conquer the Moat and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Moat.
+	 * @return If the robot has finished conquering the moat and has made it to the alignment line.
 	 */
 	public boolean autoConquerMoat()
 	{
-		return autoDriveDistance(16, AUTO_MOVE_SPEED);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED); // Move over the moat and get to the alignment line
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Drawbridge.
+	 * This method makes the robot perform a series of steps to conquer the Drawbridge and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Drawbridge.
+	 * @return false. We can't conquer the drawbridge on our own in auto.
 	 */
 	public boolean autoConquerDrawbridge()
 	{
@@ -265,8 +263,9 @@ public class AutoMethods
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Sally Port.
+	 * This method makes the robot perform a series of steps to conquer the Sally Port and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Sally Port.
+	 * @return false. We can't conquer the sally port on our own in auto.
 	 */
 	public boolean autoConquerSallyPort()
 	{
@@ -274,23 +273,31 @@ public class AutoMethods
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Rock Wall.
+	 * This method makes the robot perform a series of steps to conquer the Rock Wall and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Rock Wall.
+	 * @return If the robot has finished conquering the moat and has made it to the alignment line.
 	 */
 	public boolean autoConquerRockWall()
 	{
-		return autoDriveDistance(16, AUTO_MOVE_SPEED);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED); // Move over the rock wall and get to the alignment line
 	}
 	
 	/**
-	 * This method makes the robot perform a series of steps to conquer the Rough Terrain.
+	 * This method makes the robot perform a series of steps to conquer the Rough Terrain and end up at the alignment line.
 	 * To work properly, the robot must be correctly aligned with the Rough Terrain.
+	 * @return If the robot has finished conquering the rough terrain and has made it to the alignment line.
 	 */
 	public boolean autoConquerRoughTerrain()
 	{
-		return autoDriveDistance(16, AUTO_MOVE_SPEED);
+		return autoDriveDistance(16, AUTO_MOVE_SPEED); // Move over the rough terrain and get to the alignment line
 	}
 	
+	/**
+	 * This method calls the specific "moveToGoal" method for the given starting position.
+	 * @param startingPosition Where the robot started on the field. Possible values are 1-5 inclusive, 
+	 * with 1 indicating the robot started at the left-most defense, and 5 indicating the robot started at the right-most defense.
+	 * @return If the robot has finished moving to the low goal.
+	 */
 	public boolean autoMoveToGoal(int startingPosition)
 	{
 		if (startingPosition == 1)
@@ -310,24 +317,29 @@ public class AutoMethods
 		}
 	}
 	
+	/**
+	 * This method makes the robot perform a series of steps to get to the low goal 
+	 * from the segment of the alignment line that is aligned with the left-most defense.
+	 * @return If the robot has finished moving to the low goal.
+	 */
 	public boolean moveToGoalPos1()
 	{
-		if (moveToGoalStep == 1)
+		if (moveToGoalStep == 1) // Turn right a bit so we can move away from the wall
 		{
 			if (autoTurnWithEncoders(10))
 				moveToGoalStep++;
 		}
-		else if (moveToGoalStep == 2)
+		else if (moveToGoalStep == 2) // Move away from the wall
 		{
 			if (autoDriveDistance(12.25, AUTO_MOVE_SPEED))
 				moveToGoalStep++;
 		}
-		else if (moveToGoalStep == 3)
+		else if (moveToGoalStep == 3) // Turn a little more to align with the ramp that leads up to the low goal
 		{
 			if (autoTurnWithEncoders(15))
 				moveToGoalStep++;
 		}
-		else if (moveToGoalStep == 4)
+		else if (moveToGoalStep == 4) // Move up to the low goal
 		{
 			if (autoDriveDistance(2, AUTO_MOVE_SPEED))
 			{
@@ -338,21 +350,41 @@ public class AutoMethods
 		return false;
 	}
 	
+	/**
+	 * This method makes the robot perform a series of steps to get to the low goal 
+	 * from the segment of the alignment line that is aligned with the defense that is 2nd from the left.
+	 * @return false. This method hasn't been implemented yet.
+	 */
 	public boolean moveToGoalPos2()
 	{
 		return false;
 	}
 	
+	/**
+	 * This method makes the robot perform a series of steps to get to the low goal 
+	 * from the segment of the alignment line that is aligned with the defense that is 3rd from the left.
+	 * @return false. This method hasn't been implemented yet.
+	 */
 	public boolean moveToGoalPos3()
 	{
 		return false;
 	}
 	
+	/**
+	 * This method makes the robot perform a series of steps to get to the low goal 
+	 * from the segment of the alignment line that is aligned with the defense that is 4th from the left.
+	 * @return false. This method hasn't been implemented yet.
+	 */
 	public boolean moveToGoalPos4()
 	{
 		return false;
 	}
 	
+	/**
+	 * This method makes the robot perform a series of steps to get to the low goal 
+	 * from the segment of the alignment line that is aligned with the defense that is 5th from the left.
+	 * @return false. This method hasn't been implemented yet.
+	 */
 	public boolean moveToGoalPos5()
 	{
 		return false;
@@ -361,6 +393,7 @@ public class AutoMethods
 	/**
 	 * This method makes the robot perform a series of steps to shoot a boulder into the low goal.
 	 * To work properly, the robot must be correctly aligned with the tower.
+	 * @return If the robot has finished shooting a boulder into the low goal.
 	 */
 	public boolean autoShootLowGoal()
 	{
@@ -368,20 +401,21 @@ public class AutoMethods
 	}
 	
 	/**
-	 * This method, when called periodically, makes the robot travel a given distance.
-	 * @param distance How far the robot should travel. Use positive values to move forward, and negative values to move backward.
-	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
+	 * This method, when called periodically, makes the robot travel a given distance at a given speed.
+	 * @param distance How far, in feet, the robot should travel. Use positive values to move forward, and negative values to move backward.
+	 * @param absValSpeed How fast the robot will drive as a percentage of its top speed (a value of 0.5 means 50% max speed).
+	 * return If the robot has finished driving the given distance.
 	 */
 	public boolean autoDriveDistance(double distance, double absValSpeed)
 	{
 		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
 		{
-			driveControl.arcadeDriveUsingValues(absValSpeed, CURVE_CORRECTION_VALUE);
+			driveControl.arcadeDriveCustomValues(absValSpeed, CURVE_CORRECTION_VALUE);
 			return false;
 		}
 		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
 		{
-			driveControl.arcadeDriveUsingValues(-absValSpeed, CURVE_CORRECTION_VALUE);
+			driveControl.arcadeDriveCustomValues(-absValSpeed, CURVE_CORRECTION_VALUE);
 			return false;
 		}
 		else
@@ -395,18 +429,18 @@ public class AutoMethods
 	/**
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
-	 * @param counterToIncrementWhenComplete The step counter to increment when the operation is finished.
+	 * return If the robot has finished turning the given amount of degrees.
 	 */
 	public boolean autoTurnDegrees(double degrees)
 	{
 		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
 		{
-			driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+			driveControl.arcadeDriveCustomValues(0, AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
 		{
-			driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
+			driveControl.arcadeDriveCustomValues(0, -AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else
@@ -421,16 +455,16 @@ public class AutoMethods
 	 * This method, when called periodically, makes the robot turn a given amount of degrees in place. 
 	 * Encoders are used to measure the turn.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
-	 * @return If the robot has turned degrees
+	 * @return If the robot has finished turning the given amount of degrees.
 	 */
 	public boolean autoTurnWithEncoders(double degrees)
 	{	
-		if (!driveControl.hasTurnedDegrees(degrees))
+		if (!driveControl.hasTurnedDegreesWithEncoders(degrees))
 		{
 			if (degrees > 0) // If turning right
-				driveControl.arcadeDriveUsingValues(0, AUTO_ROTATE_SPEED);
+				driveControl.arcadeDriveCustomValues(0, AUTO_ROTATE_SPEED);
 			else if (degrees < 0) // If turning left
-				driveControl.arcadeDriveUsingValues(0, -AUTO_ROTATE_SPEED);
+				driveControl.arcadeDriveCustomValues(0, -AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else
@@ -441,12 +475,20 @@ public class AutoMethods
 		}
 	}
 	
+	/**
+	 * This method, when called periodically, makes the robot move in a sweeping curve for a given amount of time.
+	 * @param moveValue How fast the robot will move as a percentage of its max speed (a value of 0.5 means 50% max speed)
+	 * @param curveValue How tightly the robot will curve.
+	 * @param time How long, in seconds, the robot will move for.
+	 * @return If the given time has passed, and the robot has therefore completed the sweep curve.
+	 */
 	public boolean autoTimedSweepCurve(double moveValue, double curveValue, double time)
 	{
-		sweepCurveTimer.start();
+		if (sweepCurveTimer.get() == 0)
+			sweepCurveTimer.start();
 		
 		if (sweepCurveTimer.get() < time)
-			driveControl.arcadeDriveUsingValues(moveValue, curveValue);
+			driveControl.arcadeDriveCustomValues(moveValue, curveValue);
 		else
 		{
 			driveControl.stop();
@@ -454,14 +496,13 @@ public class AutoMethods
 			sweepCurveTimer.reset();
 			return true;
 		}
-		
 		return false;
 	}
 	
 	/**
-	 * Automatically move the arm to a region
-	 * @param region region to move the arm to; arm.[one of the regions]
-	 * @param counter the counter to increment when this operation is complete
+	 * This method, when called periodically, automatically moves the arm to a given region.
+	 * @param region The region to move the arm to. It is recommended to use the constants in the PickupArm class for this value.
+	 * @return If the arm has finished moving to the desired region.
 	 */
 	public boolean autoMoveArm(int region)
 	{
@@ -479,15 +520,13 @@ public class AutoMethods
 	 */
 	public boolean autoSpinWheels(double speed)
 	{
-		if (!pickupWheelsTimerStarted)
+		if (!pickupWheelsTimerStarted) // THIS CONDITION CAN MAYBE JUST BE if (pickupWheelsSpinTimer.get() == 0)
 		{
 			pickupWheelsSpinTimer.start();
 			pickupWheelsTimerStarted = true;
 		}
 		
 		arm.spinPickupWheels(speed);
-		System.out.println("Pickup Wheel Speed: " + speed);
-		System.out.println("Pickup Wheel Timer: " + pickupWheelsSpinTimer.get());
 		
 		if (speed == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME ||
 			speed == PickupArm.WHEELS_PICKUP && pickupWheelsSpinTimer.get() >= PICKUP_TIME ||
@@ -504,9 +543,9 @@ public class AutoMethods
 	}
 	
 	/**
-	 * Automatically deploy or retract the wedge
-	 * @param desiredDirection direction to move the wedge; wedge.DEPLOY or wedge.RETRACT
-	 * @param counter the counter to increment when this operation is complete
+	 * Automatically deploy or retract the wedge.
+	 * @param desiredDirection direction to move the wedge (Wedge.DEPLOY or Wedge.RETRACT).
+	 * @return If the wedge has finished moving.
 	 */
 	public boolean autoMoveWedge(int desiredDirection)
 	{
@@ -528,18 +567,6 @@ public class AutoMethods
 	}
 	
 	/**
-	 * This method is called when the robot completes a step that is part of an autonomous routine.
-	 * This method stops the robot, resets the encoders, resets the gyro, and increments the given step counter by 1.
-	 * @param stepCounterToIncrement The step counter to increment.
-	 */
-	public void completeStep(int stepCounterToIncrement)
-	{
-		driveControl.stop();
-		driveControl.resetEncodersAndGyro();
-		stepCounterToIncrement++;
-	}
-	
-	/**
 	 * Resets all steps to 1.
 	 */
 	public void resetStepCounts()
@@ -549,6 +576,10 @@ public class AutoMethods
 		moveToGoalStep = 1;
 	}
 	
+	/**
+	 * Adds all of the possible position options to a given sendable chooser.
+	 * @param positionChooser Should only be the positionChooser.
+	 */
 	public void addOptionsToPositionChooser(SendableChooser positionChooser)
 	{
 		positionChooser.addObject("It doesn't matter cuz we're just not gonna do anything during auto trololololol", 0);
@@ -559,6 +590,10 @@ public class AutoMethods
         positionChooser.addObject("Position 5 (far right)", 5);
 	}
 	
+	/**
+	 * Adds all of the possible defense options to a given sendable chooser.
+	 * @param defenseChooser Should only be the defenseChooser.
+	 */
 	public void addOptionsToDefenseChooser(SendableChooser defenseChooser)
 	{
 		defenseChooser.addDefault("Low Bar", LOW_BAR);
@@ -572,6 +607,10 @@ public class AutoMethods
         defenseChooser.addObject("Rough Terrain (Type D)", ROUGH_TERRAIN);
 	}
 	
+	/**
+	 * Adds all of the possible scoring options to a given sendable chooser.
+	 * @param scoreChooser Should only be the scoreChooser.
+	 */
 	public void addOptionsToScoreChooser(SendableChooser scoreChooser)
 	{
 		scoreChooser.addDefault("Don't score", false);

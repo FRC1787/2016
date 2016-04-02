@@ -103,7 +103,7 @@ public class DrivingDevices
 	 * Method used for intuitively driving the robot when the pickup arm in front using a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
-	public void arcadeDriveWithPickupArmInFront(Joystick stick)
+	public void arcadeDrivePickupArmInFront(Joystick stick)
 	{
 		theRobot.arcadeDrive(stick.getY(), stick.getX());
 	}
@@ -112,7 +112,7 @@ public class DrivingDevices
 	 * Method used for intuitively driving the robot when the wedge is in the front using a single joystick.
 	 * @param stick The joystick used to drive the robot.
 	 */
-	public void arcadeDriveWithWedgeInFront(Joystick stick)
+	public void arcadeDriveWedgeInFront(Joystick stick)
 	{
 		theRobot.arcadeDrive(-stick.getY(), stick.getX());
 	}
@@ -122,10 +122,15 @@ public class DrivingDevices
 	 * @param moveValue The value to use for moving forwards(positive value) or backwards(negative value)
 	 * @param rotateValue The value to use for rotating right(positive value) or left(negative value)
 	 */
-	public void arcadeDriveUsingValues(double moveValue, double rotateValue)
+	public void arcadeDriveCustomValues(double moveValue, double rotateValue)
 	{
 		theRobot.arcadeDrive(-moveValue, rotateValue);
-		// Q: WHY IS THE MOVE VALUE NEGATIVE??? A: Cuz our joysticks read the y axis unintuitively.
+		/* Q: Why is moveValue negative?
+		 * A: Apparently, a negative moveValue will move the robot forward when using arcadeDrive().
+		 * This is likely because joysticks, or at least the ones we're using, output a negative y value when pushed forward.
+		 * We wanted arcadeDriveUsingValues() to move the robot forward when given a positive move value 
+		 * because it seemed more intuitive, so we use -moveValue within the method to accomplish that.
+		 */
 	}
 	
 	/**
@@ -134,22 +139,6 @@ public class DrivingDevices
 	public void stop()
 	{
 		theRobot.arcadeDrive(0, 0);
-	}
-	
-	/**
-	 * Shifts the robot into high gear.
-	 */
-	public void setHighGear()
-	{
-		shifter.setHighGear();
-	}
-	
-	/**
-	 * Shifts the robot into low gear.
-	 */
-	public void setLowGear()
-	{
-		shifter.setLowGear();
 	}
 	
 	/**
@@ -240,7 +229,7 @@ public class DrivingDevices
 	 * @param degrees The amount of degrees to check. Positive value for turning right, negative value for turning left.
 	 * @return If the robot has turned the given amount of degrees.
 	 */
-	public boolean hasTurnedDegrees(double degrees)
+	public boolean hasTurnedDegreesWithEncoders(double degrees)
 	{	
 		if (degrees > 0) // If turning right
 			return (getLeftEncoderDegreesRightTurn() >= degrees && getRightEncoderDegreesRightTurn() <= -degrees);
@@ -248,6 +237,31 @@ public class DrivingDevices
 			return (getLeftEncoderDegreesLeftTurn() <= degrees && getRightEncoderDegreesLeftTurn() >= -degrees);
 		else
 			return true;	
+	}
+	
+	/**
+	 * Shifts the robot into high gear.
+	 */
+	public void setHighGear()
+	{
+		shifter.setHighGear();
+	}
+	
+	/**
+	 * Shifts the robot into low gear.
+	 */
+	public void setLowGear()
+	{
+		shifter.setLowGear();
+	}
+	
+	/**
+	 * Getter method for the gyro.
+	 * @return The gyro.
+	 */
+	public Gyro getGyro()
+	{
+		return gyro;
 	}
 
 	/**
@@ -265,14 +279,6 @@ public class DrivingDevices
 	public void resetGyro()
 	{
 		gyro.reset();
-	}
-	
-	/**
-	 * Gets the gyro.
-	 */
-	public Gyro getGyro()
-	{
-		return gyro;
 	}
 	
 	/**
