@@ -406,24 +406,6 @@ public class AutoMethods
 	 */
 	public boolean autoDriveDistance(double distance, double absValSpeed)
 	{
-		if (distance > 0 && driveControl.bothEncodersReadLessThan(distance))
-		{
-			driveControl.arcadeDriveCustomValues(absValSpeed, CURVE_CORRECTION_VALUE);
-			return false;
-		}
-		else if (distance < 0 && driveControl.bothEncodersReadGreaterThan(distance))
-		{
-			driveControl.arcadeDriveCustomValues(-absValSpeed, CURVE_CORRECTION_VALUE);
-			return false;
-		}
-		else
-		{
-			driveControl.stop();
-			driveControl.resetEncodersAndGyro();
-			return true;
-		}
-		
-		/*
 		if (!driveControl.hasDrivenDistance(distance))
 		{
 			if (distance > 0)
@@ -437,8 +419,7 @@ public class AutoMethods
 			driveControl.stop();
 			driveControl.resetEncodersAndGyro();
 			return true;
-		}*/
-				
+		}			
 	}
 	
 	/**
@@ -448,14 +429,12 @@ public class AutoMethods
 	 */
 	public boolean autoTurnDegrees(double degrees)
 	{
-		if (degrees > 0 && driveControl.getGyroAngle() < degrees)
+		if (!driveControl.hasTurnedDegrees(degrees))
 		{
-			driveControl.arcadeDriveCustomValues(0, AUTO_ROTATE_SPEED);
-			return false;
-		}
-		else if (degrees < 0 && driveControl.getGyroAngle() > degrees)
-		{
-			driveControl.arcadeDriveCustomValues(0, -AUTO_ROTATE_SPEED);
+			if (degrees > 0)
+				driveControl.arcadeDriveCustomValues(0, AUTO_ROTATE_SPEED);
+			else if (degrees < 0)
+				driveControl.arcadeDriveCustomValues(0, -AUTO_ROTATE_SPEED);
 			return false;
 		}
 		else

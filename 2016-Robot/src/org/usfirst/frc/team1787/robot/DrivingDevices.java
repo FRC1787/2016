@@ -168,26 +168,6 @@ public class DrivingDevices
 		rightEncoder.reset();
 	}
 	
-	/** 
-	 * Used to track forward motion.
-	 * @param distance The distance to check.
-	 * @return If both encoders read greater than the given distance.
-	 */
-	public boolean bothEncodersReadGreaterThan(double distance)
-	{
-		return (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance);
-	}
-	
-	/**
-	 * Used to track backward motion.
-	 * @param distance The distance to check.
-	 * @return If both encoders read less than the given distance.
-	 */
-	public boolean bothEncodersReadLessThan(double distance)
-	{
-		return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
-	}
-	
 	/**
 	 * Used to track motion of the robot.
 	 * @param distance The distance to check.
@@ -198,9 +178,9 @@ public class DrivingDevices
 	public boolean hasDrivenDistance(double distance)
 	{
 		if (distance > 0)
-			return (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance);
+			return (leftEncoder.getDistance() >= distance && rightEncoder.getDistance() >= distance);
 		else if (distance < 0)
-			return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
+			return (leftEncoder.getDistance() <= distance && rightEncoder.getDistance() <= distance);
 		else
 			return true;
 	}
@@ -296,6 +276,16 @@ public class DrivingDevices
 	public void resetGyro()
 	{
 		gyro.reset();
+	}
+	
+	public boolean hasTurnedDegrees(double degrees)
+	{
+		if (degrees > 0)
+			return (gyro.getAngle() >= degrees);
+		else if (degrees < 0)
+			return (gyro.getAngle() <= degrees);
+		else
+			return true;
 	}
 	
 	/**
