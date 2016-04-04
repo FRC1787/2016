@@ -60,8 +60,6 @@ public class AutoMethods
 	public static final int PICKUP_TIME = 7;
 	/** Time to spin pickupWheels to eject a boulder. */
 	public static final int EJECT_TIME = 7;
-	/** Value indicating if the pickupWheelsTimer has started. */
-	private boolean pickupWheelsTimerStarted = false;
 	/** Timer for timing a sweep curve. */
 	private Timer sweepCurveTimer = new Timer();
 	
@@ -397,7 +395,7 @@ public class AutoMethods
 	 */
 	public boolean autoShootLowGoal()
 	{
-		return autoSpinWheels(PickupArm.WHEELS_EJECT);
+		return autoSpinPickupWheels(PickupArm.WHEELS_EJECT);
 	}
 	
 	/**
@@ -424,6 +422,23 @@ public class AutoMethods
 			driveControl.resetEncodersAndGyro();
 			return true;
 		}
+		
+		/*
+		if (!driveControl.hasDrivenDistance(distance))
+		{
+			if (distance > 0)
+				driveControl.arcadeDriveCustomValues(absValSpeed, CURVE_CORRECTION_VALUE);
+			else if (distance < 0)
+				driveControl.arcadeDriveCustomValues(-absValSpeed, CURVE_CORRECTION_VALUE);
+			return false;		
+		}
+		else
+		{
+			driveControl.stop();
+			driveControl.resetEncodersAndGyro();
+			return true;
+		}*/
+				
 	}
 	
 	/**
@@ -516,30 +531,30 @@ public class AutoMethods
 	 * @param speed How fast the pickup-wheels spin.
 	 * A positive value will spin them forwards (to pick up the ball).
 	 * A negative value will spin them backwards (to eject the ball).
-	 * @param counter The step counter to increment when this operation is complete.
 	 */
-	public boolean autoSpinWheels(double speed)
+	public boolean autoSpinPickupWheels(double speed)
 	{
-		if (!pickupWheelsTimerStarted) // THIS CONDITION CAN MAYBE JUST BE if (pickupWheelsSpinTimer.get() == 0)
-		{
+		if (pickupWheelsSpinTimer.get() == 0)
 			pickupWheelsSpinTimer.start();
-			pickupWheelsTimerStarted = true;
-		}
 		
 		arm.spinPickupWheels(speed);
 		
-		if (speed == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME ||
+		if (speed == PickupArm.WHEELS_EJECT && pickupWheelsSpinTimer.get() >= EJECT_TIME   ||
 			speed == PickupArm.WHEELS_PICKUP && pickupWheelsSpinTimer.get() >= PICKUP_TIME ||
 			speed == PickupArm.WHEELS_STATIONARY)
 		{
 			arm.stopPickupWheels();
 			pickupWheelsSpinTimer.stop();
 			pickupWheelsSpinTimer.reset();
-			pickupWheelsTimerStarted = false;
 			return true;
 		}
-		else
-			return false;
+		else if (speed != PickupArm.WHEELS_EJECT  || 
+				 speed != PickupArm.WHEELS_PICKUP || 
+				 speed != PickupArm.WHEELS_STATIONARY)
+		{
+			System.out.println("Invalid autoSpinPickupWheels speed. Please use PickupArm.WHEELS_EJECT, PickupArm.WHEELS_PICKUP, or PickupArm.WHEELS_STATIONARY");
+		}
+		return false;
 	}
 	
 	/**
@@ -550,20 +565,12 @@ public class AutoMethods
 	public boolean autoMoveWedge(int desiredDirection)
 	{
 		if ((desiredDirection == Wedge.DEPLOY) && (wedge.getDirection() == Wedge.STATIONARY))
-		{
 			wedge.deploy();
-			return false;
-		}
 		else if ((desiredDirection == Wedge.RETRACT) && (wedge.getDirection() == Wedge.STATIONARY))
-		{
 			wedge.retract();
-			return false;
-		}
-		else
-		{
-			wedge.checkWedgeTimer();
-			return (wedge.getDirection() == Wedge.STATIONARY);
-		}		
+		
+		wedge.checkWedgeTimer();
+		return (wedge.getDirection() == Wedge.STATIONARY);
 	}
 	
 	/**

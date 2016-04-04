@@ -189,6 +189,23 @@ public class DrivingDevices
 	}
 	
 	/**
+	 * Used to track motion of the robot.
+	 * @param distance The distance to check.
+	 * A positive value indicates motion forward.
+	 * A negative value indicates motion backward.
+	 * @return If, according to the encoders, the robot has driven the given distance.
+	 */
+	public boolean hasDrivenDistance(double distance)
+	{
+		if (distance > 0)
+			return (leftEncoder.getDistance() > distance && rightEncoder.getDistance() > distance);
+		else if (distance < 0)
+			return (leftEncoder.getDistance() < distance && rightEncoder.getDistance() < distance);
+		else
+			return true;
+	}
+	
+	/**
 	 * Gets the degree reading from the left encoder when turning right.
 	 * @return
 	 */

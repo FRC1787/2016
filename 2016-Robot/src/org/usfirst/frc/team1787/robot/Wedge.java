@@ -52,7 +52,8 @@ public class Wedge
 	{
 		wedgeTalon.set(-MOTOR_SPEED);
 		wedgeDirection = DEPLOY;
-		wedgeTimer.start();
+		if (wedgeTimer.get() == 0)
+			wedgeTimer.start();
 	}
 	
 	/**
@@ -62,7 +63,8 @@ public class Wedge
 	{
 		wedgeTalon.set(MOTOR_SPEED);
 		wedgeDirection = RETRACT;
-		wedgeTimer.start();
+		if (wedgeTimer.get() == 0)
+			wedgeTimer.start();
 	}
 	
 	/**
@@ -75,7 +77,6 @@ public class Wedge
 			 (wedgeDirection == RETRACT && wedgeTimer.get() >= RETRACT_TIME) )
 		{
 			stop();
-			wedgeTimer.reset();
 		}
 	}
 	
@@ -86,6 +87,8 @@ public class Wedge
 	{
 		wedgeTalon.set(0);
 		wedgeDirection = STATIONARY;
+		wedgeTimer.stop();
+		wedgeTimer.reset();
 	}
 
 	/**

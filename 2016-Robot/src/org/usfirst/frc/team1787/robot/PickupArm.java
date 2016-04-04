@@ -204,6 +204,7 @@ public class PickupArm
 		rightTalon.set(0);
 		leftTalon.set(0);
 		armDirection = ARM_STATIONARY;
+		reg2Timer.stop();
 		reg2Timer.reset();
 	}
 	
@@ -259,6 +260,7 @@ public class PickupArm
 			currentRegion = REG_APPROACH;
 			movingTowardsApproachFromStore = false;
 			movingTowardsApproachFromPickup = false;
+			reg2Timer.stop();
 			reg2Timer.reset();
 		}
 		else if ( (movingTowardsApproachFromStore && reg2Timer.get() < STORE_TO_APPROACH_TIME) || 
