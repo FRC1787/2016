@@ -2,6 +2,7 @@ package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -150,6 +151,21 @@ public class Robot extends IterativeRobot
     // Objects and variables used for testing functions in testPeriodic:
     
     private int testMode = 0;
+    private Timer testTimer = new Timer();
+    /*
+     * Timer Notes
+     * 
+     * testTimer.start()
+     * 		Starts the timer relative to the current time.
+     * 		Meaning it will always start at 0 when it is called.
+     * 		Resets the timer if called while it is already running.
+     * testTimier.stop()
+     * 		Stops the timer from running and freezes the last value on it.
+     * testTimer.reset()
+     * 		resets the timer to 0.
+     * 		If the timer is running, it will continue to run after being set to 0.
+     * 		If the timer is stopped, it's value will be set to 0.
+     */
     
     // Miscellaneous objects and variables:
     
@@ -307,6 +323,15 @@ public class Robot extends IterativeRobot
     	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_RETRACT))
     		wedge.retract();
     	wedge.checkWedgeTimer();
+    	
+    	// Test Timer:
+    	if (stickB.getRawButton(8))
+    		testTimer.start();
+    	if (stickB.getRawButton(9))
+    		testTimer.stop();
+    	if (stickB.getRawButton(10))
+    		testTimer.reset();
+    	SmartDashboard.putNumber("Test Timer:", testTimer.get());
     }
     
     /**

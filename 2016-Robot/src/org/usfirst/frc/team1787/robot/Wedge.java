@@ -53,12 +53,6 @@ public class Wedge
 		wedgeTalon.set(-MOTOR_SPEED);
 		wedgeDirection = DEPLOY;
 		wedgeTimer.start();
-		/*
-		 * while (wedgeTimer.get() < DEPLOY_TIME)
-		 * { }
-		 * stop();
-		 * wedgeTimer.reset();
-		 */
 	}
 	
 	/**
