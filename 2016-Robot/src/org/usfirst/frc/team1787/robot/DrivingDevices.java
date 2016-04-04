@@ -260,23 +260,6 @@ public class DrivingDevices
 	{
 		return gyro;
 	}
-
-	/**
-	 * Getter method for the gyro angle.
-	 * @return The gyro angle.
-	 */
-	public double getGyroAngle()
-	{
-		return gyro.getAngle();
-	}
-	
-	/**
-	 * Resets the gyro to a heading of 0.
-	 */
-	public void resetGyro()
-	{
-		gyro.reset();
-	}
 	
 	public boolean hasTurnedDegrees(double degrees)
 	{
@@ -294,7 +277,7 @@ public class DrivingDevices
 	public void resetEncodersAndGyro()
 	{
 		resetEncoders();
-		resetGyro();
+		gyro.reset();
 	}
 	
 	/**
@@ -306,7 +289,7 @@ public class DrivingDevices
 			SmartDashboard.putString("Gear:", " High");
 		else
 			SmartDashboard.putString("Gear:", " Low");
-		SmartDashboard.putNumber("Gyro Angle", getGyroAngle());
+		SmartDashboard.putNumber("Gyro Angle", gyro.getAngle());
 		//SmartDashboard.putNumber("Left Encoder Ticks", leftEncoder.get());
 		//SmartDashboard.putNumber("Left Encoder Distance", leftEncoder.getDistance());
 		//SmartDashboard.putNumber("Left Encoder Degrees (Right Turn)", getLeftEncoderDegreesRightTurn());

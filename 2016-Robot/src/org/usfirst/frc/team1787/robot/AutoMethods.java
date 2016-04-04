@@ -487,6 +487,7 @@ public class AutoMethods
 		{
 			driveControl.stop();
 			driveControl.resetEncodersAndGyro();
+			sweepCurveTimer.stop();
 			sweepCurveTimer.reset();
 			return true;
 		}
