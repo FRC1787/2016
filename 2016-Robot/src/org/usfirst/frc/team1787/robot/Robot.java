@@ -116,6 +116,8 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_B_WEDGE_DEPLOY = 3;
 	/** The button on stickB that will retract the wedge. */
 	public static final int JOYSTICK_B_WEDGE_RETRACT = 2;
+	/** The button on stickB that will toggle the wedge. */
+	public static final int JOYSTICK_B_WEDGE_TOGGLE = 1;
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
@@ -324,6 +326,8 @@ public class Robot extends IterativeRobot
     		wedge.deploy();
     	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_RETRACT))
     		wedge.retract();
+    	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_TOGGLE))
+    		wedge.toggle();
     	wedge.checkWedgeTimer();
     }
     

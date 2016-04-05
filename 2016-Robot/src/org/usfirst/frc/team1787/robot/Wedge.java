@@ -28,6 +28,8 @@ public class Wedge
 	public static final int STATIONARY = 0;
 	/** The value that represents the motion of the wedge. */
 	private int wedgeDirection = STATIONARY;
+	/** The value that represents the position of the wedge (Wedge.DEPLOY or Wedge.RETRACT) */
+	private int wedgePosition = RETRACT;
 	
 	// Wedge Timing
 	/** The time, in seconds, that the motor will run when retracting the wedge. */
@@ -43,6 +45,18 @@ public class Wedge
 	{
 		wedgeTalon = new CANTalon(talonId);
 		wedgeTimer = new Timer();
+	}
+	
+	/**
+	 * Deploys the wedge at the push of a button if it is retracted.
+	 * Retracts the wedge at the push of a button if it is deployed.
+	 */
+	public void toggle()
+	{
+		if (wedgePosition == RETRACT)
+			deploy();
+		else if (wedgePosition == DEPLOY)
+			retract();
 	}
 	
 	/**
@@ -73,10 +87,15 @@ public class Wedge
 	 */
 	public void checkWedgeTimer()
 	{
-		if ( (wedgeDirection == DEPLOY && wedgeTimer.get() >= DEPLOY_TIME) ||
-			 (wedgeDirection == RETRACT && wedgeTimer.get() >= RETRACT_TIME) )
+		if (wedgeDirection == DEPLOY && wedgeTimer.get() >= DEPLOY_TIME)
 		{
 			stop();
+			wedgePosition = DEPLOY;
+		}
+		else if (wedgeDirection == RETRACT && wedgeTimer.get() >= RETRACT_TIME)
+		{
+			stop();
+			wedgePosition = RETRACT;
 		}
 	}
 	
@@ -98,5 +117,14 @@ public class Wedge
 	public int getDirection()
 	{
 		return wedgeDirection;
+	}
+	
+	/**
+	 * Gets the position of the wedge. Either Wedge.DEPLOY or Wedge.RETRACT
+	 * @return The position of the wedge.
+	 */
+	public int getPosition()
+	{
+		return wedgePosition;
 	}
 }
