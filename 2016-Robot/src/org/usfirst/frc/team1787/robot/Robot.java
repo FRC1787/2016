@@ -150,7 +150,9 @@ public class Robot extends IterativeRobot
     
     // Objects and variables used for testing functions in testPeriodic:
     
+    /** Determines which functions will be available in test mode. Value can be set by buttons on the joystick. */
     private int testMode = 0;
+    /** Timer for testing timer things. */
     private Timer testTimer = new Timer();
     /*
      * Timer Notes
@@ -323,15 +325,6 @@ public class Robot extends IterativeRobot
     	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_RETRACT))
     		wedge.retract();
     	wedge.checkWedgeTimer();
-    	
-    	// Test Timer:
-    	if (stickB.getRawButton(8))
-    		testTimer.start();
-    	if (stickB.getRawButton(9))
-    		testTimer.stop();
-    	if (stickB.getRawButton(10))
-    		testTimer.reset();
-    	SmartDashboard.putNumber("Test Timer:", testTimer.get());
     }
     
     /**
@@ -369,7 +362,8 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 2) // Auto turn 360 degrees using encoders
     	{
-    		if (autoMethods.autoTurnWithEncoders(360))
+    		System.out.println("Gyro angle: " + driveControl.getGyro().getAngle());
+    		if (autoMethods.autoTurnDegrees(360 * 0.94))
     			testMode = 0;	
     	}
     	else if (testMode == 3)
