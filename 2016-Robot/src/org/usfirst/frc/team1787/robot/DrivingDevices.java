@@ -178,9 +178,9 @@ public class DrivingDevices
 	public boolean hasDrivenDistance(double distance)
 	{
 		if (distance > 0)
-			return (leftEncoder.getDistance() >= distance && rightEncoder.getDistance() >= distance);
+			return (leftEncoder.getDistance() >= distance);// && rightEncoder.getDistance() >= distance);
 		else if (distance < 0)
-			return (leftEncoder.getDistance() <= distance && rightEncoder.getDistance() <= distance);
+			return (leftEncoder.getDistance() <= distance);// && rightEncoder.getDistance() <= distance);
 		else
 			return true;
 	}
@@ -229,9 +229,9 @@ public class DrivingDevices
 	public boolean hasTurnedDegreesWithEncoders(double degrees)
 	{	
 		if (degrees > 0) // If turning right
-			return (getLeftEncoderDegreesRightTurn() >= degrees && getRightEncoderDegreesRightTurn() <= -degrees);
+			return (getLeftEncoderDegreesRightTurn() >= degrees);// && getRightEncoderDegreesRightTurn() <= -degrees);
 		else if (degrees < 0) // If turning left
-			return (getLeftEncoderDegreesLeftTurn() <= degrees && getRightEncoderDegreesLeftTurn() >= -degrees);
+			return (getLeftEncoderDegreesLeftTurn() <= degrees);// && getRightEncoderDegreesLeftTurn() >= -degrees);
 		else
 			return true;	
 	}

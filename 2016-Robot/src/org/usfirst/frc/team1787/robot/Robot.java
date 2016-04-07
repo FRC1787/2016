@@ -352,6 +352,8 @@ public class Robot extends IterativeRobot
     		testMode = 2;
     	else if (stickA.getRawButton(8))
     		testMode = 3;
+    	else if (stickA.getRawButton(10))
+    		testMode = 4;
     	
     	if (testMode == 1) // Manually control pickup arm
     	{
@@ -373,6 +375,10 @@ public class Robot extends IterativeRobot
     	else if (testMode == 3)
     	{
     		driveControl.arcadeDrivePickupArmInFront(stickA);
+    	}
+    	else if (testMode == 4)
+    	{
+    		driveControl.arcadeDriveCustomValues(0.5, -driveControl.getGyro().getAngle() * 0.02);
     	}
     }   
 }
