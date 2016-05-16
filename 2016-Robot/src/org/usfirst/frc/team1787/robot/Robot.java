@@ -147,8 +147,10 @@ public class Robot extends IterativeRobot
     
     /** The server through which the camera image is sent to the smart dashboard. */
     CameraServer cameraServer;
-    /** The name of the camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
-    private static final String CAMERA_NAME = "cam1";
+    /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
+    private static final String CAMERA_FRONT_NAME = "cam1";
+    /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
+    private static final String CAMERA_OTHER_NAME = "cam2";
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -200,7 +202,8 @@ public class Robot extends IterativeRobot
     	// Set up the camera
         cameraServer = CameraServer.getInstance();
     	cameraServer.setQuality(50);
-    	cameraServer.startAutomaticCapture(CAMERA_NAME);
+    	cameraServer.startAutomaticCapture(CAMERA_FRONT_NAME);
+    	//cameraServer.startAutomaticCapture(CAMERA_OTHER_NAME);
     	
     	// Construct the Joysticks
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);

@@ -51,6 +51,9 @@ public class DrivingDevices
 	/** The amount of degrees that is equivalent to 1 tick on the right encoder when turning left. */
 	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
 	
+	///** The sensitivity (0 - 1) */
+	//public static final double SENSITIVITY = 0.5;
+	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per big wheel revolution. The big ass wheels are 15 inches in diameter. 
 	 * ((15 * pi) inches/1 revolution) * (1 foot/12 inches) * (1 revolution/35060 ticks) = (15 * pi)/(12 * 35060) feet per tick.
@@ -105,7 +108,10 @@ public class DrivingDevices
 	 */
 	public void arcadeDrivePickupArmInFront(Joystick stick)
 	{
-		theRobot.arcadeDrive(stick.getY(), stick.getX());
+		//if(stick.getY() >= 0)
+		theRobot.arcadeDrive(1.2 * Math.abs(stick.getY()) * stick.getY(), 1.2 * Math.abs(stick.getX()) * stick.getX());
+		//else if(stick.getY() < 0)
+		//	theRobot.arcadeDrive(1.2 * -stick.getY() * stick.getY(), stick.getX());
 	}
 	
 	/**
