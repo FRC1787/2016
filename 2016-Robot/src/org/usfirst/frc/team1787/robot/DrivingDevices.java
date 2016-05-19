@@ -51,9 +51,6 @@ public class DrivingDevices
 	/** The amount of degrees that is equivalent to 1 tick on the right encoder when turning left. */
 	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
 	
-	///** The sensitivity (0 - 1) */
-	//public static final double SENSITIVITY = 0.5;
-	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per big wheel revolution. The big ass wheels are 15 inches in diameter. 
 	 * ((15 * pi) inches/1 revolution) * (1 foot/12 inches) * (1 revolution/35060 ticks) = (15 * pi)/(12 * 35060) feet per tick.
@@ -181,9 +178,9 @@ public class DrivingDevices
 	public boolean hasDrivenDistance(double distance)
 	{
 		if (distance > 0)
-			return (leftEncoder.getDistance() >= distance);// && rightEncoder.getDistance() >= distance);
+			return (leftEncoder.getDistance() >= distance && rightEncoder.getDistance() >= distance);
 		else if (distance < 0)
-			return (leftEncoder.getDistance() <= distance);// && rightEncoder.getDistance() <= distance);
+			return (leftEncoder.getDistance() <= distance && rightEncoder.getDistance() <= distance);
 		else
 			return true;
 	}
@@ -232,9 +229,9 @@ public class DrivingDevices
 	public boolean hasTurnedDegreesWithEncoders(double degrees)
 	{	
 		if (degrees > 0) // If turning right
-			return (getLeftEncoderDegreesRightTurn() >= degrees);// && getRightEncoderDegreesRightTurn() <= -degrees);
+			return (getLeftEncoderDegreesRightTurn() >= degrees && getRightEncoderDegreesRightTurn() <= -degrees);
 		else if (degrees < 0) // If turning left
-			return (getLeftEncoderDegreesLeftTurn() <= degrees);// && getRightEncoderDegreesLeftTurn() >= -degrees);
+			return (getLeftEncoderDegreesLeftTurn() <= degrees && getRightEncoderDegreesLeftTurn() >= -degrees);
 		else
 			return true;	
 	}
