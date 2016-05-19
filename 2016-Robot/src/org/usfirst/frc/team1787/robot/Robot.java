@@ -123,7 +123,6 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_B_WEDGE_RETRACT = 2;
 	/** The button on stickB that will toggle the wedge. */
 	public static final int JOYSTICK_B_WEDGE_TOGGLE = 1;
-	
 	/** The button on stickB that will toggle the camera */
 	public static final int JOYSTICK_B_CAMERA_TOGGLE = 9;
 	
@@ -155,15 +154,17 @@ public class Robot extends IterativeRobot
     
     /** The server through which the camera image is sent to the smart dashboard. */
     CameraServer cameraServer;
+    /** The Image object that is sent to the camera server to be displayed. */
     private Image img;
+    /** The camera object representing the front-mounted camera. */
+    private USBCamera camFront;
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_FRONT_NAME = "cam1";
-    private USBCamera camFront;
+    /** The camera object representing the side-mounted camera. */
+    private USBCamera camSide;
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_SIDE_NAME = "cam2";
-    private USBCamera camSide;
-    
-    /** The camera currently in use; true for the front camera and false for the side camera*/
+    /** Boolean used for telling which camera is active. */
     private boolean frontCamActive = true;
     
     // Objects and variables used for testing functions in testPeriodic:
@@ -213,21 +214,16 @@ public class Robot extends IterativeRobot
     	// Construct the Wedge
     	wedge = new Wedge(TALON_WEDGE_ID);
     	
-    	// Set up the cameras
-    	cameraServer = CameraServer.getInstance();
-    	img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-    	
-    	camFront = new USBCamera(CAMERA_FRONT_NAME);
-    	camSide = new USBCamera(CAMERA_SIDE_NAME);
-    	
-    	camFront.openCamera();
-    	camSide.openCamera();
-    	
-    	camFront.startCapture();
-    	
     	// Construct the Joysticks
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
+    	
+    	// Set up the cameras
+    	cameraServer = CameraServer.getInstance();
+    	img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+    	camFront = new USBCamera(CAMERA_FRONT_NAME);
+    	camSide = new USBCamera(CAMERA_SIDE_NAME);
+    	camFront.startCapture();
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -291,7 +287,6 @@ public class Robot extends IterativeRobot
     public void teleopInit()
     {
     	driveControl.setLowGear();
-    	driveControl.getGyro().calibrate();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
     }
@@ -360,9 +355,9 @@ public class Robot extends IterativeRobot
     		camSide.getImage(img);
 		cameraServer.setImage(img);
 		
-    	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE))
+    	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
     	{
-    		if(frontCamActive)
+    		if (frontCamActive)
     		{
     			camFront.stopCapture();
     			camSide.startCapture();
