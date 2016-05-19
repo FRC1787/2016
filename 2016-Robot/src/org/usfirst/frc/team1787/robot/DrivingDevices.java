@@ -41,6 +41,7 @@ public class DrivingDevices
 	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN = 0.007936022752788;
 	/** The amount of degrees that is equivalent to 1 tick on the left encoder when turning left. */
 	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
+	// I'm about to make some changes dawg.
 	
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
