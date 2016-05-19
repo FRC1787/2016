@@ -3,9 +3,14 @@ package org.usfirst.frc.team1787.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.Image;
+
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.vision.USBCamera;
 
 /**
  * This class represents Team 1787's robot, Hoff 9000, for the 2016 FRC game: First Stronghold!
@@ -119,6 +124,9 @@ public class Robot extends IterativeRobot
 	/** The button on stickB that will toggle the wedge. */
 	public static final int JOYSTICK_B_WEDGE_TOGGLE = 1;
 	
+	/** The button on stickB that will toggle the camera */
+	public static final int JOYSTICK_B_CAMERA_TOGGLE = 9;
+	
 	// Objects and variables involving the robot's autonomous functions:
 	
 	// AutoMethods
@@ -146,11 +154,19 @@ public class Robot extends IterativeRobot
     // Objects and variables involving the camera:
     
     /** The server through which the camera image is sent to the smart dashboard. */
-    CameraServer cameraServer;
+    CameraServer cameraServer = CameraServer.getInstance();
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_FRONT_NAME = "cam1";
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
-    private static final String CAMERA_OTHER_NAME = "cam2";
+    private static final String CAMERA_SIDE_NAME = "cam2";
+    
+    private USBCamera camFront;
+    private USBCamera camSide;
+    
+    private Image img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+    
+    /** The camera currently in use; true for the front camera and false for the side camera*/
+    private boolean frontCamActive = true;
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -200,10 +216,13 @@ public class Robot extends IterativeRobot
     	wedge = new Wedge(TALON_WEDGE_ID);
     	
     	// Set up the camera
-        cameraServer = CameraServer.getInstance();
-    	cameraServer.setQuality(50);
-    	cameraServer.startAutomaticCapture(CAMERA_FRONT_NAME);
-    	//cameraServer.startAutomaticCapture(CAMERA_OTHER_NAME);
+        //cameraServer = CameraServer.getInstance();
+    	//cameraServer.setQuality(50);
+    	//cameraServer.startAutomaticCapture(CAMERA_FRONT_NAME);
+    	//cameraServer.startAutomaticCapture(CAMERA_SIDE_NAME);
+    	
+    	
+    	
     	
     	// Construct the Joysticks
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);
@@ -274,6 +293,15 @@ public class Robot extends IterativeRobot
     	driveControl.getGyro().calibrate();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
+    	
+    	camFront = new USBCamera(CAMERA_FRONT_NAME);
+    	camSide = new USBCamera(CAMERA_SIDE_NAME);
+    	
+    	camFront.openCamera();
+    	camSide.openCamera();
+    	
+    	camFront.startCapture();
+    	
     }
 
     /**
@@ -332,6 +360,28 @@ public class Robot extends IterativeRobot
     	else if (stickB.getRawButton(JOYSTICK_B_WEDGE_TOGGLE))
     		wedge.toggle();
     	wedge.checkWedgeTimer();
+    	
+    	// Camera
+    	if (frontCamActive)
+    		camFront.getImage(img);
+    	else
+    		camSide.getImage(img);
+		cameraServer.setImage(img);
+		
+    	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE))
+    	{
+    		if(frontCamActive)
+    		{
+    			camFront.stopCapture();
+    			camSide.startCapture();
+    		}
+    		else
+    		{
+    			camSide.stopCapture();
+    			camFront.startCapture();
+    		}
+    		frontCamActive = !frontCamActive;
+    	}
     }
     
     /**
