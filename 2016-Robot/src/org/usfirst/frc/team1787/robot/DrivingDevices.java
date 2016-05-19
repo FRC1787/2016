@@ -108,7 +108,7 @@ public class DrivingDevices
 	 */
 	public void arcadeDrivePickupArmInFront(Joystick stick)
 	{
-		theRobot.arcadeDrive(stick.getY(), stick.getX(), false);
+		theRobot.arcadeDrive(stick.getY(), stick.getX() * 0.85, false);
 	}
 	
 	/**
@@ -117,7 +117,7 @@ public class DrivingDevices
 	 */
 	public void arcadeDriveWedgeInFront(Joystick stick)
 	{
-		theRobot.arcadeDrive(-stick.getY(), stick.getX(), false);
+		theRobot.arcadeDrive(-stick.getY(), stick.getX() * 0.85, false);
 	}
 	
 	/**

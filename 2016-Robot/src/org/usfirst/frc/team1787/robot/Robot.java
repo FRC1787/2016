@@ -154,16 +154,14 @@ public class Robot extends IterativeRobot
     // Objects and variables involving the camera:
     
     /** The server through which the camera image is sent to the smart dashboard. */
-    CameraServer cameraServer = CameraServer.getInstance();
+    CameraServer cameraServer;
+    private Image img;
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_FRONT_NAME = "cam1";
+    private USBCamera camFront;
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_SIDE_NAME = "cam2";
-    
-    private USBCamera camFront;
     private USBCamera camSide;
-    
-    private Image img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
     
     /** The camera currently in use; true for the front camera and false for the side camera*/
     private boolean frontCamActive = true;
@@ -215,14 +213,17 @@ public class Robot extends IterativeRobot
     	// Construct the Wedge
     	wedge = new Wedge(TALON_WEDGE_ID);
     	
-    	// Set up the camera
-        //cameraServer = CameraServer.getInstance();
-    	//cameraServer.setQuality(50);
-    	//cameraServer.startAutomaticCapture(CAMERA_FRONT_NAME);
-    	//cameraServer.startAutomaticCapture(CAMERA_SIDE_NAME);
+    	// Set up the cameras
+    	cameraServer = CameraServer.getInstance();
+    	img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
     	
+    	camFront = new USBCamera(CAMERA_FRONT_NAME);
+    	camSide = new USBCamera(CAMERA_SIDE_NAME);
     	
+    	camFront.openCamera();
+    	camSide.openCamera();
     	
+    	camFront.startCapture();
     	
     	// Construct the Joysticks
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);
@@ -293,15 +294,6 @@ public class Robot extends IterativeRobot
     	driveControl.getGyro().calibrate();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
-    	
-    	camFront = new USBCamera(CAMERA_FRONT_NAME);
-    	camSide = new USBCamera(CAMERA_SIDE_NAME);
-    	
-    	camFront.openCamera();
-    	camSide.openCamera();
-    	
-    	camFront.startCapture();
-    	
     }
 
     /**
