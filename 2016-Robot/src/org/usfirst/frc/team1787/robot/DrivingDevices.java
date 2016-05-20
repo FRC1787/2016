@@ -37,20 +37,11 @@ public class DrivingDevices
 	private Encoder leftEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the left encoder */
 	public static final double LEFT_ENCODER_DISTANCE_PER_PULSE = 0.000114220445460;
-	/** The amount of degrees that is equivalent to 1 tick on the left encoder when turning right. */
-	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN = 0.007936022752788;
-	/** The amount of degrees that is equivalent to 1 tick on the left encoder when turning left. */
-	public static final double LEFT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
-	// I'm about to make some changes dawg.
 	
 	/** The encoder on the right side of the robot */
 	private Encoder rightEncoder;
 	/** The distance, in feet, that is equivalent to 1 tick on the right encoder */
 	public static final double RIGHT_ENCODER_DISTANCE_PER_PULSE = 0.000113327289211;
-	/** The amount of degrees that is equivalent to 1 tick on the right encoder when turning right. */
-	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN = 0.007091687581379;
-	/** The amount of degrees that is equivalent to 1 tick on the right encoder when turning left. */
-	public static final double RIGHT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN = 0.0075;
 	
 	/* 
 	 * Initial testing indicates 35060 encoder ticks per big wheel revolution. The big ass wheels are 15 inches in diameter. 
@@ -184,57 +175,6 @@ public class DrivingDevices
 			return (leftEncoder.getDistance() <= distance && rightEncoder.getDistance() <= distance);
 		else
 			return true;
-	}
-	
-	/**
-	 * Gets the degree reading from the left encoder when turning right.
-	 * @return
-	 */
-	public double getLeftEncoderDegreesRightTurn()
-	{
-		return (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
-	}
-	
-	/**
-	 * Gets the degree reading from the left encoder when turning left.
-	 * @return
-	 */
-	public double getLeftEncoderDegreesLeftTurn()
-	{
-		return (leftEncoder.get() * LEFT_ENCODER_DEGREES_PER_PULSE_LEFT_TURN);
-	}
-	
-	/**
-	 * Gets the degree reading from the right encoder when turning right.
-	 * @return
-	 */
-	public double getRightEncoderDegreesRightTurn()
-	{
-		return (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
-	}
-	
-	/**
-	 * Gets the degree reading from the right encoder when turning left.
-	 * @return
-	 */
-	public double getRightEncoderDegreesLeftTurn()
-	{
-		return (rightEncoder.get() * RIGHT_ENCODER_DEGREES_PER_PULSE_RIGHT_TURN);
-	}
-	
-	/**
-	 * Used to track turning motion.
-	 * @param degrees The amount of degrees to check. Positive value for turning right, negative value for turning left.
-	 * @return If the robot has turned the given amount of degrees.
-	 */
-	public boolean hasTurnedDegreesWithEncoders(double degrees)
-	{	
-		if (degrees > 0) // If turning right
-			return (getLeftEncoderDegreesRightTurn() >= degrees && getRightEncoderDegreesRightTurn() <= -degrees);
-		else if (degrees < 0) // If turning left
-			return (getLeftEncoderDegreesLeftTurn() <= degrees && getRightEncoderDegreesLeftTurn() >= -degrees);
-		else
-			return true;	
 	}
 	
 	/**

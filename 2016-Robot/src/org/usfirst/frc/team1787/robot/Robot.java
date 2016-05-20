@@ -409,8 +409,8 @@ public class Robot extends IterativeRobot
     	else if (testMode == 2) // Auto turn 360 degrees using encoders
     	{
     		System.out.println("Gyro angle: " + driveControl.getGyro().getAngle());
-    		if (autoMethods.autoTurnDegrees(360 * 0.94))
-    			testMode = 0;	
+    		if (autoMethods.autoTurnDegrees(360, true))
+    			testMode = 0;
     	}
     	else if (testMode == 3)
     	{

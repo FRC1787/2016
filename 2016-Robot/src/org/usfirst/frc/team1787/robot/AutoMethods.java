@@ -183,7 +183,7 @@ public class AutoMethods
 		}
 		else if (conquerDefenseStep == 4)
 		{
-			if (autoTurnWithEncoders(180)) // Turn around so the pickup arm is in the front
+			if (autoTurnDegrees(180)) // Turn around so the pickup arm is in the front
 			{
 				conquerDefenseStep++;
 				return true;
@@ -221,7 +221,7 @@ public class AutoMethods
 		}
 		else if (conquerDefenseStep == 5) // Turn around so the pickup arm is in the front
 		{
-			if (autoTurnWithEncoders(180))
+			if (autoTurnDegrees(180))
 			{
 				conquerDefenseStep++;
 				return true;
@@ -324,7 +324,7 @@ public class AutoMethods
 	{
 		if (moveToGoalStep == 1) // Turn right a bit so we can move away from the wall
 		{
-			if (autoTurnWithEncoders(10))
+			if (autoTurnDegrees(10))
 				moveToGoalStep++;
 		}
 		else if (moveToGoalStep == 2) // Move away from the wall
@@ -334,7 +334,7 @@ public class AutoMethods
 		}
 		else if (moveToGoalStep == 3) // Turn a little more to align with the ramp that leads up to the low goal
 		{
-			if (autoTurnWithEncoders(15))
+			if (autoTurnDegrees(15))
 				moveToGoalStep++;
 		}
 		else if (moveToGoalStep == 4) // Move up to the low goal
@@ -446,19 +446,15 @@ public class AutoMethods
 	}
 	
 	/**
-	 * This method, when called periodically, makes the robot turn a given amount of degrees in place. 
-	 * Encoders are used to measure the turn.
+	 * This method, when called periodically, makes the robot turn a given amount of degrees in place.
 	 * @param degrees How many degrees to turn. Use positive values to turn right, and negative values to turn left.
-	 * @return If the robot has finished turning the given amount of degrees.
+	 * return If the robot has finished turning the given amount of degrees.
 	 */
-	public boolean autoTurnWithEncoders(double degrees)
-	{	
-		if (!driveControl.hasTurnedDegreesWithEncoders(degrees))
+	public boolean autoTurnDegrees(double degrees, boolean usePID)
+	{
+		if (!driveControl.hasTurnedDegrees(degrees))
 		{
-			if (degrees > 0) // If turning right
-				driveControl.arcadeDriveCustomValues(0, AUTO_ROTATE_SPEED);
-			else if (degrees < 0) // If turning left
-				driveControl.arcadeDriveCustomValues(0, -AUTO_ROTATE_SPEED);
+			driveControl.arcadeDriveCustomValues(0, (degrees - driveControl.getGyro().getAngle()) * 0.03);
 			return false;
 		}
 		else
@@ -467,31 +463,6 @@ public class AutoMethods
 			driveControl.resetEncodersAndGyro();
 			return true;
 		}
-	}
-	
-	/**
-	 * This method, when called periodically, makes the robot move in a sweeping curve for a given amount of time.
-	 * @param moveValue How fast the robot will move as a percentage of its max speed (a value of 0.5 means 50% max speed)
-	 * @param curveValue How tightly the robot will curve.
-	 * @param time How long, in seconds, the robot will move for.
-	 * @return If the given time has passed, and the robot has therefore completed the sweep curve.
-	 */
-	public boolean autoTimedSweepCurve(double moveValue, double curveValue, double time)
-	{
-		if (sweepCurveTimer.get() == 0)
-			sweepCurveTimer.start();
-		
-		if (sweepCurveTimer.get() < time)
-			driveControl.arcadeDriveCustomValues(moveValue, curveValue);
-		else
-		{
-			driveControl.stop();
-			driveControl.resetEncodersAndGyro();
-			sweepCurveTimer.stop();
-			sweepCurveTimer.reset();
-			return true;
-		}
-		return false;
 	}
 	
 	/**
