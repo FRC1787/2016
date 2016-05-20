@@ -414,11 +414,28 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 3)
     	{
-    		driveControl.arcadeDrivePickupArmInFront(stickA);
+    		driveControl.arcadeDriveCustomValues(-stickA.getY(), -driveControl.getGyro().getAngle() * 0.03);
+    		//driveControl.arcadeDrivePickupArmInFront(stickA);
+    		System.out.println("Right Encoder Ticks: "+driveControl.getRightEncoder().get());
+    		System.out.println("Left Encoder Ticks: "+driveControl.getLeftEncoder().get());
+    		System.out.println("Right Encoder Distance: "+driveControl.getRightEncoder().getDistance());
+    		System.out.println("Left Encoder Distance: "+driveControl.getLeftEncoder().getDistance());
     	}
     	else if (testMode == 4)
     	{
-    		driveControl.arcadeDriveCustomValues(0.5, -driveControl.getGyro().getAngle() * 0.02);
+    		//driveControl.arcadeDriveCustomValues(0.45, -driveControl.getGyro().getAngle() * 0.02);
+    		if (autoMethods.autoDriveDistance(2, 0.45))
+    			testMode = 6;
+    	}
+    	else if (testMode == 5)
+    	{
+    		if (autoMethods.autoDriveDistance(30, 0.45))
+    			testMode = 0;
+    	}
+    	else if (testMode == 6)
+    	{
+    		if (autoMethods.autoTurnDegrees(15, true))
+    			testMode = 4;
     	}
     }   
 }

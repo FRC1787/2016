@@ -116,7 +116,7 @@ public class DrivingDevices
 	 */
 	public void arcadeDriveCustomValues(double moveValue, double rotateValue)
 	{
-		theRobot.arcadeDrive(-moveValue, rotateValue);
+		theRobot.arcadeDrive(-moveValue, rotateValue, false);
 		/* Q: Why is moveValue negative?
 		 * A: Apparently, a negative moveValue will move the robot forward when using arcadeDrive().
 		 * This is likely because joysticks, or at least the ones we're using, output a negative y value when pushed forward.

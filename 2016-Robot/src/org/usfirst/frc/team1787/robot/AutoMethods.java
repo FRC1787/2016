@@ -41,19 +41,39 @@ public class AutoMethods
 	
 	// Values used for auto routines
 	/** How fast the robot will move during auto as a percentage of max speed (ex. 0.8 = 80% max speed). */
-	private static final double AUTO_MOVE_SPEED = 0.7;
+	private static final double AUTO_MOVE_SPEED = 0.5;
 	/** How fast the robot will turn during auto as a percentage of max speed (ex. 0.5 = 50% max speed). */
-	private static final double AUTO_ROTATE_SPEED = 0.5;
+	private static final double AUTO_ROTATE_SPEED = 0.25;
 	/** Tested value to turn while moving to move in a straight line */
-	private static final double CURVE_CORRECTION_VALUE = 0.085;
-	/** The proportional gain used to turn with a P(ID) loop. */
-	private static final double GYRO_KP = 0.03;
+	private static final double CURVE_CORRECTION_VALUE = 0.007225;
 	/** A counter variable that keeps track of the step being performed in runAuto() */
 	private int mainStep = 1;
 	/** A counter variable that keeps track of the step being performed in a given "conquer defense" method */
 	private int conquerDefenseStep = 1;
 	/** A counter variable that keeps track of the step being performed in the "move to goal" method */
 	private int moveToGoalStep = 1;
+	
+	// Values used in the gyro PID loop
+	/** The error term in the gyro P(ID) loop. */
+	private double turnError;
+	/** The error threshold */
+	private static double turnErrorThreshold = 0.5;
+	/** The proportional gain used to turn with a PI(D) loop. */
+	private static final double GYRO_KP = 0.015;
+	/** The integral gain used to turn with a PI(D) loop. */
+	private static final double GYRO_KI = 0.0025;
+	/** The time interval (in seconds) used to calculate the integral gain. */
+	private static final double DT = 0.05;
+	/** The accumulated error that is multiplied by KI. */
+	private static double accumulatedError = 0;
+	/** The derivative gain used to turn with a PID loop. */
+	private static final double GYRO_KD = 0;
+	/** The previous error term used to evaluate the coefficient for KD. */
+	private static double previousError = 0;
+	/** The term that is multiplied by KD. */
+	private static double changeInError = 0;
+	/** The output of the PID controller. */
+	private static double PIDOutput = 0;
 	
 	// Variables for spinning wheels
 	/** Timer for timing how long the wheels spin. */
@@ -411,9 +431,9 @@ public class AutoMethods
 		if (!driveControl.hasDrivenDistance(distance))
 		{
 			if (distance > 0)
-				driveControl.arcadeDriveCustomValues(absValSpeed, CURVE_CORRECTION_VALUE);
+				driveControl.arcadeDriveCustomValues(absValSpeed, -driveControl.getGyro().getAngle() * GYRO_KP);
 			else if (distance < 0)
-				driveControl.arcadeDriveCustomValues(-absValSpeed, CURVE_CORRECTION_VALUE);
+				driveControl.arcadeDriveCustomValues(-absValSpeed, -driveControl.getGyro().getAngle() * GYRO_KP);
 			return false;		
 		}
 		else
@@ -454,13 +474,33 @@ public class AutoMethods
 	 */
 	public boolean autoTurnDegrees(double degrees, boolean usePID)
 	{
-		if (!driveControl.hasTurnedDegrees(degrees))
+		turnError = degrees - driveControl.getGyro().getAngle();
+		System.out.println("turnError: "+turnError);
+		
+		accumulatedError += turnError * DT;
+		
+		changeInError = (turnError - previousError) / DT;
+		//System.out.println("changeInError: "+changeInError);
+		
+		//System.out.println("Proportional value: "+(turnError * GYRO_KP));
+		//System.out.println("Derivative value: "+(changeInError * GYRO_KD));
+		
+		PIDOutput = (turnError * GYRO_KP) + (accumulatedError * GYRO_KI) + (changeInError * GYRO_KD);
+		
+		previousError = turnError;
+		
+		if ( ((turnError + turnErrorThreshold <= 0) || (turnError - turnErrorThreshold >= 0)) )
 		{
-			driveControl.arcadeDriveCustomValues(0, (degrees - driveControl.getGyro().getAngle()) * GYRO_KP);
+			System.out.println("Output: "+ PIDOutput);
+			driveControl.arcadeDriveCustomValues(0, PIDOutput);
 			return false;
 		}
 		else
 		{
+			accumulatedError = 0;
+			previousError = 0;
+			changeInError = 0;
+			PIDOutput = 0;
 			driveControl.stop();
 			driveControl.resetEncodersAndGyro();
 			return true;
