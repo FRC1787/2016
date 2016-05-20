@@ -46,6 +46,8 @@ public class AutoMethods
 	private static final double AUTO_ROTATE_SPEED = 0.5;
 	/** Tested value to turn while moving to move in a straight line */
 	private static final double CURVE_CORRECTION_VALUE = 0.085;
+	/** The proportional gain used to turn with a P(ID) loop. */
+	private static final double GYRO_KP = 0.03;
 	/** A counter variable that keeps track of the step being performed in runAuto() */
 	private int mainStep = 1;
 	/** A counter variable that keeps track of the step being performed in a given "conquer defense" method */
@@ -454,7 +456,7 @@ public class AutoMethods
 	{
 		if (!driveControl.hasTurnedDegrees(degrees))
 		{
-			driveControl.arcadeDriveCustomValues(0, (degrees - driveControl.getGyro().getAngle()) * 0.03);
+			driveControl.arcadeDriveCustomValues(0, (degrees - driveControl.getGyro().getAngle()) * GYRO_KP);
 			return false;
 		}
 		else
