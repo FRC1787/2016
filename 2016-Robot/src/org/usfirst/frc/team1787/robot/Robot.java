@@ -2,6 +2,7 @@ package org.usfirst.frc.team1787.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.ni.vision.NIVision;
@@ -188,6 +189,10 @@ public class Robot extends IterativeRobot
      * 		If the timer is stopped, it's value will be set to 0.
      */
     
+    Preferences prefs;
+    private PIDOutputCalc PIDTester;
+    private double desiredDegrees;
+    
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
@@ -244,6 +249,9 @@ public class Robot extends IterativeRobot
         SmartDashboard.putData("In which position will the robot start the match?", autonomousPositionChooser);
         SmartDashboard.putData("What defense is in that position?", autonomousDefenseChooser);
         SmartDashboard.putData("Try to score in the low goal during auto?", scoreChooser);
+        
+        // Construct preferences
+        prefs = Preferences.getInstance();
     }
     
 	/**
@@ -376,9 +384,16 @@ public class Robot extends IterativeRobot
      */
     public void testInit()
     {
+    	desiredDegrees = prefs.getDouble("Setpoint", 0);
+    	PIDTester = new PIDOutputCalc(prefs.getDouble("P", 0), prefs.getDouble("I", 0), prefs.getDouble("D", 0));
     	testMode = 0;
     	driveControl.resetEncoders();
     	driveControl.getGyro().calibrate();
+    	System.out.println("P: "+prefs.getDouble("P", 0));
+    	System.out.println("I: "+prefs.getDouble("I", 0));
+    	System.out.println("D: "+prefs.getDouble("D", 0));
+    	System.out.println("Setpoint: "+prefs.getDouble("Setpoint", 0));
+    	System.out.println("Test Init Complete");
     }
     
     /**
@@ -423,19 +438,8 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 4)
     	{
-    		//driveControl.arcadeDriveCustomValues(0.45, -driveControl.getGyro().getAngle() * 0.02);
-    		if (autoMethods.autoDriveDistance(2, 0.45))
-    			testMode = 6;
-    	}
-    	else if (testMode == 5)
-    	{
-    		if (autoMethods.autoDriveDistance(30, 0.45))
+    		if (autoMethods.autoTurnDegrees(5, true))
     			testMode = 0;
-    	}
-    	else if (testMode == 6)
-    	{
-    		if (autoMethods.autoTurnDegrees(15, true))
-    			testMode = 4;
     	}
     }   
 }

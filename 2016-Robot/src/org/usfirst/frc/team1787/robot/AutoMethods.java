@@ -70,6 +70,7 @@ public class AutoMethods
 	/** Time to spin pickupWheels to eject a boulder. */
 	public static final int EJECT_TIME = 7;
 	
+	Timer waitTimer = new Timer();
 	// Methods:
 	
 	
@@ -337,17 +338,17 @@ public class AutoMethods
 		}
 		else if (moveToGoalStep == 2) // Move away from the wall
 		{
-			if (autoDriveDistance(12.25, AUTO_MOVE_SPEED))
+			if (autoDriveDistance(7, AUTO_MOVE_SPEED))
 				moveToGoalStep++;
 		}
 		else if (moveToGoalStep == 3) // Turn a little more to align with the ramp that leads up to the low goal
 		{
-			if (autoTurnDegrees(15))
+			if (autoTurnDegrees(25))
 				moveToGoalStep++;
 		}
 		else if (moveToGoalStep == 4) // Move up to the low goal
 		{
-			if (autoDriveDistance(2, AUTO_MOVE_SPEED))
+			if (autoDriveDistance(7, AUTO_MOVE_SPEED))
 			{
 				moveToGoalStep++;
 				return true;
@@ -448,6 +449,7 @@ public class AutoMethods
 		else
 		{
 			driveControl.stop();
+			waitTimer.delay(0.5);
 			driveControl.resetEncodersAndGyro();
 			return true;
 		}
