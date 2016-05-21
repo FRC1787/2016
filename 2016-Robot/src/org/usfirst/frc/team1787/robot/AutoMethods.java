@@ -54,26 +54,13 @@ public class AutoMethods
 	private int moveToGoalStep = 1;
 	
 	// Values used in the gyro PID loop
-	/** The error term in the gyro P(ID) loop. */
-	private double turnError;
-	/** The error threshold */
-	private static double turnErrorThreshold = 0.5;
+	PIDOutputCalc gyroController;
 	/** The proportional gain used to turn with a PI(D) loop. */
 	private static final double GYRO_KP = 0.015;
 	/** The integral gain used to turn with a PI(D) loop. */
 	private static final double GYRO_KI = 0.0025;
-	/** The time interval (in seconds) used to calculate the integral gain. */
-	private static final double DT = 0.05;
-	/** The accumulated error that is multiplied by KI. */
-	private static double accumulatedError = 0;
 	/** The derivative gain used to turn with a PID loop. */
 	private static final double GYRO_KD = 0;
-	/** The previous error term used to evaluate the coefficient for KD. */
-	private static double previousError = 0;
-	/** The term that is multiplied by KD. */
-	private static double changeInError = 0;
-	/** The output of the PID controller. */
-	private static double PIDOutput = 0;
 	
 	// Variables for spinning wheels
 	/** Timer for timing how long the wheels spin. */
@@ -82,8 +69,6 @@ public class AutoMethods
 	public static final int PICKUP_TIME = 7;
 	/** Time to spin pickupWheels to eject a boulder. */
 	public static final int EJECT_TIME = 7;
-	/** Timer for timing a sweep curve. */
-	private Timer sweepCurveTimer = new Timer();
 	
 	// Methods:
 	
@@ -100,6 +85,7 @@ public class AutoMethods
 		driveControl = d;
 		arm = a;
 		wedge = w;
+		gyroController = new PIDOutputCalc(GYRO_KP, GYRO_KI, GYRO_KD);
 	}
 	
 	public void runAuto(int startingPosition, int defenseInStartingPosition, boolean tryToScore)
@@ -474,33 +460,15 @@ public class AutoMethods
 	 */
 	public boolean autoTurnDegrees(double degrees, boolean usePID)
 	{
-		turnError = degrees - driveControl.getGyro().getAngle();
-		System.out.println("turnError: "+turnError);
-		
-		accumulatedError += turnError * DT;
-		
-		changeInError = (turnError - previousError) / DT;
-		//System.out.println("changeInError: "+changeInError);
-		
-		//System.out.println("Proportional value: "+(turnError * GYRO_KP));
-		//System.out.println("Derivative value: "+(changeInError * GYRO_KD));
-		
-		PIDOutput = (turnError * GYRO_KP) + (accumulatedError * GYRO_KI) + (changeInError * GYRO_KD);
-		
-		previousError = turnError;
-		
-		if ( ((turnError + turnErrorThreshold <= 0) || (turnError - turnErrorThreshold >= 0)) )
+		gyroController.calculateError(degrees, driveControl.getGyro().getAngle());
+		if (!gyroController.errorIsAcceptable())
 		{
-			System.out.println("Output: "+ PIDOutput);
-			driveControl.arcadeDriveCustomValues(0, PIDOutput);
+			driveControl.arcadeDriveCustomValues(0, gyroController.generateOutput());
 			return false;
 		}
 		else
 		{
-			accumulatedError = 0;
-			previousError = 0;
-			changeInError = 0;
-			PIDOutput = 0;
+			gyroController.reset();
 			driveControl.stop();
 			driveControl.resetEncodersAndGyro();
 			return true;
