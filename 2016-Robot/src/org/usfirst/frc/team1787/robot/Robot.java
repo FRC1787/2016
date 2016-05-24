@@ -386,6 +386,10 @@ public class Robot extends IterativeRobot
     {
     	desiredDegrees = prefs.getDouble("Setpoint", 0);
     	PIDTester = new PIDOutputCalc(prefs.getDouble("P", 0), prefs.getDouble("I", 0), prefs.getDouble("D", 0));
+    	PIDTester.setMaxOutput(0.5);
+    	PIDTester.setMinOutput(-0.5);
+    	PIDTester.setToleranceThreshold(prefs.getDouble("Tolerance Threshold", 0));
+    	PIDTester.setIntegralThreshold(prefs.getDouble("Integral Threshold", 0));
     	testMode = 0;
     	driveControl.resetEncoders();
     	driveControl.getGyro().calibrate();
@@ -393,6 +397,8 @@ public class Robot extends IterativeRobot
     	System.out.println("I: "+prefs.getDouble("I", 0));
     	System.out.println("D: "+prefs.getDouble("D", 0));
     	System.out.println("Setpoint: "+prefs.getDouble("Setpoint", 0));
+    	System.out.println("Tolerance Threshold: "+prefs.getDouble("Tolerance Threshold", 0));
+    	System.out.println("Integral Threshold: "+prefs.getDouble("Integral Threshold", 0));
     	System.out.println("Test Init Complete");
     }
     
@@ -401,6 +407,7 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
+    	PIDTester.putDataOnSmartDashboard();
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) && stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS))
     		testMode = 1;
     	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_APPROACH) && stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
@@ -409,6 +416,8 @@ public class Robot extends IterativeRobot
     		testMode = 3;
     	else if (stickA.getRawButton(10))
     		testMode = 4;
+    	else if (stickB.getRawButton(10))
+    		testMode = 5;
     	
     	if (testMode == 1) // Manually control pickup arm
     	{
@@ -421,7 +430,7 @@ public class Robot extends IterativeRobot
         	else
         		arm.stopPickupWheels();
     	}
-    	else if (testMode == 2) // Auto turn 360 degrees using encoders
+    	else if (testMode == 2) // Auto turn 360 degrees using gyro
     	{
     		System.out.println("Gyro angle: " + driveControl.getGyro().getAngle());
     		if (autoMethods.autoTurnDegrees(360, true))
@@ -438,8 +447,24 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 4)
     	{
-    		if (autoMethods.autoTurnDegrees(5, true))
-    			testMode = 0;
+    		PIDTester.calculateError(desiredDegrees, driveControl.getGyro().getAngle());
+    		if (!PIDTester.errorIsAcceptable())
+    		{
+    			driveControl.arcadeDriveCustomValues(0, PIDTester.generateOutput());
+    		}
+    		else
+    		{
+    			driveControl.stop();
+    			System.out.println("Sucessfully turned "+desiredDegrees+" degrees!");
+    			testTimer.delay(0.5);
+    			PIDTester.reset();
+    			driveControl.resetEncodersAndGyro();
+    		}
+    	}
+    	else if (testMode == 5)
+    	{
+    		driveControl.arcadeDriveCustomValues(0, stickA.getX());
+    		System.out.println(stickA.getX());
     	}
     }   
 }
