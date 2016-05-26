@@ -408,6 +408,7 @@ public class Robot extends IterativeRobot
     public void testPeriodic()
     {
     	PIDTester.putDataOnSmartDashboard();
+    	SmartDashboard.putNumber("Gyro Angle (Test)", driveControl.getGyro().getAngle());
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) && stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS))
     		testMode = 1;
     	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_APPROACH) && stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
@@ -456,9 +457,10 @@ public class Robot extends IterativeRobot
     		{
     			driveControl.stop();
     			System.out.println("Sucessfully turned "+desiredDegrees+" degrees!");
-    			testTimer.delay(0.5);
+    			testTimer.delay(1);
     			PIDTester.reset();
     			driveControl.resetEncodersAndGyro();
+    			testTimer.delay(1);
     		}
     	}
     	else if (testMode == 5)
