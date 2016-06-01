@@ -3,6 +3,7 @@ package org.usfirst.frc.team1787.robot;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.ni.vision.NIVision;
@@ -192,6 +193,9 @@ public class Robot extends IterativeRobot
     Preferences prefs;
     private PIDOutputCalc PIDTester;
     private double desiredDegrees;
+    
+    private Servo testServo = new Servo(1);
+    private int testCounter = 0;
     
     // Miscellaneous objects and variables:
     
@@ -383,7 +387,7 @@ public class Robot extends IterativeRobot
      * This function is run once when the robot enters test mode.
      */
     public void testInit()
-    {
+    {	
     	desiredDegrees = prefs.getDouble("Setpoint", 0);
     	PIDTester = new PIDOutputCalc(prefs.getDouble("P", 0), prefs.getDouble("I", 0), prefs.getDouble("D", 0));
     	PIDTester.setMaxOutput(0.5);
@@ -465,8 +469,12 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 5)
     	{
-    		driveControl.arcadeDriveCustomValues(0, stickA.getX());
-    		System.out.println(stickA.getX());
+    		testServo.setAngle(153);
+    		testTimer.delay(1);
+    		testServo.setAngle(100);
+    		testTimer.delay(1);
+    		testServo.setAngle(180);
+    		testTimer.delay(1);
     	}
     }   
 }
