@@ -231,6 +231,7 @@ public class Robot extends IterativeRobot
     	
     	// Set up the cameras
     	cameraServer = CameraServer.getInstance();
+    	cameraServer.setQuality(30);
     	img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
     	camFront = new USBCamera(CAMERA_FRONT_NAME);
     	camSide = new USBCamera(CAMERA_SIDE_NAME);
@@ -521,15 +522,15 @@ public class Robot extends IterativeRobot
     		}
     		*/
     		
-    		if (stickA.getX() > 0.5 && testCounterX < 180)
-    			testCounterX++;
-    		else if (stickA.getX() < -0.5 && testCounterX > 0)
-    			testCounterX--;
+    		if (stickA.getX() > 0.2 && testCounterX < 180)
+    			testCounterX += 5;
+    		else if (stickA.getX() < -0.2 && testCounterX > 0)
+    			testCounterX -= 5;
     		
-    		if (-stickA.getY() > 0.5 && testCounterY < 180)
-    			testCounterY++;
-    		else if (-stickA.getY() < -0.5 && testCounterY > 0)
-    			testCounterY--;
+    		if (-stickA.getY() > 0.2 && testCounterY < 180)
+    			testCounterY += 5;
+    		else if (-stickA.getY() < -0.2 && testCounterY > 0)
+    			testCounterY -= 5;
     		
     		bottomServo.setAngle(testCounterX);
     		sideServo.setAngle(testCounterY);
