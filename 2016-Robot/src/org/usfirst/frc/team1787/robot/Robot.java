@@ -194,8 +194,10 @@ public class Robot extends IterativeRobot
     private PIDOutputCalc PIDTester;
     private double desiredDegrees;
     
-    private Servo testServo = new Servo(1);
-    private int testCounter = 0;
+    private Servo bottomServo = new Servo(0);
+    private Servo sideServo = new Servo(4);
+    private int testCounterX = 90;
+    private int testCounterY = 90;
     
     // Miscellaneous objects and variables:
     
@@ -469,12 +471,68 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 5)
     	{
-    		testServo.setAngle(153);
-    		testTimer.delay(1);
-    		testServo.setAngle(100);
-    		testTimer.delay(1);
-    		testServo.setAngle(180);
-    		testTimer.delay(1);
+    		/*
+    		if (testCounterX <= 180)
+    		{
+    			if (stickA.getX() >= 0.2 && stickA.getX() < 0.4)
+    				testCounterX++;
+    			else if (stickA.getX() >= 0.4 && stickA.getX() < 0.6)
+    				testCounterX += 2;
+    			else if (stickA.getX() >= 0.6 && stickA.getX() < 0.8)
+    				testCounterX += 3;
+    			else if (stickA.getX() >= 0.8)
+    				testCounterX += 4;
+    		}
+    		
+    		if (testCounterX >= 0)
+    		{
+    			if (stickA.getX() <= -0.2 && stickA.getX() > -0.4)
+    				testCounterX++;
+    			else if (stickA.getX() <= -0.4 && stickA.getX() > -0.6)
+    				testCounterX += 2;
+    			else if (stickA.getX() <= -0.6 && stickA.getX() > -0.8)
+    				testCounterX += 3;
+    			else if (stickA.getX() <= -0.8)
+    				testCounterX += 4;
+    		}
+    		
+    		if (testCounterY <= 180)
+    		{
+    			if (-stickA.getY() >= 0.8)
+    				testCounterY += 4;
+    			else if (-stickA.getY() >= 0.6)
+    				testCounterY += 3;
+    			else if (-stickA.getY() >= 0.4)
+    				testCounterY += 2;
+    			else if (-stickA.getY() >= 0.2)
+    				testCounterY += 2;
+    		}
+    		
+    		if (testCounterY >= 0)
+    		{
+    			if (-stickA.getY() <= -0.8)
+    				testCounterY -= 4;
+    			else if (-stickA.getY() <= -0.6)
+    				testCounterY -= 3;
+    			else if (-stickA.getY() <= -0.4)
+    				testCounterY -= 2;
+    			else if (-stickA.getY() <= -0.2)
+    				testCounterY -= 1;
+    		}
+    		*/
+    		
+    		if (stickA.getX() > 0.5 && testCounterX < 180)
+    			testCounterX++;
+    		else if (stickA.getX() < -0.5 && testCounterX > 0)
+    			testCounterX--;
+    		
+    		if (-stickA.getY() > 0.5 && testCounterY < 180)
+    			testCounterY++;
+    		else if (-stickA.getY() < -0.5 && testCounterY > 0)
+    			testCounterY--;
+    		
+    		bottomServo.setAngle(testCounterX);
+    		sideServo.setAngle(testCounterY);
     	}
     }   
 }
