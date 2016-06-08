@@ -196,8 +196,8 @@ public class Robot extends IterativeRobot
     
     private Servo bottomServo = new Servo(0);
     private Servo sideServo = new Servo(4);
-    private int testCounterX = 90;
-    private int testCounterY = 90;
+    private int testCounterX = 80;
+    private int testCounterY = 92;
     
     // Miscellaneous objects and variables:
     
@@ -523,14 +523,23 @@ public class Robot extends IterativeRobot
     		*/
     		
     		if (stickA.getX() > 0.2 && testCounterX < 180)
-    			testCounterX += 5;
+    			testCounterX += 1;
     		else if (stickA.getX() < -0.2 && testCounterX > 0)
-    			testCounterX -= 5;
+    			testCounterX -= 1;
     		
     		if (-stickA.getY() > 0.2 && testCounterY < 180)
-    			testCounterY += 5;
+    			testCounterY += 1;
     		else if (-stickA.getY() < -0.2 && testCounterY > 0)
-    			testCounterY -= 5;
+    			testCounterY -= 1;
+    		
+    		if (stickB.getRawButton(10))
+    		{
+    			testCounterX = 80;
+    			testCounterY = 92;
+    		}
+    		
+    		System.out.println("X: "+testCounterX);
+    		System.out.println("Y: "+testCounterY);
     		
     		bottomServo.setAngle(testCounterX);
     		sideServo.setAngle(testCounterY);
