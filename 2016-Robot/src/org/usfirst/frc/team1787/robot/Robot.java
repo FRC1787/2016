@@ -5,14 +5,9 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
-
-import com.ni.vision.NIVision;
-import com.ni.vision.NIVision.Image;
-
-import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.vision.USBCamera;
 
 /**
  * This class represents Team 1787's robot, Hoff 9000, for the 2016 FRC game: First Stronghold!
@@ -155,19 +150,19 @@ public class Robot extends IterativeRobot
     // Objects and variables involving the camera:
     
     /** The server through which the camera image is sent to the smart dashboard. */
-    CameraServer cameraServer;
+//    CameraServer cameraServer;
     /** The Image object that is sent to the camera server to be displayed. */
-    private Image img;
+//    private Image img;
     /** The camera object representing the front-mounted camera. */
-    private USBCamera camFront;
+//    private USBCamera camFront;
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
-    private static final String CAMERA_FRONT_NAME = "cam1";
+//    private static final String CAMERA_FRONT_NAME = "cam1";
     /** The camera object representing the side-mounted camera. */
-    private USBCamera camSide;
+//    private USBCamera camSide;
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
-    private static final String CAMERA_SIDE_NAME = "cam2";
+//    private static final String CAMERA_SIDE_NAME = "cam2";
     /** Boolean used for telling which camera is active. */
-    private boolean frontCamActive = true;
+//    private boolean frontCamActive = true;
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -199,6 +194,11 @@ public class Robot extends IterativeRobot
     private int testCounterX = 80;
     private int testCounterY = 92;
     
+    NetworkTable table;
+    double[] area;
+    double[] defaultValue;
+    boolean toClose;
+    boolean toFar;
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
@@ -230,12 +230,15 @@ public class Robot extends IterativeRobot
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
     	
     	// Set up the cameras
+    	
+    	/*
     	cameraServer = CameraServer.getInstance();
     	cameraServer.setQuality(30);
     	img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
     	camFront = new USBCamera(CAMERA_FRONT_NAME);
     	camSide = new USBCamera(CAMERA_SIDE_NAME);
-    	camFront.startCapture();
+    	camFront.startCapture(); */
+    	table = NetworkTable.getTable("GRIP/myContoursReport");
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -364,6 +367,7 @@ public class Robot extends IterativeRobot
     	wedge.checkWedgeTimer();
     	
     	// Camera
+    	/*
     	if (frontCamActive)
     		camFront.getImage(img);
     	else
@@ -383,7 +387,7 @@ public class Robot extends IterativeRobot
     			camFront.startCapture();
     		}
     		frontCamActive = !frontCamActive;
-    	}
+    	} */
     }
     
     /**
@@ -407,6 +411,13 @@ public class Robot extends IterativeRobot
     	System.out.println("Tolerance Threshold: "+prefs.getDouble("Tolerance Threshold", 0));
     	System.out.println("Integral Threshold: "+prefs.getDouble("Integral Threshold", 0));
     	System.out.println("Test Init Complete");
+    	System.out.println("Creating default value array");
+    	defaultValue = new double[1];
+    	defaultValue[0] = 0;
+    	System.out.println("defaultValue[0]: "+defaultValue[0]);
+    	toFar = false;
+    	toClose = false;
+    	System.out.println("Ok, now we're really done");
     }
     
     /**
@@ -426,6 +437,10 @@ public class Robot extends IterativeRobot
     		testMode = 4;
     	else if (stickB.getRawButton(10))
     		testMode = 5;
+    	else if (stickB.getRawButton(11))
+    		testMode = 6;
+    	else if (stickB.getRawButton(8))
+    		testMode = 7;
     	
     	if (testMode == 1) // Manually control pickup arm
     	{
@@ -543,6 +558,51 @@ public class Robot extends IterativeRobot
     		
     		bottomServo.setAngle(testCounterX);
     		sideServo.setAngle(testCounterY);
+    	}
+    	else if (testMode == 6)
+    	{
+    		driveControl.theRobot.tankDrive(stickB, stickA);
+    	}
+    	else if (testMode == 7)
+    	{
+    		area = table.getNumberArray("area", defaultValue);
+    		if (area.length < 1)
+    			area = defaultValue;
+    		System.out.println("area: "+area[0]);
+    		
+    		/*
+    		System.out.println("toFar: "+toFar);
+    		System.out.println("toClose: "+toClose);
+    		if (area[0] == 0)
+    			driveControl.stop();
+    		else if (!toFar && !toClose) // If right in the middle, check the camera
+    		{
+    			toFar = (area[0] < 3000);
+    			toClose = (area[0] > 5000);
+    			if (!toFar && !toClose)
+    				testTimer.delay(1);
+    		}
+    		else if (toFar)
+    			toFar = !autoMethods.autoDriveDistance(0.083, 0.25);
+    		else if (toClose)
+    			toClose = !autoMethods.autoDriveDistance(-0.083, 0.25);
+    		else
+    			driveControl.stop(); */
+    		
+    		if (area[0] == 0)
+    			driveControl.stop();
+    		else if (area[0] < 3000)
+    		{
+    			//driveControl.arcadeDriveCustomValues(0.25, 0);
+    			autoMethods.autoDriveDistance(20, 0.25);
+    		}
+    		else if (area[0] > 5000)
+    		{
+    			//driveControl.arcadeDriveCustomValues(-0.25, 0);
+    			autoMethods.autoDriveDistance(-20, 0.25);
+    		}
+    		else
+    			driveControl.stop();
     	}
     }   
 }
