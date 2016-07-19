@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.wpilibj.vision.USBCamera;
 /**
  * This class represents Team 1787's robot, Hoff 9000, for the 2016 FRC game: First Stronghold!
  * @author David Miron
