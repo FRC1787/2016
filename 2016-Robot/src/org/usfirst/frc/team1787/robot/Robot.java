@@ -1,5 +1,8 @@
 package org.usfirst.frc.team1787.robot;
 
+
+import java.io.IOException;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -15,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * @author Simon Wieder
  */
 public class Robot extends IterativeRobot
-{	
+{
 	//NOTE: MAKE SURE PORT/ID NUMBERS DON'T REPEAT FOR LIKE OBJECTS, AND THAT PORT NUMBERS DON'T GO OUT OF BOUNDS
 	
 	// Objects and variables used for driving the robot:
@@ -194,7 +197,7 @@ public class Robot extends IterativeRobot
     private int testCounterX = 80;
     private int testCounterY = 92;
     
-    NetworkTable table;
+    NetworkTable grip;
     double[] area;
     double[] defaultValue;
     boolean toClose;
@@ -238,7 +241,17 @@ public class Robot extends IterativeRobot
     	camFront = new USBCamera(CAMERA_FRONT_NAME);
     	camSide = new USBCamera(CAMERA_SIDE_NAME);
     	camFront.startCapture(); */
-    	table = NetworkTable.getTable("GRIP/myContoursReport");
+    	
+    	/*
+    	grip = NetworkTable.getTable("grip");
+    	try 
+    	{
+    		new ProcessBuilder("/home/lvuser/grip").inheritIO().start();
+    	}
+    	catch (IOException e)
+    	{
+    		e.printStackTrace();
+    	}*/
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -565,10 +578,11 @@ public class Robot extends IterativeRobot
     	}
     	else if (testMode == 7)
     	{
-    		area = table.getNumberArray("area", defaultValue);
+    		/*
+    		area = grip.getNumberArray("myContoursReport/area", defaultValue);
     		if (area.length < 1)
     			area = defaultValue;
-    		System.out.println("area: "+area[0]);
+    		System.out.println("area: "+area[0]); */
     		
     		/*
     		System.out.println("toFar: "+toFar);
@@ -589,6 +603,7 @@ public class Robot extends IterativeRobot
     		else
     			driveControl.stop(); */
     		
+    		/*
     		if (area[0] == 0)
     			driveControl.stop();
     		else if (area[0] < 3000)
@@ -602,7 +617,7 @@ public class Robot extends IterativeRobot
     			autoMethods.autoDriveDistance(-20, 0.25);
     		}
     		else
-    			driveControl.stop();
+    			driveControl.stop(); */
     	}
     }   
 }
