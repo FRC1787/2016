@@ -202,6 +202,8 @@ public class Robot extends IterativeRobot
     double[] defaultValue;
     boolean toClose;
     boolean toFar;
+    
+    private VisionMethods vm;
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
@@ -252,6 +254,8 @@ public class Robot extends IterativeRobot
     	{
     		e.printStackTrace();
     	}*/
+    	
+    	vm = new VisionMethods();
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -618,6 +622,7 @@ public class Robot extends IterativeRobot
     		}
     		else
     			driveControl.stop(); */
+    		vm.method1();
     	}
     }   
 }
