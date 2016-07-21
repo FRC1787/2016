@@ -1,10 +1,5 @@
 package org.usfirst.frc.team1787.robot;
 
-
-import java.io.IOException;
-
-import org.opencv.core.Core;
-
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
@@ -219,9 +214,7 @@ public class Robot extends IterativeRobot
      * This function is run once when the robot is first started up and is used for initialization code.
      */
     public void robotInit()
-    {
-    	//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    	
+    {	
     	// Construct the DrivingDevices
     	driveControl = new DrivingDevices(TALON_DRIVE_BR_ID, TALON_DRIVE_BL_ID, TALON_DRIVE_FR_ID, TALON_DRIVE_FL_ID, 
     			SOL_GEAR_SHIFTING_PCM_PORT, LEFT_ENCODER_DIO_PORT_A, LEFT_ENCODER_DIO_PORT_B, 
