@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1787.robot;
 
-//import org.bytedeco.javacpp.opencv_core.Mat;
+//import org.opencv.core.Core;
+//import org.opencv.core.Mat;
 
 public class VisionMethods
 {
@@ -10,6 +11,8 @@ public class VisionMethods
 	int imageHeight = 6;
 	public VisionMethods ()
 	{
+		System.out.println("Trying to construct VisionMethods!");
+		//System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		//vc.open(0);
 		//img = new Mat();
 	}
