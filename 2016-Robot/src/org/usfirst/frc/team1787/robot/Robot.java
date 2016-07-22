@@ -156,7 +156,7 @@ public class Robot extends IterativeRobot
     /** The camera object representing the front-mounted camera. */
 //    private USBCamera camFront;
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
-//    private static final String CAMERA_FRONT_NAME = "cam1";
+    private static final String CAMERA_FRONT_NAME = "cam1";
     /** The camera object representing the side-mounted camera. */
 //    private USBCamera camSide;
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
@@ -252,7 +252,7 @@ public class Robot extends IterativeRobot
     		e.printStackTrace();
     	}*/
     	
-    	vm = new VisionMethods();
+    	vm = new VisionMethods(CAMERA_FRONT_NAME);
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
