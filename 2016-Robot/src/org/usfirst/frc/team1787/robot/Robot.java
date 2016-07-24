@@ -120,8 +120,10 @@ public class Robot extends IterativeRobot
 	public static final int JOYSTICK_B_WEDGE_RETRACT = 2;
 	/** The button on stickB that will toggle the wedge. */
 	public static final int JOYSTICK_B_WEDGE_TOGGLE = 1;
-	/** The button on stickB that will toggle the camera */
+	/** The button on stickB that will toggle which camera feed is sent to the driver station. */
 	public static final int JOYSTICK_B_CAMERA_TOGGLE = 9;
+	/** The button on stickB that will toggle which type of image is sent to the driver station, either regular or processed. */
+	public static final int JOYSTICK_B_IMAGE_PROCESSING_TOGGLE = 8;
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
@@ -149,20 +151,13 @@ public class Robot extends IterativeRobot
     
     // Objects and variables involving the camera:
     
-    /** The server through which the camera image is sent to the smart dashboard. */
-//    CameraServer cameraServer;
-    /** The Image object that is sent to the camera server to be displayed. */
-//    private Image img;
-    /** The camera object representing the front-mounted camera. */
-//    private USBCamera camFront;
+    /** The object which has methods to control the various camera functions / processes. */
+    private VisionMethods camController;
+    
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_FRONT_NAME = "cam1";
-    /** The camera object representing the side-mounted camera. */
-//    private USBCamera camSide;
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
-//    private static final String CAMERA_SIDE_NAME = "cam2";
-    /** Boolean used for telling which camera is active. */
-//    private boolean frontCamActive = true;
+    private static final String CAMERA_SIDE_NAME = "cam2";
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -200,7 +195,6 @@ public class Robot extends IterativeRobot
     boolean toClose;
     boolean toFar;
     
-    private VisionMethods vm;
     // Miscellaneous objects and variables:
     
 	/** Don't ask. */
@@ -231,17 +225,11 @@ public class Robot extends IterativeRobot
     	stickA = new Joystick(JOYSTICK_A_USB_PORT);
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
     	
-    	// Set up the cameras
+    	// Construct the VisionMethods
+    	camController = new VisionMethods(CAMERA_FRONT_NAME, CAMERA_SIDE_NAME);
     	
-    	/*
-    	cameraServer = CameraServer.getInstance();
-    	cameraServer.setQuality(30);
-    	img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-    	camFront = new USBCamera(CAMERA_FRONT_NAME);
-    	camSide = new USBCamera(CAMERA_SIDE_NAME);
-    	camFront.startCapture(); */
-    	
-    	/*
+    	/* The code below is used to start GRIP upon turning on the robot.
+    	 * It allows GRIP to run without having to be deployed from the desktop application.
     	grip = NetworkTable.getTable("grip");
     	try 
     	{
@@ -251,8 +239,6 @@ public class Robot extends IterativeRobot
     	{
     		e.printStackTrace();
     	}*/
-    	
-    	vm = new VisionMethods(CAMERA_FRONT_NAME);
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -380,28 +366,24 @@ public class Robot extends IterativeRobot
     		wedge.toggle();
     	wedge.checkWedgeTimer();
     	
-    	// Camera
-    	/*
-    	if (frontCamActive)
-    		camFront.getImage(img);
-    	else
-    		camSide.getImage(img);
-		cameraServer.setImage(img);
-		
+    	// Cameras
+    	camController.setHueRange(prefs.getInt("HMin", 0), prefs.getInt("HMax", 360));
+    	camController.setSaturationRange(prefs.getInt("SMin", 0), prefs.getInt("SMax", 255));
+    	camController.setValueRange(prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
+    	
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
+    		camController.toggleActiveCamFeed();
+    	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
+    		camController.toggleImageProcessing();
+    	
+    	if (camController.imageProcessingIsActive())
     	{
-    		if (frontCamActive)
-    		{
-    			camFront.stopCapture();
-    			camSide.startCapture();
-    		}
-    		else
-    		{
-    			camSide.stopCapture();
-    			camFront.startCapture();
-    		}
-    		frontCamActive = !frontCamActive;
-    	} */
+    		camController.performHSVFilter();
+    		camController.sendProcessedImageToDashboard();
+    	}
+    	else if (!camController.imageProcessingIsActive())
+    		camController.sendRegularImageToDashboard();
+    	
     }
     
     /**
@@ -619,7 +601,8 @@ public class Robot extends IterativeRobot
     		}
     		else
     			driveControl.stop(); */
-    		vm.method1();
+    		
+    		//camController.hsvFilter();
     	}
     }   
 }
