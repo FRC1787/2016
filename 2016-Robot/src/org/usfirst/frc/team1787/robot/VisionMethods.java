@@ -16,6 +16,7 @@ public class VisionMethods
 	private Image binaryImg;
 	private boolean frontCamActive;
 	private boolean imageProcessingActive;
+	private boolean imageProcessingSettingsActive;
 	
 	Range HUE = new Range(90, 120);
 	Range SATURATION = new Range(0, 255);
@@ -24,15 +25,16 @@ public class VisionMethods
 	public VisionMethods (String camFrontName, String camSideName)
 	{
 		camServer = CameraServer.getInstance();
-		camServer.setQuality(100);
+		camServer.setQuality(50);
 		
 		camFront = new USBCamera(camFrontName);
 		camSide = new USBCamera(camSideName);
 		
 		camSide.setExposureManual(0);
-		camSide.setExposureHoldCurrent();
 		camSide.setBrightness(0);
+		camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
 		camSide.updateSettings();
+		imageProcessingSettingsActive = true;
 		
 		camFront.startCapture();
 		frontCamActive = true;
@@ -109,5 +111,23 @@ public class VisionMethods
 	public boolean imageProcessingIsActive()
 	{
 		return imageProcessingActive;
+	}
+	
+	public void toggleCamSettings()
+	{
+		if (imageProcessingSettingsActive)
+		{
+			camSide.setExposureAuto();
+			camSide.setWhiteBalanceAuto();
+			camSide.setBrightness(50);
+		}
+		else if (!imageProcessingSettingsActive)
+		{
+			camSide.setExposureManual(0);
+			camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
+			camSide.setBrightness(0);
+		}
+		camSide.updateSettings();
+		imageProcessingSettingsActive = !imageProcessingSettingsActive;
 	}
 }

@@ -375,6 +375,8 @@ public class Robot extends IterativeRobot
     		camController.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
     		camController.toggleImageProcessing();
+    	if (stickB.getRawButton(10))
+    		camController.toggleCamSettings();
     	
     	if (camController.imageProcessingIsActive())
     	{
