@@ -18,9 +18,9 @@ public class VisionMethods
 	private boolean imageProcessingActive;
 	private boolean imageProcessingSettingsActive;
 	
-	Range HUE = new Range(90, 120);
-	Range SATURATION = new Range(0, 255);
-	Range VALUE = new Range(0, 255);
+	Range HUE = new Range(125, 145);
+	Range SATURATION = new Range(245, 255);
+	Range VALUE = new Range(30, 175);
 
 	public VisionMethods (String camFrontName, String camSideName)
 	{
@@ -31,8 +31,8 @@ public class VisionMethods
 		camSide = new USBCamera(camSideName);
 		
 		camSide.setExposureManual(0);
-		camSide.setBrightness(0);
 		camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
+		camSide.setBrightness(100);
 		camSide.updateSettings();
 		imageProcessingSettingsActive = true;
 		
@@ -90,22 +90,14 @@ public class VisionMethods
 		camServer.setImage(binaryImg);
 	}
 	
-	public void setHueRange(int min, int max)
+	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)
 	{
-		HUE.minValue = min;
-		HUE.maxValue = max;
-	}
-	
-	public void setSaturationRange(int min, int max)
-	{
-		SATURATION.minValue = min;
-		SATURATION.maxValue = max;
-	}
-	
-	public void setValueRange(int min, int max)
-	{
-		VALUE.minValue = min;
-		VALUE.maxValue = max;
+		HUE.minValue = hMin;
+		HUE.maxValue = hMax;
+		SATURATION.minValue = sMin;
+		SATURATION.maxValue = sMax;
+		VALUE.minValue = vMin;
+		VALUE.maxValue = vMax;
 	}
 	
 	public boolean imageProcessingIsActive()
@@ -125,7 +117,7 @@ public class VisionMethods
 		{
 			camSide.setExposureManual(0);
 			camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
-			camSide.setBrightness(0);
+			camSide.setBrightness(100);
 		}
 		camSide.updateSettings();
 		imageProcessingSettingsActive = !imageProcessingSettingsActive;

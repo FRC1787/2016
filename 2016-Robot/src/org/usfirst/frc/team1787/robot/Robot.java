@@ -307,6 +307,10 @@ public class Robot extends IterativeRobot
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
+    	camController.setHSVThreshold(
+    			prefs.getInt("HMin", 0), prefs.getInt("HMax", 360), 
+    			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
+    			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
     }
 
     /**
@@ -367,16 +371,15 @@ public class Robot extends IterativeRobot
     	wedge.checkWedgeTimer();
     	
     	// Cameras
-    	camController.setHueRange(prefs.getInt("HMin", 0), prefs.getInt("HMax", 360));
-    	camController.setSaturationRange(prefs.getInt("SMin", 0), prefs.getInt("SMax", 255));
-    	camController.setValueRange(prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
-    	
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
     		camController.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
     		camController.toggleImageProcessing();
     	if (stickB.getRawButton(10))
+    	{
     		camController.toggleCamSettings();
+    		testTimer.delay(2); // Gives the camera time to update settings.
+    	}
     	
     	if (camController.imageProcessingIsActive())
     	{
