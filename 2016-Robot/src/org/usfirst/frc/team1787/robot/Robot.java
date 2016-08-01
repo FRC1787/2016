@@ -384,6 +384,7 @@ public class Robot extends IterativeRobot
     	if (camController.imageProcessingIsActive())
     	{
     		camController.performHSVFilter();
+    		camController.updateAndDrawBoundingRectangle();
     		camController.sendProcessedImageToDashboard();
     	}
     	else if (!camController.imageProcessingIsActive())

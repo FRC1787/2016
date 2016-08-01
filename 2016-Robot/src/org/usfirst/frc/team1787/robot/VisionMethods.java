@@ -52,20 +52,47 @@ import edu.wpi.first.wpilibj.vision.USBCamera;
 
 public class VisionMethods
 {
+	/** The camera server object used to sent images to the smart dashboard. */
 	private CameraServer camServer;
+	/** The camera mounted on the front of the pickup arm. */
 	private USBCamera camFront;
+	/** The camera mounted on the side of the robot, or on the 2 axis servo base. */
 	private USBCamera camSide;
+	/** The image object that stores an image captured by a camera. */
 	private Image img;
+	/** The binary image used for vision processing. */
 	private Image binaryImg;
+	/** A boolean indicating if the front camera is currently active. */
 	private boolean frontCamActive;
+	/** A boolean indicating if methods involving vision processing are being called. */
 	private boolean imageProcessingActive;
+	/** A boolean indicating if the side-cam's exposure, white balance, and brightness are currently optimal for vision processing. */
 	private boolean imageProcessingSettingsActive;
 	
-	Range HUE = new Range(125, 145);
-	Range SATURATION = new Range(245, 255);
-	Range VALUE = new Range(30, 175);
+	/** The Range object which stores the acceptable range of hues for vision processing. (hue is on a scale from 0 - 360). */
+	private final Range HUE;
+	/** The minimum hue. */
+	private final int HUE_MIN = 125;
+	/** The maximum hue. */
+	private final int HUE_MAX = 145;
+	/** The Range object which stores the acceptable range of saturations for vision processing. (saturation is on a scale from 0 - 255). */
+	private final Range SATURATION;
+	/** The minimum saturation. */
+	private final int SATURATION_MIN = 245;
+	/** The maximum saturation. */
+	private final int SATURATION_MAX = 255;
+	/** The Range object which stores the acceptable range of values (as in the "v" in HSV) for vision processing. (value is on a scale from 0 - 255). */
+	private final Range VALUE;
+	/** The minimum value (as in the "v" in HSV). */
+	private final int VALUE_MIN = 30;
+	/** The maximum value (as in the "v" in HSV). */
+	private final int VALUE_MAX = 175;
 
+	/** The rectangle that completely surrounds a particle in a binary image. */
 	Rect boundingRectangle;
+	
+	private final int IMAGE_WIDTH_IN_PIXELS = 5;
+	private final int IMAGE_HEIGHT_IN_PIXELS = 5;
 	
 	public VisionMethods (String camFrontName, String camSideName)
 	{
@@ -88,6 +115,10 @@ public class VisionMethods
 		binaryImg = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_U8, 0);
 		
 		imageProcessingActive = false;
+		
+		HUE = new Range(HUE_MIN, HUE_MAX);
+		SATURATION = new Range(SATURATION_MIN, SATURATION_MAX);
+		VALUE = new Range(VALUE_MIN, VALUE_MAX);
 		
 		boundingRectangle = new Rect(20, 20, 100, 100);
 	}
@@ -134,7 +165,7 @@ public class VisionMethods
 	
 	public void updateAndDrawBoundingRectangle()
 	{
-		if (NIVision.imaqCountParticles(binaryImg, 1) > 0)
+		if (aParticleIsPresent())
 		{
 			boundingRectangle.top = (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_BOUNDING_RECT_TOP);
 			boundingRectangle.left = (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_BOUNDING_RECT_LEFT);
@@ -144,9 +175,24 @@ public class VisionMethods
 		}
 	}
 	
+	public int getCenterOfMassX()
+	{
+		if (aParticleIsPresent())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_CENTER_OF_MASS_X);
+		else
+			return -1;
+	}
+	
+	public int getCenterOfMassY()
+	{
+		if (aParticleIsPresent())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_CENTER_OF_MASS_Y);
+		else
+			return -1;
+	}
+	
 	public void sendProcessedImageToDashboard()
 	{
-		updateAndDrawBoundingRectangle();
 		camServer.setImage(binaryImg);
 	}
 	
@@ -181,5 +227,10 @@ public class VisionMethods
 		}
 		camSide.updateSettings();
 		imageProcessingSettingsActive = !imageProcessingSettingsActive;
+	}
+	
+	public boolean aParticleIsPresent()
+	{
+		return (NIVision.imaqCountParticles(binaryImg, 1) > 0);
 	}
 }
