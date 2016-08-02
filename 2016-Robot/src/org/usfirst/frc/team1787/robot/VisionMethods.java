@@ -49,6 +49,12 @@ import edu.wpi.first.wpilibj.vision.USBCamera;
  * 
  * Other areas to look into:
  * 1) Overlays
+ * 
+ * Note on connectivity8:
+ * There are a couple of methods that have an int connectivity8 as a parameter. I figured out what that's for today.
+ * When detecting particles, it connectivity8 is on, then pixels adjacent or diagonal to another pixel are considered to be part of the same particle.
+ * The other form of connectivity, connectivity4, defines particles as groups of pixels that are only adjacent to each other, not touching diagonally.
+ * Learned this from the NI Vision Concepts Help section called "Connectivity".
  */
 
 public class VisionMethods
@@ -71,27 +77,15 @@ public class VisionMethods
 	private boolean imageProcessingSettingsActive;
 	
 	/** The Range object which stores the acceptable range of hues for vision processing. (hue is on a scale from 0 - 360). */
-	private final Range HUE;
-	/** The minimum hue. */
-	private final int HUE_MIN = 125;
-	/** The maximum hue. */
-	private final int HUE_MAX = 145;
+	private final Range HUE = new Range(125, 145);
 	/** The Range object which stores the acceptable range of saturations for vision processing. (saturation is on a scale from 0 - 255). */
-	private final Range SATURATION;
-	/** The minimum saturation. */
-	private final int SATURATION_MIN = 245;
-	/** The maximum saturation. */
-	private final int SATURATION_MAX = 255;
+	private final Range SATURATION = new Range(245, 255);
 	/** The Range object which stores the acceptable range of values (as in the "v" in HSV) for vision processing. (value is on a scale from 0 - 255). */
-	private final Range VALUE;
-	/** The minimum value (as in the "v" in HSV). */
-	private final int VALUE_MIN = 30;
-	/** The maximum value (as in the "v" in HSV). */
-	private final int VALUE_MAX = 175;
+	private final Range VALUE = new Range(30, 175);
 
 	/** The rectangle that completely surrounds a particle in a binary image. */
-	Rect boundingRectangle;
-	Rect centerCircle;
+	Rect boundingRectangle = new Rect();
+	Rect centerCircle = new Rect(0, 0, 11, 11);
 	
 	private final int IMAGE_WIDTH_IN_PIXELS = 320;
 	private final int IMAGE_HEIGHT_IN_PIXELS = 240;
@@ -100,6 +94,7 @@ public class VisionMethods
 	Point horizontalEnd = new Point(320, 120);
 	Point verticalStart = new Point(160, 0);
 	Point verticalEnd = new Point(160, 240);
+	Point centerOfImage = new Point(160, 120);
 	
 	public VisionMethods (String camFrontName, String camSideName)
 	{
@@ -122,13 +117,6 @@ public class VisionMethods
 		binaryImg = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_U8, 0);
 		
 		imageProcessingActive = false;
-		
-		HUE = new Range(HUE_MIN, HUE_MAX);
-		SATURATION = new Range(SATURATION_MIN, SATURATION_MAX);
-		VALUE = new Range(VALUE_MIN, VALUE_MAX);
-		
-		boundingRectangle = new Rect(20, 20, 100, 100);
-		centerCircle = new Rect(20, 20, 11, 11);
 	}
 	
 	public Image getImageFromActiveCam()
