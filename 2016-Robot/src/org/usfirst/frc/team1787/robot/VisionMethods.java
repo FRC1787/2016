@@ -4,6 +4,7 @@ import com.ni.vision.NIVision;
 import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
 import com.ni.vision.NIVision.MeasurementType;
+import com.ni.vision.NIVision.Point;
 import com.ni.vision.NIVision.Range;
 import com.ni.vision.NIVision.Rect;
 import com.ni.vision.NIVision.ShapeMode;
@@ -90,9 +91,15 @@ public class VisionMethods
 
 	/** The rectangle that completely surrounds a particle in a binary image. */
 	Rect boundingRectangle;
+	Rect centerCircle;
 	
-	private final int IMAGE_WIDTH_IN_PIXELS = 5;
-	private final int IMAGE_HEIGHT_IN_PIXELS = 5;
+	private final int IMAGE_WIDTH_IN_PIXELS = 320;
+	private final int IMAGE_HEIGHT_IN_PIXELS = 240;
+	
+	Point horizontalStart = new Point(0, 120);
+	Point horizontalEnd = new Point(320, 120);
+	Point verticalStart = new Point(160, 0);
+	Point verticalEnd = new Point(160, 240);
 	
 	public VisionMethods (String camFrontName, String camSideName)
 	{
@@ -121,6 +128,7 @@ public class VisionMethods
 		VALUE = new Range(VALUE_MIN, VALUE_MAX);
 		
 		boundingRectangle = new Rect(20, 20, 100, 100);
+		centerCircle = new Rect(20, 20, 11, 11);
 	}
 	
 	public Image getImageFromActiveCam()
@@ -189,6 +197,25 @@ public class VisionMethods
 			return (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_CENTER_OF_MASS_Y);
 		else
 			return -1;
+	}
+	
+	public void updateAndDrawReticle()
+	{
+		if (aParticleIsPresent())
+		{
+			centerCircle.top = getCenterOfMassY() - 5;
+			centerCircle.left = getCenterOfMassX() - 5;
+			NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
+			
+			horizontalStart.y = getCenterOfMassY();
+			horizontalEnd.y = getCenterOfMassY();
+			
+			verticalStart.x = getCenterOfMassX();
+			verticalEnd.x = getCenterOfMassX();
+			
+			NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
+			NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
+		}
 	}
 	
 	public void sendProcessedImageToDashboard()
