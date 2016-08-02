@@ -186,8 +186,8 @@ public class Robot extends IterativeRobot
     
     private Servo bottomServo = new Servo(0);
     private Servo sideServo = new Servo(4);
-    private int testCounterX = 80;
-    private int testCounterY = 92;
+    private int testCounterX = 95;
+    private int testCounterY = 85;
     
     NetworkTable grip;
     double[] area;
@@ -552,8 +552,8 @@ public class Robot extends IterativeRobot
     		
     		if (stickB.getRawButton(10))
     		{
-    			testCounterX = 80;
-    			testCounterY = 92;
+    			testCounterX = 95;
+    			testCounterY = 85;
     		}
     		
     		System.out.println("X: "+testCounterX);
