@@ -187,7 +187,9 @@ public class Robot extends IterativeRobot
     private Servo bottomServo = new Servo(0);
     private Servo sideServo = new Servo(4);
     private int testCounterX = 95;
-    private int testCounterY = 85;
+    private int testCounterY = 60;
+    private final int BOTTOM_SERVO_NEUTRAL_ANGLE = 95;
+    private final int SIDE_SERVO_NEUTRAL_ANGLE = 85;
     
     NetworkTable grip;
     double[] area;
@@ -346,7 +348,7 @@ public class Robot extends IterativeRobot
 			pickupArmDesiredRegion = PickupArm.REG_PICKUP;
 		
 		if (pickupArmDesiredRegion >= 0) // Used to see if an arm region button has been pressed in teleop yet.
-			arm.moveToRegion(pickupArmDesiredRegion);
+			//arm.moveToRegion(pickupArmDesiredRegion); <----- COMMENTED OUT TO PREVENT DAMAGE TO SERVO MOUNT!!!!!
     	
     	// Pickup Wheels
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || (arm.getCurrentRegion() == 4 && stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP)))
@@ -386,6 +388,22 @@ public class Robot extends IterativeRobot
     		camController.performHSVFilter();
     		camController.updateAndDrawBoundingRectangle();
     		camController.updateAndDrawReticle();
+    		if (camController.getCenterOfMassX() != -1 && camController.getCenterOfMassY() != -1)
+    		{
+				if (camController.getCenterOfMassX() < camController.centerOfImage.x - 5) // if the goal is to the left, turn left.
+					testCounterX--;
+				else if (camController.getCenterOfMassX() > camController.centerOfImage.x + 5) // if the goal is to the right, turn right.
+					testCounterX++;
+				
+				if (camController.getCenterOfMassY() < camController.centerOfImage.y - 5) // if the goal is too high, look up.
+					testCounterY--;
+				else if (camController.getCenterOfMassY() > camController.centerOfImage.y + 5) // if teh goal is too low, look down.
+					testCounterY++;
+    		}
+    		
+    		bottomServo.setAngle(testCounterX);
+    		sideServo.setAngle(testCounterY);
+    		
     		camController.sendProcessedImageToDashboard();
     	}
     	else if (!camController.imageProcessingIsActive())
