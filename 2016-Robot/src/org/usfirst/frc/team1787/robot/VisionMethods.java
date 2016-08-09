@@ -91,12 +91,12 @@ public class VisionMethods
 	private Point horizontalEnd = new Point(320, 120);
 	private Point verticalStart = new Point(160, 0);
 	private Point verticalEnd = new Point(160, 240);
-	private Point centerOfImage = new Point(160, 120);
+	Point centerOfImage = new Point(160, 120);
 
 	/** The particleID for the particle that has been confirmed to be a goal and is currently being tracked. */
-	private int currentParticle = 0;
+	private int currentParticle = -1;
 	/** The particleID for the largest particle currently in view. This particle hasn't necessarily been confirmed to be a goal. */
-	private int largestParticle = 0;
+	private int largestParticle = -1;
 	
 	private final double DESIRED_AREA_AS_PERCENTAGE_OF_BOUNDING_BOX_AREA = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
 	private final double DESIRED_ASPECT_RATIO = 1.6; // Taken from screensteps live, but not actually tested yet. Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height
@@ -190,44 +190,59 @@ public class VisionMethods
 		NIVision.imaqColorThreshold(binaryImg, getImageFromActiveCam(), 255, NIVision.ColorMode.HSV, HUE, SATURATION, VALUE);
 	}
 	
+	public void updateBoundingRectangle()
+	{
+		boundingBox.top = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_TOP);
+		boundingBox.left = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_LEFT);
+		boundingBox.height = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_HEIGHT);
+		boundingBox.width = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
+	}
+	
 	public void updateAndDrawBoundingRectangle()
 	{
-		if (ParticleMeasurer.getBoundingBox(currentParticle) != null)
-			NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, ParticleMeasurer.getBoundingBox(currentParticle), DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
+		updateBoundingRectangle();
+		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, boundingBox, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
 	}
 	
 	public void updateAndDrawReticle()
 	{
-		centerCircle.top = ParticleMeasurer.getCenterOfMassY(currentParticle) - 5;
-		centerCircle.left = ParticleMeasurer.getCenterOfMassX(currentParticle) - 5;
+		// centerCircle
+		centerCircle.top = getCenterOfMassY(currentParticle) - 5;
+		centerCircle.left = getCenterOfMassX(currentParticle) - 5;
 		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
 		
-		horizontalStart.y = ParticleMeasurer.getCenterOfMassY(currentParticle);
-		horizontalEnd.y = ParticleMeasurer.getCenterOfMassY(currentParticle);
-		
-		verticalStart.x = ParticleMeasurer.getCenterOfMassX(currentParticle);
-		verticalEnd.x = ParticleMeasurer.getCenterOfMassX(currentParticle);
-		
+		// horizontal line
+		horizontalStart.y = getCenterOfMassY(currentParticle);
+		horizontalEnd.y = getCenterOfMassY(currentParticle);
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
+		
+		// vertical line
+		verticalStart.x = getCenterOfMassX(currentParticle);
+		verticalEnd.x = getCenterOfMassX(currentParticle);
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
 	}
 	
 	public void determineParticleToTrack()
 	{
-		// This is where scores should be compared and stuff.
+		if (getNumOfParticles() == 0)
+		{
+			currentParticle = -1;
+			largestParticle = -1;
+		}
 		for (int particleNumber = 0; particleNumber < getNumOfParticles(); particleNumber++)
 		{
-			if (ParticleMeasurer.getArea(particleNumber) > ParticleMeasurer.getArea(currentParticle))
+			if (getArea(particleNumber) > getArea(currentParticle))
 			{
-				currentParticle = particleNumber;
-				ParticleMeasurer.setCurrentParticle(particleNumber);
+				largestParticle = particleNumber;
 			}
 		}
+		// This is where largestParticle should be tested to see if it's a goal.
+		currentParticle = largestParticle;
 	}
 	
 	public int getArea(int particleID)
 	{
-		if (particleID < getNumOfParticles())
+		if (0 <= particleID && particleID < getNumOfParticles())
 			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_PARTICLE_AND_HOLES_AREA);
 		else
 			return -1;
@@ -235,7 +250,7 @@ public class VisionMethods
 	
 	public int getCenterOfMassX(int particleID)
 	{
-		if (particleID < getNumOfParticles())
+		if (0 <= particleID && particleID < getNumOfParticles())
 			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_CENTER_OF_MASS_X);
 		else
 			return -1;
@@ -243,10 +258,15 @@ public class VisionMethods
 	
 	public int getCenterOfMassY(int particleID)
 	{
-		if (particleID < getNumOfParticles())
+		if (0 <= particleID && particleID < getNumOfParticles())
 			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_CENTER_OF_MASS_Y);
 		else
 			return -1;
+	}
+	
+	public int getCurrentParticle()
+	{
+		return currentParticle;
 	}
 	
 	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)

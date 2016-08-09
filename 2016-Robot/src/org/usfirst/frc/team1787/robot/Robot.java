@@ -310,10 +310,14 @@ public class Robot extends IterativeRobot
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
+    	bottomServo.setAngle(testCounterX); // Start with the camera looking up so it can find a goal.
+    	sideServo.setAngle(testCounterY); // Start with the camera looking up so it can find a goal.
+    	/*
     	visionMaster.setHSVThreshold(
     			prefs.getInt("HMin", 0), prefs.getInt("HMax", 360), 
     			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
+    	*/
     }
 
     /**
@@ -388,23 +392,25 @@ public class Robot extends IterativeRobot
     	{
     		visionMaster.performHSVFilter();
     		visionMaster.determineParticleToTrack();
-    		visionMaster.updateAndDrawBoundingRectangle();
-    		visionMaster.updateAndDrawReticle();
-    		if (ParticleMeasurer.getCenterOfMassX() != -1 && ParticleMeasurer.getCenterOfMassY() != -1)
+    		
+    		if (visionMaster.getCurrentParticle() != -1) // A value of -1 indicates no particle found
     		{
-				if (ParticleMeasurer.getCenterOfMassX() < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
+    			visionMaster.updateAndDrawBoundingRectangle();
+        		visionMaster.updateAndDrawReticle();
+        		
+				if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
 					testCounterX--;
-				else if (ParticleMeasurer.getCenterOfMassX() > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
+				else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
 					testCounterX++;
 				
-				if (ParticleMeasurer.getCenterOfMassY() < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
+				if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
 					testCounterY--;
-				else if (ParticleMeasurer.getCenterOfMassY() > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
+				else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
 					testCounterY++;
+				
+				bottomServo.setAngle(testCounterX);
+	    		sideServo.setAngle(testCounterY);
     		}
-    		
-    		bottomServo.setAngle(testCounterX);
-    		sideServo.setAngle(testCounterY);
     		
     		visionMaster.sendProcessedImageToDashboard();
     	}
