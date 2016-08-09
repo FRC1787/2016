@@ -152,7 +152,7 @@ public class Robot extends IterativeRobot
     // Objects and variables involving the camera:
     
     /** The object which has methods to control the various camera functions / processes. */
-    private VisionMethods camController;
+    private VisionMethods visionMaster;
     
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_FRONT_NAME = "cam1";
@@ -228,7 +228,7 @@ public class Robot extends IterativeRobot
     	stickB = new Joystick(JOSTICK_B_USB_PORT);
     	
     	// Construct the VisionMethods
-    	camController = new VisionMethods(CAMERA_FRONT_NAME, CAMERA_SIDE_NAME);
+    	visionMaster = new VisionMethods(CAMERA_FRONT_NAME, CAMERA_SIDE_NAME);
     	
     	/* The code below is used to start GRIP upon turning on the robot.
     	 * It allows GRIP to run without having to be deployed from the desktop application.
@@ -309,7 +309,7 @@ public class Robot extends IterativeRobot
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
-    	camController.setHSVThreshold(
+    	visionMaster.setHSVThreshold(
     			prefs.getInt("HMin", 0), prefs.getInt("HMax", 360), 
     			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
@@ -374,40 +374,41 @@ public class Robot extends IterativeRobot
     	
     	// Cameras
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
-    		camController.toggleActiveCamFeed();
+    		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
-    		camController.toggleImageProcessing();
+    		visionMaster.toggleImageProcessing();
     	if (stickB.getRawButton(10))
     	{
-    		camController.toggleCamSettings();
+    		visionMaster.toggleCamSettings();
     		testTimer.delay(2); // Gives the camera time to update settings.
     	}
     	
-    	if (camController.imageProcessingIsActive())
+    	if (visionMaster.imageProcessingIsActive())
     	{
-    		camController.performHSVFilter();
-    		camController.updateAndDrawBoundingRectangle();
-    		camController.updateAndDrawReticle();
-    		if (camController.currentParticle.getCenterOfMassX() != -1 && camController.currentParticle.getCenterOfMassY() != -1)
+    		visionMaster.performHSVFilter();
+    		visionMaster.determineParticleToTrack();
+    		visionMaster.updateAndDrawBoundingRectangle();
+    		visionMaster.updateAndDrawReticle();
+    		if (ParticleMeasurer.getCenterOfMassX() != -1 && ParticleMeasurer.getCenterOfMassY() != -1)
     		{
-				if (camController.currentParticle.getCenterOfMassX() < camController.centerOfImage.x - 5) // if the goal is to the left, turn left.
+				if (ParticleMeasurer.getCenterOfMassX() < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
 					testCounterX--;
-				else if (camController.currentParticle.getCenterOfMassX() > camController.centerOfImage.x + 5) // if the goal is to the right, turn right.
+				else if (ParticleMeasurer.getCenterOfMassX() > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
 					testCounterX++;
 				
-				if (camController.currentParticle.getCenterOfMassY() < camController.centerOfImage.y - 5) // if the goal is too high, look up.
+				if (ParticleMeasurer.getCenterOfMassY() < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
 					testCounterY--;
-				else if (camController.currentParticle.getCenterOfMassY() > camController.centerOfImage.y + 5) // if teh goal is too low, look down.
+				else if (ParticleMeasurer.getCenterOfMassY() > visionMaster.centerOfImage.y + 5) // if teh goal is too low, look down.
 					testCounterY++;
     		}
     		
     		bottomServo.setAngle(testCounterX);
     		sideServo.setAngle(testCounterY);
     		
-    		camController.sendProcessedImageToDashboard();
+    		visionMaster.sendProcessedImageToDashboard();
     	}
-    	else if (!camController.imageProcessingIsActive())
-    		camController.sendRegularImageToDashboard();
+    	else if (!visionMaster.imageProcessingIsActive())
+    		visionMaster.sendRegularImageToDashboard();
     	
     }
     

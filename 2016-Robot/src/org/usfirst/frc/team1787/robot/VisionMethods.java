@@ -93,10 +93,10 @@ public class VisionMethods
 	Point verticalEnd = new Point(160, 240);
 	Point centerOfImage = new Point(160, 120);
 	
-	VisionParticle[] particles = new VisionParticle[3];
-	VisionParticle currentParticle;
+	ParticleMeasurer particleMeasure;
 	
 	int numOfParticles;
+	int currentParticle = 0;
 	
 	public VisionMethods (String camFrontName, String camSideName)
 	{
@@ -117,10 +117,7 @@ public class VisionMethods
 		
 		img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 		binaryImg = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_U8, 0);
-		
-		particles[0] = new VisionParticle(0);
-		particles[1] = new VisionParticle(1);
-		particles[2] = new VisionParticle(2);
+		particleMeasure = new ParticleMeasurer(binaryImg);
 		
 		imageProcessingActive = false;
 	}
@@ -167,21 +164,21 @@ public class VisionMethods
 	
 	public void updateAndDrawBoundingRectangle()
 	{
-		currentParticle.updateBoundingBox(binaryImg);
-		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, currentParticle.getBoundingBox(), DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
+		if (ParticleMeasurer.getBoundingBox(currentParticle) != null)
+			NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, ParticleMeasurer.getBoundingBox(currentParticle), DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
 	}
 	
 	public void updateAndDrawReticle()
 	{
-		centerCircle.top = currentParticle.getCenterOfMassY() - 5;
-		centerCircle.left = currentParticle.getCenterOfMassX() - 5;
+		centerCircle.top = ParticleMeasurer.getCenterOfMassY(currentParticle) - 5;
+		centerCircle.left = ParticleMeasurer.getCenterOfMassX(currentParticle) - 5;
 		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
 		
-		horizontalStart.y = currentParticle.getCenterOfMassY();
-		horizontalEnd.y = currentParticle.getCenterOfMassY();
+		horizontalStart.y = ParticleMeasurer.getCenterOfMassY(currentParticle);
+		horizontalEnd.y = ParticleMeasurer.getCenterOfMassY(currentParticle);
 		
-		verticalStart.x = currentParticle.getCenterOfMassX();
-		verticalEnd.x = currentParticle.getCenterOfMassX();
+		verticalStart.x = ParticleMeasurer.getCenterOfMassX(currentParticle);
+		verticalEnd.x = ParticleMeasurer.getCenterOfMassX(currentParticle);
 		
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
@@ -225,19 +222,21 @@ public class VisionMethods
 		imageProcessingSettingsActive = !imageProcessingSettingsActive;
 	}
 	
-	public void updateParticleInfo()
-	{
-		numOfParticles = NIVision.imaqCountParticles(binaryImg, 1);
-		for (int particleNumber = 0; particleNumber < numOfParticles; particleNumber++)
-		{
-			particles[particleNumber].calculateAreaScore();
-			particles[particleNumber].calculateAspectRatioScore();
-		}
-	}
-	
 	public void determineParticleToTrack()
 	{
 		// This is where scores should be compared and stuff.
-		currentParticle = particles[0];
+		for (int particleNumber = 0; particleNumber < getNumOfParticles(); particleNumber++)
+		{
+			if (ParticleMeasurer.getArea(particleNumber) > ParticleMeasurer.getArea(currentParticle))
+			{
+				currentParticle = particleNumber;
+				ParticleMeasurer.setCurrentParticle(particleNumber);
+			}
+		}
+	}
+	
+	public int getNumOfParticles()
+	{
+		return NIVision.imaqCountParticles(binaryImg, 1);
 	}
 }
