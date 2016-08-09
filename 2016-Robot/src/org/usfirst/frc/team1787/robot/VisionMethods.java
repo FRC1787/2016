@@ -3,7 +3,6 @@ package org.usfirst.frc.team1787.robot;
 import com.ni.vision.NIVision;
 import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
-import com.ni.vision.NIVision.MeasurementType;
 import com.ni.vision.NIVision.Point;
 import com.ni.vision.NIVision.Range;
 import com.ni.vision.NIVision.Rect;
@@ -83,8 +82,6 @@ public class VisionMethods
 	/** The Range object which stores the acceptable range of values (as in the "v" in HSV) for vision processing. (value is on a scale from 0 - 255). */
 	private final Range VALUE = new Range(30, 175);
 
-	/** The rectangle that completely surrounds a particle in a binary image. */
-	Rect boundingRectangle = new Rect();
 	Rect centerCircle = new Rect(0, 0, 11, 11);
 	
 	private final int IMAGE_WIDTH_IN_PIXELS = 320;
@@ -95,6 +92,11 @@ public class VisionMethods
 	Point verticalStart = new Point(160, 0);
 	Point verticalEnd = new Point(160, 240);
 	Point centerOfImage = new Point(160, 120);
+	
+	VisionParticle[] particles = new VisionParticle[3];
+	VisionParticle currentParticle;
+	
+	int numOfParticles;
 	
 	public VisionMethods (String camFrontName, String camSideName)
 	{
@@ -115,6 +117,10 @@ public class VisionMethods
 		
 		img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 		binaryImg = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_U8, 0);
+		
+		particles[0] = new VisionParticle(0);
+		particles[1] = new VisionParticle(1);
+		particles[2] = new VisionParticle(2);
 		
 		imageProcessingActive = false;
 	}
@@ -161,49 +167,24 @@ public class VisionMethods
 	
 	public void updateAndDrawBoundingRectangle()
 	{
-		if (aParticleIsPresent())
-		{
-			boundingRectangle.top = (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_BOUNDING_RECT_TOP);
-			boundingRectangle.left = (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_BOUNDING_RECT_LEFT);
-			boundingRectangle.width = (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
-			boundingRectangle.height = (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_BOUNDING_RECT_HEIGHT);
-			NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, boundingRectangle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
-		}
-	}
-	
-	public int getCenterOfMassX()
-	{
-		if (aParticleIsPresent())
-			return (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_CENTER_OF_MASS_X);
-		else
-			return -1;
-	}
-	
-	public int getCenterOfMassY()
-	{
-		if (aParticleIsPresent())
-			return (int) NIVision.imaqMeasureParticle(binaryImg, 0, 0, MeasurementType.MT_CENTER_OF_MASS_Y);
-		else
-			return -1;
+		currentParticle.updateBoundingBox(binaryImg);
+		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, currentParticle.getBoundingBox(), DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
 	}
 	
 	public void updateAndDrawReticle()
 	{
-		if (aParticleIsPresent())
-		{
-			centerCircle.top = getCenterOfMassY() - 5;
-			centerCircle.left = getCenterOfMassX() - 5;
-			NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
-			
-			horizontalStart.y = getCenterOfMassY();
-			horizontalEnd.y = getCenterOfMassY();
-			
-			verticalStart.x = getCenterOfMassX();
-			verticalEnd.x = getCenterOfMassX();
-			
-			NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
-			NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
-		}
+		centerCircle.top = currentParticle.getCenterOfMassY() - 5;
+		centerCircle.left = currentParticle.getCenterOfMassX() - 5;
+		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
+		
+		horizontalStart.y = currentParticle.getCenterOfMassY();
+		horizontalEnd.y = currentParticle.getCenterOfMassY();
+		
+		verticalStart.x = currentParticle.getCenterOfMassX();
+		verticalEnd.x = currentParticle.getCenterOfMassX();
+		
+		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
+		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
 	}
 	
 	public void sendProcessedImageToDashboard()
@@ -244,8 +225,19 @@ public class VisionMethods
 		imageProcessingSettingsActive = !imageProcessingSettingsActive;
 	}
 	
-	public boolean aParticleIsPresent()
+	public void updateParticleInfo()
 	{
-		return (NIVision.imaqCountParticles(binaryImg, 1) > 0);
+		numOfParticles = NIVision.imaqCountParticles(binaryImg, 1);
+		for (int particleNumber = 0; particleNumber < numOfParticles; particleNumber++)
+		{
+			particles[particleNumber].calculateAreaScore();
+			particles[particleNumber].calculateAspectRatioScore();
+		}
+	}
+	
+	public void determineParticleToTrack()
+	{
+		// This is where scores should be compared and stuff.
+		currentParticle = particles[0];
 	}
 }

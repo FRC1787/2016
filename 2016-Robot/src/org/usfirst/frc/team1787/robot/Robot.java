@@ -388,16 +388,16 @@ public class Robot extends IterativeRobot
     		camController.performHSVFilter();
     		camController.updateAndDrawBoundingRectangle();
     		camController.updateAndDrawReticle();
-    		if (camController.getCenterOfMassX() != -1 && camController.getCenterOfMassY() != -1)
+    		if (camController.currentParticle.getCenterOfMassX() != -1 && camController.currentParticle.getCenterOfMassY() != -1)
     		{
-				if (camController.getCenterOfMassX() < camController.centerOfImage.x - 5) // if the goal is to the left, turn left.
+				if (camController.currentParticle.getCenterOfMassX() < camController.centerOfImage.x - 5) // if the goal is to the left, turn left.
 					testCounterX--;
-				else if (camController.getCenterOfMassX() > camController.centerOfImage.x + 5) // if the goal is to the right, turn right.
+				else if (camController.currentParticle.getCenterOfMassX() > camController.centerOfImage.x + 5) // if the goal is to the right, turn right.
 					testCounterX++;
 				
-				if (camController.getCenterOfMassY() < camController.centerOfImage.y - 5) // if the goal is too high, look up.
+				if (camController.currentParticle.getCenterOfMassY() < camController.centerOfImage.y - 5) // if the goal is too high, look up.
 					testCounterY--;
-				else if (camController.getCenterOfMassY() > camController.centerOfImage.y + 5) // if teh goal is too low, look down.
+				else if (camController.currentParticle.getCenterOfMassY() > camController.centerOfImage.y + 5) // if teh goal is too low, look down.
 					testCounterY++;
     		}
     		
