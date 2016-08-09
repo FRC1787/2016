@@ -153,11 +153,12 @@ public class Robot extends IterativeRobot
     
     /** The object which has methods to control the various camera functions / processes. */
     private VisionMethods visionMaster;
-    
     /** The name of the front camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_FRONT_NAME = "cam1";
     /** The name of the other camera as it is set in the roborio web interface ("roboRIO-1787-FRC.local"). */
     private static final String CAMERA_SIDE_NAME = "cam2";
+    /** A boolean indicating if methods involving vision processing should be/are being called. */
+	private boolean imageProcessingActive = false;
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -376,14 +377,14 @@ public class Robot extends IterativeRobot
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
-    		visionMaster.toggleImageProcessing();
+    		imageProcessingActive = !imageProcessingActive;
     	if (stickB.getRawButton(10))
     	{
     		visionMaster.toggleCamSettings();
     		testTimer.delay(2); // Gives the camera time to update settings.
     	}
     	
-    	if (visionMaster.imageProcessingIsActive())
+    	if (imageProcessingActive)
     	{
     		visionMaster.performHSVFilter();
     		visionMaster.determineParticleToTrack();
@@ -398,7 +399,7 @@ public class Robot extends IterativeRobot
 				
 				if (ParticleMeasurer.getCenterOfMassY() < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
 					testCounterY--;
-				else if (ParticleMeasurer.getCenterOfMassY() > visionMaster.centerOfImage.y + 5) // if teh goal is too low, look down.
+				else if (ParticleMeasurer.getCenterOfMassY() > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
 					testCounterY++;
     		}
     		
@@ -407,7 +408,7 @@ public class Robot extends IterativeRobot
     		
     		visionMaster.sendProcessedImageToDashboard();
     	}
-    	else if (!visionMaster.imageProcessingIsActive())
+    	else if (!imageProcessingActive)
     		visionMaster.sendRegularImageToDashboard();
     	
     }

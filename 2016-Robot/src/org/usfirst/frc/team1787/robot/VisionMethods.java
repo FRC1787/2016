@@ -3,6 +3,7 @@ package org.usfirst.frc.team1787.robot;
 import com.ni.vision.NIVision;
 import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.MeasurementType;
 import com.ni.vision.NIVision.Point;
 import com.ni.vision.NIVision.Range;
 import com.ni.vision.NIVision.Rect;
@@ -70,8 +71,6 @@ public class VisionMethods
 	private Image binaryImg;
 	/** A boolean indicating if the front camera is currently active. */
 	private boolean frontCamActive;
-	/** A boolean indicating if methods involving vision processing are being called. */
-	private boolean imageProcessingActive;
 	/** A boolean indicating if the side-cam's exposure, white balance, and brightness are currently optimal for vision processing. */
 	private boolean imageProcessingSettingsActive;
 	
@@ -82,44 +81,50 @@ public class VisionMethods
 	/** The Range object which stores the acceptable range of values (as in the "v" in HSV) for vision processing. (value is on a scale from 0 - 255). */
 	private final Range VALUE = new Range(30, 175);
 
-	Rect centerCircle = new Rect(0, 0, 11, 11);
+	private Rect boundingBox = new Rect();
+	private Rect centerCircle = new Rect(0, 0, 11, 11);
 	
 	private final int IMAGE_WIDTH_IN_PIXELS = 320;
 	private final int IMAGE_HEIGHT_IN_PIXELS = 240;
 	
-	Point horizontalStart = new Point(0, 120);
-	Point horizontalEnd = new Point(320, 120);
-	Point verticalStart = new Point(160, 0);
-	Point verticalEnd = new Point(160, 240);
-	Point centerOfImage = new Point(160, 120);
+	private Point horizontalStart = new Point(0, 120);
+	private Point horizontalEnd = new Point(320, 120);
+	private Point verticalStart = new Point(160, 0);
+	private Point verticalEnd = new Point(160, 240);
+	private Point centerOfImage = new Point(160, 120);
+
+	/** The particleID for the particle that has been confirmed to be a goal and is currently being tracked. */
+	private int currentParticle = 0;
+	/** The particleID for the largest particle currently in view. This particle hasn't necessarily been confirmed to be a goal. */
+	private int largestParticle = 0;
 	
-	ParticleMeasurer particleMeasure;
-	
-	int numOfParticles;
-	int currentParticle = 0;
+	private final double DESIRED_AREA_AS_PERCENTAGE_OF_BOUNDING_BOX_AREA = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
+	private final double DESIRED_ASPECT_RATIO = 1.6; // Taken from screensteps live, but not actually tested yet. Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height
 	
 	public VisionMethods (String camFrontName, String camSideName)
 	{
+		// set up CameraServer
 		camServer = CameraServer.getInstance();
 		camServer.setQuality(50);
 		
+		// construct the Image objects
+		img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+		binaryImg = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_U8, 0);
+		
+		// construct cameras
 		camFront = new USBCamera(camFrontName);
 		camSide = new USBCamera(camSideName);
 		
+		// Set the exposure, white balance, and brightness of the side camera to be optimal for vision processing.
 		camSide.setExposureManual(0);
 		camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
 		camSide.setBrightness(100);
 		camSide.updateSettings();
 		imageProcessingSettingsActive = true;
 		
+		// Start capturing video from the front cam.
 		camFront.startCapture();
 		frontCamActive = true;
-		
-		img = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-		binaryImg = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_U8, 0);
-		particleMeasure = new ParticleMeasurer(binaryImg);
-		
-		imageProcessingActive = false;
 	}
 	
 	public Image getImageFromActiveCam()
@@ -147,14 +152,37 @@ public class VisionMethods
 		frontCamActive = !frontCamActive;
 	}
 	
+	public void toggleCamSettings()
+	{
+		if (imageProcessingSettingsActive)
+		{
+			camSide.setExposureAuto();
+			camSide.setWhiteBalanceAuto();
+			camSide.setBrightness(50);
+		}
+		else if (!imageProcessingSettingsActive)
+		{
+			camSide.setExposureManual(0);
+			camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
+			camSide.setBrightness(100);
+		}
+		camSide.updateSettings();
+		imageProcessingSettingsActive = !imageProcessingSettingsActive;
+	}
+	
 	public void sendRegularImageToDashboard()
 	{
 		camServer.setImage(getImageFromActiveCam());
 	}
 	
-	public void toggleImageProcessing()
+	public void sendProcessedImageToDashboard()
 	{
-		imageProcessingActive = !imageProcessingActive;
+		camServer.setImage(binaryImg);
+	}
+	
+	public int getNumOfParticles()
+	{
+		return NIVision.imaqCountParticles(binaryImg, 1);
 	}
 	
 	public void performHSVFilter()
@@ -184,44 +212,6 @@ public class VisionMethods
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
 	}
 	
-	public void sendProcessedImageToDashboard()
-	{
-		camServer.setImage(binaryImg);
-	}
-	
-	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)
-	{
-		HUE.minValue = hMin;
-		HUE.maxValue = hMax;
-		SATURATION.minValue = sMin;
-		SATURATION.maxValue = sMax;
-		VALUE.minValue = vMin;
-		VALUE.maxValue = vMax;
-	}
-	
-	public boolean imageProcessingIsActive()
-	{
-		return imageProcessingActive;
-	}
-	
-	public void toggleCamSettings()
-	{
-		if (imageProcessingSettingsActive)
-		{
-			camSide.setExposureAuto();
-			camSide.setWhiteBalanceAuto();
-			camSide.setBrightness(50);
-		}
-		else if (!imageProcessingSettingsActive)
-		{
-			camSide.setExposureManual(0);
-			camSide.setWhiteBalanceManual(USBCamera.WhiteBalance.kFixedIndoor);
-			camSide.setBrightness(100);
-		}
-		camSide.updateSettings();
-		imageProcessingSettingsActive = !imageProcessingSettingsActive;
-	}
-	
 	public void determineParticleToTrack()
 	{
 		// This is where scores should be compared and stuff.
@@ -235,8 +225,37 @@ public class VisionMethods
 		}
 	}
 	
-	public int getNumOfParticles()
+	public int getArea(int particleID)
 	{
-		return NIVision.imaqCountParticles(binaryImg, 1);
+		if (particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_PARTICLE_AND_HOLES_AREA);
+		else
+			return -1;
+	}
+	
+	public int getCenterOfMassX(int particleID)
+	{
+		if (particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_CENTER_OF_MASS_X);
+		else
+			return -1;
+	}
+	
+	public int getCenterOfMassY(int particleID)
+	{
+		if (particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_CENTER_OF_MASS_Y);
+		else
+			return -1;
+	}
+	
+	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)
+	{
+		HUE.minValue = hMin;
+		HUE.maxValue = hMax;
+		SATURATION.minValue = sMin;
+		SATURATION.maxValue = sMax;
+		VALUE.minValue = vMin;
+		VALUE.maxValue = vMax;
 	}
 }
