@@ -206,20 +206,22 @@ public class VisionMethods
 	
 	public void updateAndDrawReticle()
 	{
-		// centerCircle
+		// calculate centerCircle
 		centerCircle.top = getCenterOfMassY(currentParticle) - 5;
 		centerCircle.left = getCenterOfMassX(currentParticle) - 5;
-		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
 		
-		// horizontal line
-		horizontalStart.y = getCenterOfMassY(currentParticle);
-		horizontalEnd.y = getCenterOfMassY(currentParticle);
-		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
-		
-		// vertical line
+		// calculate vertical line
 		verticalStart.x = getCenterOfMassX(currentParticle);
 		verticalEnd.x = getCenterOfMassX(currentParticle);
+		
+		// calculate horizontal line
+		horizontalStart.y = getCenterOfMassY(currentParticle);
+		horizontalEnd.y = getCenterOfMassY(currentParticle);
+
+		// draw circle and lines
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
+		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
+		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
 	}
 	
 	public void determineParticleToTrack()
