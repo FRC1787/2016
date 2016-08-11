@@ -4,6 +4,8 @@ import com.ni.vision.NIVision;
 import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
 import com.ni.vision.NIVision.MeasurementType;
+import com.ni.vision.NIVision.ParticleFilterCriteria2;
+import com.ni.vision.NIVision.ParticleFilterOptions2;
 import com.ni.vision.NIVision.Point;
 import com.ni.vision.NIVision.RGBValue;
 import com.ni.vision.NIVision.Range;
@@ -92,6 +94,7 @@ public class VisionMethods
 	
 	private final int IMAGE_WIDTH_IN_PIXELS = 320;
 	private final int IMAGE_HEIGHT_IN_PIXELS = 240;
+	private final int MINIMUM_AREA_TO_GET_PAST_FILTER = 50;
 	
 	private Point horizontalStart = new Point(0, 120);
 	private Point horizontalEnd = new Point(320, 120);
@@ -107,10 +110,14 @@ public class VisionMethods
 	private final double DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
 	private final double DESIRED_ASPECT_RATIO = 1.6; // Taken from screensteps live, but not actually tested yet. Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height
 	
-	private RGBValue white = new RGBValue(100, 100, 100, 5);
+	ParticleFilterCriteria2[] particleFilterCriteria = new ParticleFilterCriteria2[1]; // We only filter based on one criteria: area.
+	ParticleFilterOptions2 particleFilterOptions = new ParticleFilterOptions2(0,0,1,1); // Don't reject matches, don't reject the border, fill holes, and use connectivity8.
 	
 	public VisionMethods(String camFrontName, String camSideName)
 	{
+		// set particle filter criteria
+		particleFilterCriteria[0] = new ParticleFilterCriteria2(MeasurementType.MT_AREA, MINIMUM_AREA_TO_GET_PAST_FILTER, 76800, 0, 0);
+		
 		// set up CameraServer
 		camServer = CameraServer.getInstance();
 		camServer.setQuality(50);
@@ -196,6 +203,11 @@ public class VisionMethods
 	public void performHSVFilter()
 	{
 		NIVision.imaqColorThreshold(binaryImg, getImageFromActiveCam(), 255, NIVision.ColorMode.HSV, HUE, SATURATION, VALUE);
+	}
+	
+	public void removeSmallParticles()
+	{
+		NIVision.imaqParticleFilter4(binaryImg, binaryImg, particleFilterCriteria, particleFilterOptions, null);
 	}
 	
 	public void updateCurrentParticleBoundingBox()

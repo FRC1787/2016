@@ -390,6 +390,7 @@ public class Robot extends IterativeRobot
     	if (imageProcessingActive)
     	{
     		visionMaster.performHSVFilter();
+    		visionMaster.removeSmallParticles();
     		visionMaster.findLargestParticle();
     		
     		if (visionMaster.getCurrentParticle() != -1)
