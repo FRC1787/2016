@@ -50,6 +50,11 @@ import edu.wpi.first.wpilibj.vision.USBCamera;
  * 
  * Other areas to look into:
  * 1) Overlays
+ * 		Looked into Overlays, and it appears either I couldn't figure out how to use them or they just don't work.
+ * 		One thing to note about the difference between overlays and drawings though. When using the NIVision draw method,
+ * 		the shape gets drawn directly onto the image and becomes a part of the image as a result. An overlay is put onto an image,
+ * 		but isn't a part of the image itself. Knowing this, I will put any drawing functions after everything I need to process
+ * 		in an image has been processed, so the drawings don't interfere with the processing.
  * 
  * Note on connectivity8:
  * There are a couple of methods that have an int connectivity8 as a parameter. I figured out what that's for today.
@@ -175,11 +180,7 @@ public class VisionMethods
 	
 	public void sendRegularImageToDashboard()
 	{
-		img = getImageFromActiveCam();
-		NIVision.imaqOverlayLine(img, verticalStart, verticalEnd, white, null);
-		NIVision.imaqOverlayRect(img, centerCircle, white, DrawMode.DRAW_VALUE);
-		//camServer.setImage(getImageFromActiveCam());
-		camServer.setImage(img);
+		camServer.setImage(getImageFromActiveCam());
 	}
 	
 	public void sendProcessedImageToDashboard()
@@ -226,8 +227,7 @@ public class VisionMethods
 		horizontalEnd.y = getCenterOfMassY(currentParticle);
 
 		// draw circle and lines
-		//NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
-		NIVision.imaqOverlayLine(binaryImg, verticalStart, verticalEnd, white, null);
+		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
 		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
 	}

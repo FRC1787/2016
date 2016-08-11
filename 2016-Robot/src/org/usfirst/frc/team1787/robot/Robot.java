@@ -395,8 +395,6 @@ public class Robot extends IterativeRobot
     		if (visionMaster.getCurrentParticle() != -1)
     		{
     			//visionMaster.determineIfLargestParticleIsGoal();
-    			//visionMaster.updateAndDrawBoundingBoxForCurrentParticle();
-        		visionMaster.updateAndDrawReticleOnCurrentParticle();
         		
 				if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
 					testCounterX--;
@@ -410,8 +408,10 @@ public class Robot extends IterativeRobot
 				
 				bottomServo.setAngle(testCounterX);
 	    		sideServo.setAngle(testCounterY);
+	    		
+	    		visionMaster.updateAndDrawBoundingBoxForCurrentParticle();
+	    		visionMaster.updateAndDrawReticleOnCurrentParticle();
     		}
-    		
     		visionMaster.sendProcessedImageToDashboard();
     	}
     	else if (!imageProcessingActive)
