@@ -5,6 +5,7 @@ import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
 import com.ni.vision.NIVision.MeasurementType;
 import com.ni.vision.NIVision.Point;
+import com.ni.vision.NIVision.RGBValue;
 import com.ni.vision.NIVision.Range;
 import com.ni.vision.NIVision.Rect;
 import com.ni.vision.NIVision.ShapeMode;
@@ -98,10 +99,12 @@ public class VisionMethods
 	/** The particleID for the largest particle currently in view. This particle hasn't necessarily been confirmed to be a goal. */
 	private int largestParticle = -1;
 	
-	private final double DESIRED_AREA_AS_PERCENTAGE_OF_BOUNDING_BOX_AREA = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
+	private final double DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
 	private final double DESIRED_ASPECT_RATIO = 1.6; // Taken from screensteps live, but not actually tested yet. Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height
 	
-	public VisionMethods (String camFrontName, String camSideName)
+	private RGBValue white = new RGBValue(100, 100, 100, 5);
+	
+	public VisionMethods(String camFrontName, String camSideName)
 	{
 		// set up CameraServer
 		camServer = CameraServer.getInstance();
@@ -172,7 +175,11 @@ public class VisionMethods
 	
 	public void sendRegularImageToDashboard()
 	{
-		camServer.setImage(getImageFromActiveCam());
+		img = getImageFromActiveCam();
+		NIVision.imaqOverlayLine(img, verticalStart, verticalEnd, white, null);
+		NIVision.imaqOverlayRect(img, centerCircle, white, DrawMode.DRAW_VALUE);
+		//camServer.setImage(getImageFromActiveCam());
+		camServer.setImage(img);
 	}
 	
 	public void sendProcessedImageToDashboard()
@@ -190,7 +197,7 @@ public class VisionMethods
 		NIVision.imaqColorThreshold(binaryImg, getImageFromActiveCam(), 255, NIVision.ColorMode.HSV, HUE, SATURATION, VALUE);
 	}
 	
-	public void updateBoundingRectangle()
+	public void updateCurrentParticleBoundingBox()
 	{
 		boundingBox.top = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_TOP);
 		boundingBox.left = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_LEFT);
@@ -198,13 +205,13 @@ public class VisionMethods
 		boundingBox.width = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
 	}
 	
-	public void updateAndDrawBoundingRectangle()
+	public void updateAndDrawBoundingBoxForCurrentParticle()
 	{
-		updateBoundingRectangle();
+		updateCurrentParticleBoundingBox();
 		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, boundingBox, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
 	}
 	
-	public void updateAndDrawReticle()
+	public void updateAndDrawReticleOnCurrentParticle()
 	{
 		// calculate centerCircle
 		centerCircle.top = getCenterOfMassY(currentParticle) - 5;
@@ -219,27 +226,41 @@ public class VisionMethods
 		horizontalEnd.y = getCenterOfMassY(currentParticle);
 
 		// draw circle and lines
-		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
+		//NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, verticalStart, verticalEnd, 500.0f);
+		NIVision.imaqOverlayLine(binaryImg, verticalStart, verticalEnd, white, null);
 		NIVision.imaqDrawLineOnImage(binaryImg, binaryImg, DrawMode.DRAW_VALUE, horizontalStart, horizontalEnd, 500.0f);
 		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, centerCircle, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 500.0f);
 	}
 	
-	public void determineParticleToTrack()
+	public void findLargestParticle()
 	{
 		if (getNumOfParticles() == 0)
 		{
-			currentParticle = -1;
 			largestParticle = -1;
+			currentParticle = -1;
 		}
 		for (int particleNumber = 0; particleNumber < getNumOfParticles(); particleNumber++)
 		{
 			if (getArea(particleNumber) > getArea(currentParticle))
-			{
 				largestParticle = particleNumber;
-			}
 		}
-		// This is where largestParticle should be tested to see if it's a goal.
 		currentParticle = largestParticle;
+	}
+	
+	public boolean determineIfLargestParticleIsGoal()
+	{
+		System.out.println("Largest Particle: "+largestParticle);
+		double boundingBoxArea = getBoundingBoxWidth(largestParticle) * getBoundingBoxHeight(largestParticle);
+		System.out.println("Bounding Box Area: "+boundingBoxArea);
+		double areaToBoundingBoxAreaRatio = (getArea(largestParticle) / boundingBoxArea);
+		System.out.println("Particle Area Over Bounding Box Area: "+areaToBoundingBoxAreaRatio);
+		double areaScore = (areaToBoundingBoxAreaRatio / DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO);
+		System.out.println("Area Score: "+areaScore);
+		
+		if (0.75 <= areaScore && areaScore <= 1.36)
+			currentParticle = largestParticle;
+		
+		return (0.75 <= areaScore && areaScore <= 1.36);
 	}
 	
 	public int getArea(int particleID)
@@ -262,6 +283,22 @@ public class VisionMethods
 	{
 		if (0 <= particleID && particleID < getNumOfParticles())
 			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_CENTER_OF_MASS_Y);
+		else
+			return -1;
+	}
+	
+	public int getBoundingBoxHeight(int particleID)
+	{
+		if (0 <= particleID && particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_BOUNDING_RECT_HEIGHT);
+		else
+			return -1;
+	}
+	
+	public int getBoundingBoxWidth(int particleID)
+	{
+		if (0 <= particleID && particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
 		else
 			return -1;
 	}

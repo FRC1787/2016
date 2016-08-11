@@ -390,12 +390,13 @@ public class Robot extends IterativeRobot
     	if (imageProcessingActive)
     	{
     		visionMaster.performHSVFilter();
-    		visionMaster.determineParticleToTrack();
+    		visionMaster.findLargestParticle();
     		
-    		if (visionMaster.getCurrentParticle() != -1) // A value of -1 indicates no particle found
+    		if (visionMaster.getCurrentParticle() != -1)
     		{
-    			visionMaster.updateAndDrawBoundingRectangle();
-        		visionMaster.updateAndDrawReticle();
+    			//visionMaster.determineIfLargestParticleIsGoal();
+    			//visionMaster.updateAndDrawBoundingBoxForCurrentParticle();
+        		visionMaster.updateAndDrawReticleOnCurrentParticle();
         		
 				if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
 					testCounterX--;
