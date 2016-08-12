@@ -390,7 +390,9 @@ public class Robot extends IterativeRobot
     	if (imageProcessingActive)
     	{
     		visionMaster.performHSVFilter();
+    		System.out.println("Before: "+visionMaster.getNumOfParticles());
     		visionMaster.removeSmallParticles();
+    		System.out.println("After: "+visionMaster.getNumOfParticles());
     		visionMaster.findLargestParticle();
     		
     		if (visionMaster.getCurrentParticle() != -1)
@@ -416,8 +418,7 @@ public class Robot extends IterativeRobot
     		visionMaster.sendProcessedImageToDashboard();
     	}
     	else if (!imageProcessingActive)
-    		visionMaster.sendRegularImageToDashboard();
-    	
+    		visionMaster.sendRegularImageToDashboard();	
     }
     
     /**
