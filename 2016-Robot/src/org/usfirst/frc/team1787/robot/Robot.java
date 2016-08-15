@@ -390,30 +390,28 @@ public class Robot extends IterativeRobot
     	if (imageProcessingActive)
     	{
     		visionMaster.performHSVFilter();
-    		System.out.println("Before: "+visionMaster.getNumOfParticles());
     		visionMaster.removeSmallParticles();
-    		System.out.println("After: "+visionMaster.getNumOfParticles());
-    		visionMaster.findLargestParticle();
-    		
-    		if (visionMaster.getCurrentParticle() != -1)
+    		if (visionMaster.getNumOfParticles() > 0) // if there is at least 1 particle, look for the biggest one.
     		{
-    			//visionMaster.determineIfLargestParticleIsGoal();
-        		
-				if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
-					testCounterX--;
-				else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
-					testCounterX++;
-				
-				if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
-					testCounterY--;
-				else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
-					testCounterY++;
-				
-				bottomServo.setAngle(testCounterX);
-	    		sideServo.setAngle(testCounterY);
-	    		
-	    		visionMaster.updateAndDrawBoundingBoxForCurrentParticle();
-	    		visionMaster.updateAndDrawReticleOnCurrentParticle();
+    			visionMaster.findLargestParticle();
+				if (visionMaster.performAreaTest()) // if the biggest particle is a goal, track it.
+				{
+					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
+						testCounterX--;
+					else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
+						testCounterX++;
+					
+					if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
+						testCounterY--;
+					else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
+						testCounterY++;
+					
+					bottomServo.setAngle(testCounterX);
+		    		sideServo.setAngle(testCounterY);
+		    		
+		    		visionMaster.updateAndDrawCurrentParticleBoundingBox();
+		    		visionMaster.updateAndDrawReticleOnCurrentParticle();
+				}
     		}
     		visionMaster.sendProcessedImageToDashboard();
     	}

@@ -94,7 +94,6 @@ public class VisionMethods
 	
 	private final int IMAGE_WIDTH_IN_PIXELS = 320;
 	private final int IMAGE_HEIGHT_IN_PIXELS = 240;
-	private final int MINIMUM_AREA_TO_GET_PAST_FILTER = 25;
 	
 	private Point horizontalStart = new Point(0, 120);
 	private Point horizontalEnd = new Point(320, 120);
@@ -108,6 +107,9 @@ public class VisionMethods
 	private int largestParticle = -1;
 	
 	private final double DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
+	private final double MIN_AREA_SCORE = 0.65;
+	private final double MAX_AREA_SCORE = 1.35;
+	
 	private final double DESIRED_ASPECT_RATIO = 1.6; // Taken from screensteps live, but not actually tested yet. Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height
 	
 	ParticleFilterCriteria2[] filterCriteria = new ParticleFilterCriteria2[1]; // We only filter based on one criteria: area.
@@ -218,7 +220,7 @@ public class VisionMethods
 		boundingBox.width = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
 	}
 	
-	public void updateAndDrawBoundingBoxForCurrentParticle()
+	public void updateAndDrawCurrentParticleBoundingBox()
 	{
 		updateCurrentParticleBoundingBox();
 		NIVision.imaqDrawShapeOnImage(binaryImg, binaryImg, boundingBox, DrawMode.DRAW_VALUE, ShapeMode.SHAPE_RECT, 500.0f);
@@ -251,28 +253,45 @@ public class VisionMethods
 			largestParticle = -1;
 			currentParticle = -1;
 		}
+		else
+			largestParticle = 0;
+		
 		for (int particleNumber = 0; particleNumber < getNumOfParticles(); particleNumber++)
 		{
-			if (getArea(particleNumber) > getArea(currentParticle))
+			if (getArea(particleNumber) > getArea(largestParticle))
 				largestParticle = particleNumber;
 		}
 		currentParticle = largestParticle;
 	}
 	
-	public boolean determineIfLargestParticleIsGoal()
+	public boolean performAreaTest()
 	{
-		System.out.println("Largest Particle: "+largestParticle);
+		//System.out.println("Largest Particle: "+largestParticle);
 		double boundingBoxArea = getBoundingBoxWidth(largestParticle) * getBoundingBoxHeight(largestParticle);
-		System.out.println("Bounding Box Area: "+boundingBoxArea);
+		//System.out.println("Bounding Box Area: "+boundingBoxArea);
 		double areaToBoundingBoxAreaRatio = (getArea(largestParticle) / boundingBoxArea);
-		System.out.println("Particle Area Over Bounding Box Area: "+areaToBoundingBoxAreaRatio);
+		//System.out.println("Particle Area Over Bounding Box Area: "+areaToBoundingBoxAreaRatio);
 		double areaScore = (areaToBoundingBoxAreaRatio / DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO);
 		System.out.println("Area Score: "+areaScore);
 		
-		if (0.75 <= areaScore && areaScore <= 1.36)
+		if (MIN_AREA_SCORE <= areaScore && areaScore <= MAX_AREA_SCORE)
+		{
+			System.out.println("Particle #"+largestParticle+" passes.");
 			currentParticle = largestParticle;
+			return true;
+		}
+		else
+		{
+			System.out.println("Particle #"+largestParticle+" fails.");
+			return false;
+		}
 		
-		return (0.75 <= areaScore && areaScore <= 1.36);
+		//return (MIN_AREA_SCORE <= areaScore && areaScore <= MAX_AREA_SCORE);
+	}
+	
+	public boolean performAspectRatioTest()
+	{
+		return true;
 	}
 	
 	public int getArea(int particleID)
@@ -318,6 +337,11 @@ public class VisionMethods
 	public int getCurrentParticle()
 	{
 		return currentParticle;
+	}
+	
+	public int getLargestParticle()
+	{
+		return largestParticle;
 	}
 	
 	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)
