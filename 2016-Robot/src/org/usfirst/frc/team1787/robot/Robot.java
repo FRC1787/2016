@@ -394,7 +394,7 @@ public class Robot extends IterativeRobot
     		if (visionMaster.getNumOfParticles() > 0) // if there is at least 1 particle, look for the biggest one.
     		{
     			visionMaster.findLargestParticle();
-				if (visionMaster.performAreaTest()) // if the biggest particle is a goal, track it.
+				if (visionMaster.performAspectRatioTest()) // if the biggest particle is a goal, track it.
 				{
 					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
 						testCounterX--;

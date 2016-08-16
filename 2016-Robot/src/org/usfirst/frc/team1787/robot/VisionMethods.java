@@ -7,7 +7,6 @@ import com.ni.vision.NIVision.MeasurementType;
 import com.ni.vision.NIVision.ParticleFilterCriteria2;
 import com.ni.vision.NIVision.ParticleFilterOptions2;
 import com.ni.vision.NIVision.Point;
-import com.ni.vision.NIVision.RGBValue;
 import com.ni.vision.NIVision.Range;
 import com.ni.vision.NIVision.Rect;
 import com.ni.vision.NIVision.ShapeMode;
@@ -106,11 +105,18 @@ public class VisionMethods
 	/** The particleID for the largest particle currently in view. This particle hasn't necessarily been confirmed to be a goal. */
 	private int largestParticle = -1;
 	
-	private final double DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO = 0.33; // Taken from screensteps live. Not tested, but their reasoning is sound.
-	private final double MIN_AREA_SCORE = 0.65;
-	private final double MAX_AREA_SCORE = 1.35;
+	private final double DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO = 0.33; // (Area of target (80 in^2) / Area of "bounding box" (240 in^2)) = 1/3
+	private final double MIN_AREA_SCORE = 0.65; // determined through testing
+	private final double MAX_AREA_SCORE = 1.35; // determined through testing
 	
-	private final double DESIRED_ASPECT_RATIO = 1.6; // Taken from screensteps live, but not actually tested yet. Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height
+	private final double DESIRED_ASPECT_RATIO = 20; 
+	/* Aspect ratio is determined using the equvalent rectangle, and is calculated as width/height. 
+	The zeroes of this parabola --> 2x^2 + 2(particleArea) - (particlePerimeter)x <-- are are the side lengths of the equivalent rectangle.
+	We'll call the long side the width, and the short side the height.
+	Performing the calculation using the target's area (80 in^2) and the target's perimeter (84 in^2), yield a equivalent rectangle with width 40in and height 2in.
+ 	The desired aspect ratio is therefore 40/2 = 20. */
+	private final double MIN_ASPECT_RATIO_SCORE = 0.75; // determined through testing
+	private final double MAX_ASPECT_RATIO_SCORE = 1.25; // determined through testing
 	
 	ParticleFilterCriteria2[] filterCriteria = new ParticleFilterCriteria2[1]; // We only filter based on one criteria: area.
 	ParticleFilterOptions2 filterOptions = new ParticleFilterOptions2(0,0,1,1); // Don't reject matches, don't reject the border, fill holes, and use connectivity8.
@@ -214,10 +220,10 @@ public class VisionMethods
 	
 	public void updateCurrentParticleBoundingBox()
 	{
-		boundingBox.top = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_TOP);
-		boundingBox.left = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_LEFT);
-		boundingBox.height = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_HEIGHT);
-		boundingBox.width = (int) NIVision.imaqMeasureParticle(binaryImg, currentParticle, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
+		boundingBox.top = getBoundingBoxTop(currentParticle);
+		boundingBox.left = getBoundingBoxLeft(currentParticle);
+		boundingBox.height = getBoundingBoxHeight(currentParticle);
+		boundingBox.width = getBoundingBoxWidth(currentParticle);
 	}
 	
 	public void updateAndDrawCurrentParticleBoundingBox()
@@ -266,32 +272,40 @@ public class VisionMethods
 	
 	public boolean performAreaTest()
 	{
-		//System.out.println("Largest Particle: "+largestParticle);
-		double boundingBoxArea = getBoundingBoxWidth(largestParticle) * getBoundingBoxHeight(largestParticle);
-		//System.out.println("Bounding Box Area: "+boundingBoxArea);
-		double areaToBoundingBoxAreaRatio = (getArea(largestParticle) / boundingBoxArea);
-		//System.out.println("Particle Area Over Bounding Box Area: "+areaToBoundingBoxAreaRatio);
+		double areaToBoundingBoxAreaRatio = getRatioOfAreaToBoundingBoxArea(largestParticle);
 		double areaScore = (areaToBoundingBoxAreaRatio / DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO);
 		System.out.println("Area Score: "+areaScore);
 		
 		if (MIN_AREA_SCORE <= areaScore && areaScore <= MAX_AREA_SCORE)
 		{
-			System.out.println("Particle #"+largestParticle+" passes.");
+			System.out.println("Particle #"+largestParticle+" passes the area test.");
 			currentParticle = largestParticle;
 			return true;
 		}
 		else
 		{
-			System.out.println("Particle #"+largestParticle+" fails.");
+			System.out.println("Particle #"+largestParticle+" fails the area test.");
 			return false;
 		}
-		
-		//return (MIN_AREA_SCORE <= areaScore && areaScore <= MAX_AREA_SCORE);
 	}
 	
 	public boolean performAspectRatioTest()
 	{
-		return true;
+		double equivalentRectangleAspectRatio = getEquivalentRectangleAspectRatio(largestParticle);
+		double aspectRatioScore = (equivalentRectangleAspectRatio / DESIRED_ASPECT_RATIO);
+		System.out.println("Score: "+aspectRatioScore);
+		
+		if (MIN_ASPECT_RATIO_SCORE <= aspectRatioScore && aspectRatioScore <= MAX_ASPECT_RATIO_SCORE)
+		{
+			System.out.println("Particle #"+largestParticle+" passes the aspect ratio test.");
+			currentParticle = largestParticle;
+			return true;
+		}
+		else
+		{
+			System.out.println("Particle #"+largestParticle+" fails the aspect ratio test.");
+			return false;
+		}
 	}
 	
 	public int getArea(int particleID)
@@ -318,6 +332,22 @@ public class VisionMethods
 			return -1;
 	}
 	
+	public int getBoundingBoxTop(int particleID)
+	{
+		if (0 <= particleID && particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_BOUNDING_RECT_TOP);
+		else
+			return -1;
+	}
+	
+	public int getBoundingBoxLeft(int particleID)
+	{
+		if (0 <= particleID && particleID < getNumOfParticles())
+			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_BOUNDING_RECT_LEFT);
+		else
+			return -1;
+	}
+	
 	public int getBoundingBoxHeight(int particleID)
 	{
 		if (0 <= particleID && particleID < getNumOfParticles())
@@ -330,6 +360,22 @@ public class VisionMethods
 	{
 		if (0 <= particleID && particleID < getNumOfParticles())
 			return (int) NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_BOUNDING_RECT_WIDTH);
+		else
+			return -1;
+	}
+	
+	public double getRatioOfAreaToBoundingBoxArea(int particleID)
+	{
+		if (0 <= particleID && particleID < getNumOfParticles())
+			return NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_COMPACTNESS_FACTOR);
+		else
+			return -1;
+	}
+	
+	public double getEquivalentRectangleAspectRatio(int particleID)
+	{
+		if (0 <= particleID && particleID < getNumOfParticles())
+			return NIVision.imaqMeasureParticle(binaryImg, particleID, 0, MeasurementType.MT_RATIO_OF_EQUIVALENT_RECT_SIDES);
 		else
 			return -1;
 	}
