@@ -158,6 +158,8 @@ public class Robot extends IterativeRobot
     private static final String CAMERA_SIDE_NAME = "cam2";
     /** A boolean indicating if methods involving vision processing should be/are being called. */
 	private boolean imageProcessingActive = false;
+	/** A boolean indicating if a binary image or a regular image should be drawn on and sent to the dashboard. */
+	private boolean sendBinaryImage = true;
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -381,6 +383,8 @@ public class Robot extends IterativeRobot
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
     		imageProcessingActive = !imageProcessingActive;
+    	if (stickB.getRawButton(11))
+    		sendBinaryImage = ! sendBinaryImage;
     	if (stickB.getRawButton(10))
     	{
     		visionMaster.toggleCamSettings();
@@ -408,12 +412,12 @@ public class Robot extends IterativeRobot
 					
 					bottomServo.setAngle(testCounterX);
 		    		sideServo.setAngle(testCounterY);
-		    		
-		    		visionMaster.updateAndDrawCurrentParticleBoundingBox();
-		    		visionMaster.updateAndDrawReticleOnCurrentParticle();
 				}
     		}
-    		visionMaster.sendProcessedImageToDashboard();
+    		if (sendBinaryImage)
+    			visionMaster.sendProcessedImageToDashboard();
+    		else
+    			visionMaster.sendHybridImageToDashboard();
     	}
     	else if (!imageProcessingActive)
     		visionMaster.sendRegularImageToDashboard();	
