@@ -121,6 +121,14 @@ public class VisionMethods
 	ParticleFilterCriteria2[] filterCriteria = new ParticleFilterCriteria2[1]; // We only filter based on one criteria: area.
 	ParticleFilterOptions2 filterOptions = new ParticleFilterOptions2(0,0,1,1); // Don't reject matches, don't reject the border, fill holes, and use connectivity8.
 	
+	private final double DEGREES_PER_PIXEL_HORIZONTAL_NI = 0.17125;
+	private final double DEGREES_PER_PIXEL_HORIZONTAL_DATA_SHEET = 0.046643;
+	private double DEGREES_PER_PIXEL_HORIZONTAL_GUESS = 0.15; // determined through testing. My not be super accurate, but works better than the others right now.
+	
+	private final double DEGREES_PER_PIXEL_VERTICAL_NI = 0.17125;
+	private final double DEGREES_PER_PIXEL_VERTICAL_DATA_SHEET = 0.046643;
+	private double DEGREES_PER_PIXEL_VERTICAL_GUESS = 0;
+	
 	public VisionMethods(String camFrontName, String camSideName)
 	{
 		// set particle filter criteria
@@ -281,17 +289,17 @@ public class VisionMethods
 	{
 		double areaToBoundingBoxAreaRatio = getRatioOfAreaToBoundingBoxArea(largestParticle);
 		double areaScore = (areaToBoundingBoxAreaRatio / DESIRED_AREA_TO_BOUNDING_BOX_AREA_RATIO);
-		System.out.println("Area Score: "+areaScore);
+		//System.out.println("Area Score: "+areaScore);
 		
 		if (MIN_AREA_SCORE <= areaScore && areaScore <= MAX_AREA_SCORE)
 		{
-			System.out.println("Particle #"+largestParticle+" passes the area test.");
+			//System.out.println("Particle #"+largestParticle+" passes the area test.");
 			currentParticle = largestParticle;
 			return true;
 		}
 		else
 		{
-			System.out.println("Particle #"+largestParticle+" fails the area test.");
+			//System.out.println("Particle #"+largestParticle+" fails the area test.");
 			return false;
 		}
 	}
@@ -300,17 +308,17 @@ public class VisionMethods
 	{
 		double equivalentRectangleAspectRatio = getEquivalentRectangleAspectRatio(largestParticle);
 		double aspectRatioScore = (equivalentRectangleAspectRatio / DESIRED_ASPECT_RATIO);
-		System.out.println("Score: "+aspectRatioScore);
+		//System.out.println("Score: "+aspectRatioScore);
 		
 		if (MIN_ASPECT_RATIO_SCORE <= aspectRatioScore && aspectRatioScore <= MAX_ASPECT_RATIO_SCORE)
 		{
-			System.out.println("Particle #"+largestParticle+" passes the aspect ratio test.");
+			//System.out.println("Particle #"+largestParticle+" passes the aspect ratio test.");
 			currentParticle = largestParticle;
 			return true;
 		}
 		else
 		{
-			System.out.println("Particle #"+largestParticle+" fails the aspect ratio test.");
+			//System.out.println("Particle #"+largestParticle+" fails the aspect ratio test.");
 			return false;
 		}
 	}
@@ -400,6 +408,28 @@ public class VisionMethods
 	public boolean particleIsValid(int particleID)
 	{
 		return (0 <= particleID && particleID < getNumOfParticles());
+	}
+	
+	public double getErrorInDegreesX(int errorInPixels)
+	{
+		return DEGREES_PER_PIXEL_HORIZONTAL_GUESS * errorInPixels;
+	}
+	
+	public double getErrorInDegreesY(int errorInPixels)
+	{
+		return DEGREES_PER_PIXEL_VERTICAL_GUESS * errorInPixels;
+	}
+	
+	public void setDegreesPerPixelVerticalGuess(double d)
+	{
+		DEGREES_PER_PIXEL_VERTICAL_GUESS = d;
+		System.out.println("GuessY: "+DEGREES_PER_PIXEL_VERTICAL_GUESS);
+	}
+	
+	public void setDegreesPerPixelHorizontalGuess(double d)
+	{
+		DEGREES_PER_PIXEL_HORIZONTAL_GUESS = d;
+		System.out.println("GuessX: "+DEGREES_PER_PIXEL_HORIZONTAL_GUESS);
 	}
 	
 	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)

@@ -188,10 +188,11 @@ public class Robot extends IterativeRobot
     
     private Servo bottomServo = new Servo(0);
     private Servo sideServo = new Servo(4);
-    private int testCounterX = 95;
-    private int testCounterY = 60;
+    private double testCounterX = 95;
+    private double testCounterY = 60;
     private final int BOTTOM_SERVO_NEUTRAL_ANGLE = 95;
     private final int SIDE_SERVO_NEUTRAL_ANGLE = 85;
+    int recalcCount = 0;
     
     NetworkTable grip;
     double[] area;
@@ -319,6 +320,8 @@ public class Robot extends IterativeRobot
     			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
     	*/
+    	//visionMaster.setDegreesPerPixelHorizontalGuess(prefs.getDouble("degrees per pixel guess x", 0.0));
+    	visionMaster.setDegreesPerPixelVerticalGuess(prefs.getDouble("degrees per pixel guess y", 0.0));
     }
 
     /**
@@ -382,7 +385,10 @@ public class Robot extends IterativeRobot
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
-    		imageProcessingActive = !imageProcessingActive;
+    	{
+    		//imageProcessingActive = !imageProcessingActive;
+    		imageProcessingActive = true;
+    	}
     	if (stickB.getRawButton(11))
     		sendBinaryImage = ! sendBinaryImage;
     	if (stickB.getRawButton(10))
@@ -400,18 +406,54 @@ public class Robot extends IterativeRobot
     			visionMaster.findLargestParticle();
 				if (visionMaster.performAspectRatioTest()) // if the biggest particle is a goal, track it.
 				{
+					/*
 					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
-						testCounterX--;
+					{
+						int errorInPixels = visionMaster.centerOfImage.x - visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle());
+						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
+						recalcCount++;
+						System.out.println("RecalcCount: "+recalcCount);
+						testCounterX -= errorInDegrees;
+					}
 					else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
-						testCounterX++;
+					{
+						int errorInPixels = visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.x;
+						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
+						recalcCount++;
+						System.out.println("RecalcCount: "+recalcCount);
+						testCounterX += errorInDegrees;
+					}
+					else
+					{
+						recalcCount = 0;
+						//imageProcessingActive = false;
+					} */
 					
 					if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
-						testCounterY--;
+					{
+						int errorInPixels = visionMaster.centerOfImage.y - visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle());
+						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
+						recalcCount++;
+						System.out.println("RecalcCount: "+recalcCount);
+						testCounterY -= errorInDegrees;
+					}
 					else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
-						testCounterY++;
+					{
+						int errorInPixels = visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.y;
+						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
+						recalcCount++;
+						System.out.println("RecalcCount: "+recalcCount);
+						testCounterY += errorInDegrees;
+					}
+					else
+					{
+						recalcCount = 0;
+						imageProcessingActive = false;
+					}
 					
 					bottomServo.setAngle(testCounterX);
 		    		sideServo.setAngle(testCounterY);
+		    		testTimer.delay(1);
 				}
     		}
     		if (sendBinaryImage)
