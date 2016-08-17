@@ -123,11 +123,11 @@ public class VisionMethods
 	
 	private final double DEGREES_PER_PIXEL_HORIZONTAL_NI = 0.17125;
 	private final double DEGREES_PER_PIXEL_HORIZONTAL_DATA_SHEET = 0.046643;
-	private double DEGREES_PER_PIXEL_HORIZONTAL_GUESS = 0.15; // determined through testing. My not be super accurate, but works better than the others right now.
+	private double DEGREES_PER_PIXEL_HORIZONTAL_GUESS = 0.15; // determined through testing. May not be super accurate, but works better than the others right now.
 	
 	private final double DEGREES_PER_PIXEL_VERTICAL_NI = 0.17125;
 	private final double DEGREES_PER_PIXEL_VERTICAL_DATA_SHEET = 0.046643;
-	private double DEGREES_PER_PIXEL_VERTICAL_GUESS = 0;
+	private double DEGREES_PER_PIXEL_VERTICAL_GUESS = 0.15; // determined though testing. May not be super accurate, but works better than the others right now. Unsure if this being the same as the horizontal ratio is a coincidence or not.
 	
 	public VisionMethods(String camFrontName, String camSideName)
 	{

@@ -160,6 +160,7 @@ public class Robot extends IterativeRobot
 	private boolean imageProcessingActive = false;
 	/** A boolean indicating if a binary image or a regular image should be drawn on and sent to the dashboard. */
 	private boolean sendBinaryImage = true;
+	private final int ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER = 5;
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -192,6 +193,11 @@ public class Robot extends IterativeRobot
     private double testCounterY = 60;
     private final int BOTTOM_SERVO_NEUTRAL_ANGLE = 95;
     private final int SIDE_SERVO_NEUTRAL_ANGLE = 85;
+    private final int BOTTOM_SERVO_LOWER_LIMIT = 0;
+    private final int BOTTOM_SERVO_UPPER_LIMIT = 180;
+    private final int SIDE_SERVO_LOWER_LIMIT = 0;
+    private final int SIDE_SERVO_UPPER_LIMIT = 130;
+    
     int recalcCount = 0;
     
     NetworkTable grip;
@@ -321,7 +327,7 @@ public class Robot extends IterativeRobot
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
     	*/
     	//visionMaster.setDegreesPerPixelHorizontalGuess(prefs.getDouble("degrees per pixel guess x", 0.0));
-    	visionMaster.setDegreesPerPixelVerticalGuess(prefs.getDouble("degrees per pixel guess y", 0.0));
+    	//visionMaster.setDegreesPerPixelVerticalGuess(prefs.getDouble("degrees per pixel guess y", 0.0));
     }
 
     /**
@@ -386,8 +392,8 @@ public class Robot extends IterativeRobot
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
     	{
-    		//imageProcessingActive = !imageProcessingActive;
-    		imageProcessingActive = true;
+    		imageProcessingActive = !imageProcessingActive;
+    		//imageProcessingActive = true;
     	}
     	if (stickB.getRawButton(11))
     		sendBinaryImage = ! sendBinaryImage;
@@ -406,54 +412,63 @@ public class Robot extends IterativeRobot
     			visionMaster.findLargestParticle();
 				if (visionMaster.performAspectRatioTest()) // if the biggest particle is a goal, track it.
 				{
-					/*
-					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - 5) // if the goal is to the left, turn left.
+					// Horizontal
+					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is to the left, turn left.
 					{
 						int errorInPixels = visionMaster.centerOfImage.x - visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle());
 						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
-						recalcCount++;
-						System.out.println("RecalcCount: "+recalcCount);
+						//recalcCount++;
+						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterX -= errorInDegrees;
+						if (testCounterX < BOTTOM_SERVO_LOWER_LIMIT)
+							testCounterX = BOTTOM_SERVO_LOWER_LIMIT;
 					}
-					else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + 5) // if the goal is to the right, turn right.
+					else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is to the right, turn right.
 					{
 						int errorInPixels = visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.x;
 						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
-						recalcCount++;
-						System.out.println("RecalcCount: "+recalcCount);
+						//recalcCount++;
+						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterX += errorInDegrees;
+						if (testCounterX > BOTTOM_SERVO_UPPER_LIMIT)
+							testCounterX = BOTTOM_SERVO_UPPER_LIMIT;
 					}
 					else
 					{
-						recalcCount = 0;
+						//recalcCount = 0;
 						//imageProcessingActive = false;
-					} */
+					}
 					
-					if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - 5) // if the goal is too high, look up.
+					// Vertical
+					if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is too high, look up.
 					{
 						int errorInPixels = visionMaster.centerOfImage.y - visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle());
 						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
-						recalcCount++;
-						System.out.println("RecalcCount: "+recalcCount);
+						//recalcCount++;
+						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterY -= errorInDegrees;
+						if (testCounterY < SIDE_SERVO_LOWER_LIMIT)
+							testCounterY = SIDE_SERVO_LOWER_LIMIT;
 					}
-					else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + 5) // if the goal is too low, look down.
+					else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is too low, look down.
 					{
 						int errorInPixels = visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.y;
 						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
-						recalcCount++;
-						System.out.println("RecalcCount: "+recalcCount);
+						//recalcCount++;
+						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterY += errorInDegrees;
+						if (testCounterY > SIDE_SERVO_UPPER_LIMIT)
+							testCounterY = SIDE_SERVO_UPPER_LIMIT;
 					}
 					else
 					{
-						recalcCount = 0;
-						imageProcessingActive = false;
+						//recalcCount = 0;
+						//imageProcessingActive = false;
 					}
 					
 					bottomServo.setAngle(testCounterX);
 		    		sideServo.setAngle(testCounterY);
-		    		testTimer.delay(1);
+		    		//testTimer.delay(1);
 				}
     		}
     		if (sendBinaryImage)
@@ -560,7 +575,7 @@ public class Robot extends IterativeRobot
     			testTimer.delay(1);
     		}
     	}
-    	else if (testMode == 5)
+    	else if (testMode == 5) // Manually control servos.
     	{
     		/*
     		if (testCounterX <= 180)
@@ -612,20 +627,20 @@ public class Robot extends IterativeRobot
     		}
     		*/
     		
-    		if (stickA.getX() > 0.2 && testCounterX < 180)
+    		if (stickA.getX() > 0.2 && testCounterX < BOTTOM_SERVO_UPPER_LIMIT)
     			testCounterX += 1;
-    		else if (stickA.getX() < -0.2 && testCounterX > 0)
+    		else if (stickA.getX() < -0.2 && testCounterX > BOTTOM_SERVO_LOWER_LIMIT)
     			testCounterX -= 1;
     		
-    		if (-stickA.getY() > 0.2 && testCounterY < 180)
+    		if (-stickA.getY() > 0.2 && testCounterY < SIDE_SERVO_UPPER_LIMIT)
     			testCounterY += 1;
-    		else if (-stickA.getY() < -0.2 && testCounterY > 0)
+    		else if (-stickA.getY() < -0.2 && testCounterY > SIDE_SERVO_LOWER_LIMIT)
     			testCounterY -= 1;
     		
     		if (stickB.getRawButton(10))
     		{
-    			testCounterX = 95;
-    			testCounterY = 85;
+    			testCounterX = BOTTOM_SERVO_NEUTRAL_ANGLE;
+    			testCounterY = SIDE_SERVO_NEUTRAL_ANGLE;
     		}
     		
     		System.out.println("X: "+testCounterX);
@@ -634,11 +649,11 @@ public class Robot extends IterativeRobot
     		bottomServo.setAngle(testCounterX);
     		sideServo.setAngle(testCounterY);
     	}
-    	else if (testMode == 6)
+    	else if (testMode == 6) // Tank drive the robot, just for fun.
     	{
     		driveControl.theRobot.tankDrive(stickB, stickA);
     	}
-    	else if (testMode == 7)
+    	else if (testMode == 7) // GRIP Testing
     	{
     		/*
     		area = grip.getNumberArray("myContoursReport/area", defaultValue);
