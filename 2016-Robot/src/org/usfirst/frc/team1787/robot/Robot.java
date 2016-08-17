@@ -391,10 +391,7 @@ public class Robot extends IterativeRobot
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
-    	{
     		imageProcessingActive = !imageProcessingActive;
-    		//imageProcessingActive = true;
-    	}
     	if (stickB.getRawButton(11))
     		sendBinaryImage = ! sendBinaryImage;
     	if (stickB.getRawButton(10))
@@ -417,8 +414,6 @@ public class Robot extends IterativeRobot
 					{
 						int errorInPixels = visionMaster.centerOfImage.x - visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle());
 						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
-						//recalcCount++;
-						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterX -= errorInDegrees;
 						if (testCounterX < BOTTOM_SERVO_LOWER_LIMIT)
 							testCounterX = BOTTOM_SERVO_LOWER_LIMIT;
@@ -427,16 +422,9 @@ public class Robot extends IterativeRobot
 					{
 						int errorInPixels = visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.x;
 						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
-						//recalcCount++;
-						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterX += errorInDegrees;
 						if (testCounterX > BOTTOM_SERVO_UPPER_LIMIT)
 							testCounterX = BOTTOM_SERVO_UPPER_LIMIT;
-					}
-					else
-					{
-						//recalcCount = 0;
-						//imageProcessingActive = false;
 					}
 					
 					// Vertical
@@ -444,8 +432,6 @@ public class Robot extends IterativeRobot
 					{
 						int errorInPixels = visionMaster.centerOfImage.y - visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle());
 						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
-						//recalcCount++;
-						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterY -= errorInDegrees;
 						if (testCounterY < SIDE_SERVO_LOWER_LIMIT)
 							testCounterY = SIDE_SERVO_LOWER_LIMIT;
@@ -454,21 +440,13 @@ public class Robot extends IterativeRobot
 					{
 						int errorInPixels = visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.y;
 						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
-						//recalcCount++;
-						//System.out.println("RecalcCount: "+recalcCount);
 						testCounterY += errorInDegrees;
 						if (testCounterY > SIDE_SERVO_UPPER_LIMIT)
 							testCounterY = SIDE_SERVO_UPPER_LIMIT;
 					}
-					else
-					{
-						//recalcCount = 0;
-						//imageProcessingActive = false;
-					}
 					
 					bottomServo.setAngle(testCounterX);
 		    		sideServo.setAngle(testCounterY);
-		    		//testTimer.delay(1);
 				}
     		}
     		if (sendBinaryImage)
