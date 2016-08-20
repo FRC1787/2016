@@ -328,8 +328,7 @@ public class Robot extends IterativeRobot
     			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
     	*/
-    	visionMaster.setDegreesPerPixelHorizontalGuess(prefs.getDouble("degrees per pixel guess x", 0.0));
-    	visionMaster.setDegreesPerPixelVerticalGuess(prefs.getDouble("degrees per pixel guess y", 0.0));
+    	visionMaster.setControlLoopDampener(prefs.getDouble("vision dampener", 0.83));
     	xLocked = false;
     	yLocked = false;
     }
@@ -419,7 +418,7 @@ public class Robot extends IterativeRobot
 						visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is to the left or right of center, turn appropriately.
 					{
 						int errorInPixels = visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.x;
-						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
+						double errorInDegrees = visionMaster.getDampenedErrorInDegreesX(errorInPixels);
 						testCounterX += errorInDegrees;
 						
 						if (testCounterX < BOTTOM_SERVO_LOWER_LIMIT)
@@ -435,7 +434,7 @@ public class Robot extends IterativeRobot
 						visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is too high or too low, turn accordingly.
 					{
 						int errorInPixels = visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.y;
-						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
+						double errorInDegrees = visionMaster.getDampenedErrorInDegreesY(errorInPixels);
 						testCounterY += errorInDegrees;
 						
 						if (testCounterY < SIDE_SERVO_LOWER_LIMIT)

@@ -124,12 +124,12 @@ public class VisionMethods
 	private final double DEGREES_PER_PIXEL_HORIZONTAL_NI = 0.17125;
 	private final double DEGREES_PER_PIXEL_HORIZONTAL_DATA_SHEET = 0.046643;
 	private double DEGREES_PER_PIXEL_HORIZONTAL_GUESS = 0.15; // determined through testing. May not be super accurate, but works better than the others right now.
-	private double DAMPENED_DEGREES_PER_PIXEL_HORIZONTAL_GUESS = 0.125;
 	
 	private final double DEGREES_PER_PIXEL_VERTICAL_NI = 0.17125;
 	private final double DEGREES_PER_PIXEL_VERTICAL_DATA_SHEET = 0.046643;
 	private double DEGREES_PER_PIXEL_VERTICAL_GUESS = 0.15; // determined though testing. May not be super accurate, but works better than the others right now. Unsure if this being the same as the horizontal ratio is a coincidence or not.
-	private double DAMPENED_DEGREES_PER_PIXEL_VERTICAL_GUESS = 0.125;
+	
+	private double CONTROL_LOOP_DAMPENER = 0.83; // Value determined through testing.
 	
 	public VisionMethods(String camFrontName, String camSideName)
 	{
@@ -422,6 +422,16 @@ public class VisionMethods
 		return DEGREES_PER_PIXEL_VERTICAL_GUESS * errorInPixels;
 	}
 	
+	public double getDampenedErrorInDegreesX(int errorInPixels)
+	{
+		return getErrorInDegreesX(errorInPixels) * CONTROL_LOOP_DAMPENER;
+	}
+	
+	public double getDampenedErrorInDegreesY(int errorInPixels)
+	{
+		return getErrorInDegreesY(errorInPixels) * CONTROL_LOOP_DAMPENER;
+	}
+	
 	public void setDegreesPerPixelVerticalGuess(double d)
 	{
 		DEGREES_PER_PIXEL_VERTICAL_GUESS = d;
@@ -432,6 +442,12 @@ public class VisionMethods
 	{
 		DEGREES_PER_PIXEL_HORIZONTAL_GUESS = d;
 		System.out.println("GuessX: "+DEGREES_PER_PIXEL_HORIZONTAL_GUESS);
+	}
+	
+	public void setControlLoopDampener(double d)
+	{
+		CONTROL_LOOP_DAMPENER = d;
+		System.out.println("New Dampener: "+CONTROL_LOOP_DAMPENER);
 	}
 	
 	public void setHSVThreshold(int hMin, int hMax, int sMin, int sMax, int vMin, int vMax)
