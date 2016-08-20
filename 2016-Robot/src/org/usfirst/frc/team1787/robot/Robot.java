@@ -160,7 +160,7 @@ public class Robot extends IterativeRobot
 	private boolean imageProcessingActive = false;
 	/** A boolean indicating if a binary image or a regular image should be drawn on and sent to the dashboard. */
 	private boolean sendBinaryImage = true;
-	private final int ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER = 5;
+	private final int ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER = 3;
     
     // Objects and variables used for testing functions in testPeriodic:
     
@@ -197,6 +197,8 @@ public class Robot extends IterativeRobot
     private final int BOTTOM_SERVO_UPPER_LIMIT = 180;
     private final int SIDE_SERVO_LOWER_LIMIT = 0;
     private final int SIDE_SERVO_UPPER_LIMIT = 130;
+    boolean xLocked = false;
+    boolean yLocked = false;
     
     int recalcCount = 0;
     
@@ -326,10 +328,12 @@ public class Robot extends IterativeRobot
     			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
     	*/
-    	//visionMaster.setDegreesPerPixelHorizontalGuess(prefs.getDouble("degrees per pixel guess x", 0.0));
-    	//visionMaster.setDegreesPerPixelVerticalGuess(prefs.getDouble("degrees per pixel guess y", 0.0));
+    	visionMaster.setDegreesPerPixelHorizontalGuess(prefs.getDouble("degrees per pixel guess x", 0.0));
+    	visionMaster.setDegreesPerPixelVerticalGuess(prefs.getDouble("degrees per pixel guess y", 0.0));
+    	xLocked = false;
+    	yLocked = false;
     }
-
+    
     /**
      * This function is called periodically while the robot is in teleop mode.
      */
@@ -391,13 +395,14 @@ public class Robot extends IterativeRobot
     	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
-    		imageProcessingActive = !imageProcessingActive;
+    		imageProcessingActive = true; //!imageProcessingActive;
     	if (stickB.getRawButton(11))
     		sendBinaryImage = ! sendBinaryImage;
     	if (stickB.getRawButton(10))
     	{
-    		visionMaster.toggleCamSettings();
-    		testTimer.delay(2); // Gives the camera time to update settings.
+    		imageProcessingActive = false;
+    		//visionMaster.toggleCamSettings();
+    		//testTimer.delay(2); // Gives the camera time to update settings.
     	}
     	
     	if (imageProcessingActive)
@@ -410,40 +415,41 @@ public class Robot extends IterativeRobot
 				if (visionMaster.performAspectRatioTest()) // if the biggest particle is a goal, track it.
 				{
 					// Horizontal
-					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is to the left, turn left.
-					{
-						int errorInPixels = visionMaster.centerOfImage.x - visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle());
-						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
-						testCounterX -= errorInDegrees;
-						if (testCounterX < BOTTOM_SERVO_LOWER_LIMIT)
-							testCounterX = BOTTOM_SERVO_LOWER_LIMIT;
-					}
-					else if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is to the right, turn right.
+					if (visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.x - ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER ||
+						visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.x + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is to the left or right of center, turn appropriately.
 					{
 						int errorInPixels = visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.x;
 						double errorInDegrees = visionMaster.getErrorInDegreesX(errorInPixels);
 						testCounterX += errorInDegrees;
-						if (testCounterX > BOTTOM_SERVO_UPPER_LIMIT)
+						
+						if (testCounterX < BOTTOM_SERVO_LOWER_LIMIT)
+							testCounterX = BOTTOM_SERVO_LOWER_LIMIT;
+						else if (testCounterX > BOTTOM_SERVO_UPPER_LIMIT)
 							testCounterX = BOTTOM_SERVO_UPPER_LIMIT;
 					}
-					
+					else
+						xLocked = true;
+						
 					// Vertical
-					if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is too high, look up.
-					{
-						int errorInPixels = visionMaster.centerOfImage.y - visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle());
-						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
-						testCounterY -= errorInDegrees;
-						if (testCounterY < SIDE_SERVO_LOWER_LIMIT)
-							testCounterY = SIDE_SERVO_LOWER_LIMIT;
-					}
-					else if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is too low, look down.
+					if (visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) < visionMaster.centerOfImage.y - ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER ||
+						visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) > visionMaster.centerOfImage.y + ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER) // if the goal is too high or too low, turn accordingly.
 					{
 						int errorInPixels = visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.y;
 						double errorInDegrees = visionMaster.getErrorInDegreesY(errorInPixels);
 						testCounterY += errorInDegrees;
-						if (testCounterY > SIDE_SERVO_UPPER_LIMIT)
+						
+						if (testCounterY < SIDE_SERVO_LOWER_LIMIT)
+							testCounterY = SIDE_SERVO_LOWER_LIMIT;
+						else if (testCounterY > SIDE_SERVO_UPPER_LIMIT)
 							testCounterY = SIDE_SERVO_UPPER_LIMIT;
 					}
+					else
+						yLocked = true;
+					
+					SmartDashboard.putBoolean("X Locked", xLocked);
+					SmartDashboard.putBoolean("Y Locked", yLocked);
+					xLocked = false;
+					yLocked = false;
 					
 					bottomServo.setAngle(testCounterX);
 		    		sideServo.setAngle(testCounterY);
@@ -605,14 +611,14 @@ public class Robot extends IterativeRobot
     		}
     		*/
     		
-    		if (stickA.getX() > 0.2 && testCounterX < BOTTOM_SERVO_UPPER_LIMIT)
+    		if (stickA.getX() > 0.2 && testCounterX < BOTTOM_SERVO_UPPER_LIMIT) // look right
     			testCounterX += 1;
-    		else if (stickA.getX() < -0.2 && testCounterX > BOTTOM_SERVO_LOWER_LIMIT)
+    		else if (stickA.getX() < -0.2 && testCounterX > BOTTOM_SERVO_LOWER_LIMIT) // look left
     			testCounterX -= 1;
     		
-    		if (-stickA.getY() > 0.2 && testCounterY < SIDE_SERVO_UPPER_LIMIT)
+    		if (-stickA.getY() > 0.2 && testCounterY < SIDE_SERVO_UPPER_LIMIT) // look down
     			testCounterY += 1;
-    		else if (-stickA.getY() < -0.2 && testCounterY > SIDE_SERVO_LOWER_LIMIT)
+    		else if (-stickA.getY() < -0.2 && testCounterY > SIDE_SERVO_LOWER_LIMIT) // look up
     			testCounterY -= 1;
     		
     		if (stickB.getRawButton(10))
