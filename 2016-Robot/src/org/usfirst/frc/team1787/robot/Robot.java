@@ -199,6 +199,10 @@ public class Robot extends IterativeRobot
     private final int SIDE_SERVO_UPPER_LIMIT = 130;
     boolean xLocked = false;
     boolean yLocked = false;
+    boolean bothLocked = false;
+    
+    double lastGyroAngle = 0.0;
+    double gyroDampener;
     
     int recalcCount = 0;
     
@@ -331,6 +335,11 @@ public class Robot extends IterativeRobot
     	visionMaster.setControlLoopDampener(prefs.getDouble("vision dampener", 0.83));
     	xLocked = false;
     	yLocked = false;
+    	/*
+    	gyroDampener = prefs.getDouble("gyroDampener", 0.5);
+    	System.out.println("Gyro Dampener: "+gyroDampener);
+    	bothLocked = false;
+    	lastGyroAngle = 0.0; */
     }
     
     /**
@@ -406,6 +415,14 @@ public class Robot extends IterativeRobot
     	
     	if (imageProcessingActive)
     	{
+    		/*
+    		if (bothLocked)
+    		{
+    			double gyroAngleDifference = lastGyroAngle - driveControl.getGyro().getAngle();
+    			testCounterX += (gyroAngleDifference * gyroDampener);
+    			bottomServo.setAngle(testCounterX);
+    			lastGyroAngle = driveControl.getGyro().getAngle();
+    		} */
     		visionMaster.performHSVFilter();
     		visionMaster.removeSmallParticles();
     		if (visionMaster.getNumOfParticles() > 0) // if there is at least 1 particle, look for the biggest one.
@@ -447,6 +464,13 @@ public class Robot extends IterativeRobot
 					
 					SmartDashboard.putBoolean("X Locked", xLocked);
 					SmartDashboard.putBoolean("Y Locked", yLocked);
+					/*
+					if (xLocked && yLocked)
+					{
+						if (!bothLocked)
+							driveControl.resetEncodersAndGyro();
+						bothLocked = true;
+					} */
 					xLocked = false;
 					yLocked = false;
 					
