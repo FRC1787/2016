@@ -56,11 +56,11 @@ public class AutoMethods
 	// Values used in the gyro PID loop
 	PIDOutputCalc gyroController;
 	/** The proportional gain used to turn with a PI(D) loop. */
-	private static final double GYRO_KP = 0.015;
+	private static final double GYRO_KP = 0.07;
 	/** The integral gain used to turn with a PI(D) loop. */
-	private static final double GYRO_KI = 0.0025;
+	private static final double GYRO_KI = 0.0;
 	/** The derivative gain used to turn with a PID loop. */
-	private static final double GYRO_KD = 0;
+	private static final double GYRO_KD = 0.03;
 	
 	// Variables for spinning wheels
 	/** Timer for timing how long the wheels spin. */

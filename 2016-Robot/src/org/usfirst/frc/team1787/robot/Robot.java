@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
@@ -120,9 +119,13 @@ public class Robot extends IterativeRobot
 	/** The button on stickB that will toggle the wedge. */
 	public static final int JOYSTICK_B_WEDGE_TOGGLE = 1;
 	/** The button on stickB that will toggle which camera feed is sent to the driver station. */
-	public static final int JOYSTICK_B_CAMERA_TOGGLE = 9;
-	/** The button on stickB that will toggle which type of image is sent to the driver station, either regular or processed. */
+	public static final int JOYSTICK_B_CAMERA_FEED_TOGGLE = 9;
+	/** The button on stickB that will toggle image processing on and off. */
 	public static final int JOYSTICK_B_IMAGE_PROCESSING_TOGGLE = 8;
+	/** The button on stickB that will toggle the type of image sent to the dashboard if image processing is active. Either binary or hybrid. */
+	public static final int JOYSTICK_B_IMAGE_TYPE_TOGGLE = 10;
+	/** The button on stickB that will toggle the settings of the side camera between regular settings, and those optimal for image processing. */
+	public static final int JOYSTICK_B_CAMERA_SETTINGS_TOGGLE = 11;
 	
 	// Objects and variables involving the robot's autonomous functions:
 	
@@ -160,9 +163,38 @@ public class Robot extends IterativeRobot
 	private boolean imageProcessingActive = false;
 	/** A boolean indicating if a binary image or a regular image should be drawn on and sent to the dashboard. */
 	private boolean sendBinaryImage = true;
+	/** The amount of pixels off center that is considered acceptable when locking on to a targed. */
 	private final int ACCEPTABLE_NUM_OF_PIXELS_OFF_CENTER = 3;
+	/** The PWM port on the roborio that the bottom servo is plugged in to. */
+	private final int BOTTOM_SERVO_PWM_PORT = 0;
+	/** The bottom servo on the camera mount. */
+	private Servo bottomServo = new Servo(BOTTOM_SERVO_PWM_PORT);
+	/** The PWM port on the roborio that the side servo is plugged in to. */
+	private final int SIDE_SERVO_PWM_PORT = 4;
+	/** The side servo on the camera mount. */
+	private Servo sideServo = new Servo(SIDE_SERVO_PWM_PORT);
+	/** The angle of the bottom servo. */
+	private double bottomServoDesiredAngle;
+	/** The angle of the side servo. */
+	private double sideServoDesiredAngle;
+	/** This is how many degrees off the bottom servo is from the angle it thinks it's at (ie setting the angle to 90 doesn't make the mount point at the front of the robot, but setting it to 95 does. It is 5 degrees off). This is only used when you want to know the actual angle of the servo. */
+	private final double BOTTOM_SERVO_OFFSET = 5;
+	/** This is how many degrees off the side servo is from the angle it thinks it's at (ie setting the angle to 90 doesn't make the mount level, but setting it to 85 does. It is -5 degrees off). This is only used when you want to know the actual angle of the servo. */
+	private final double SIDE_SERVO_OFFSET = -5;
+	/** The lowest angle the bottom servo should turn to. */
+	private final double BOTTOM_SERVO_LOWER_LIMIT = 0;
+	/** The greatest angle the bottom servo should turn to. */
+	private final double BOTTOM_SERVO_UPPER_LIMIT = 180;
+	/** The lowest angle the side servo should turn to. */
+	private final double SIDE_SERVO_LOWER_LIMIT = 0;
+	/** The greatest angle the side servo should turn to. */
+	private final double SIDE_SERVO_UPPER_LIMIT = 130;
+	/** A boolean telling whether the camera is locked on to the target in the x dimension (horizontally). */
+	private boolean xLocked = false;
+	/** A boolean telling whether the camera is locked on to the target in the y dimension (vertically). */
+	private boolean yLocked = false;
     
-    // Objects and variables used for testing functions in testPeriodic:
+    // Objects and variables used for general testing.
     
     /** Determines which functions will be available in test mode. Value can be set by buttons on the joystick. */
     private int testMode = 0;
@@ -182,35 +214,19 @@ public class Robot extends IterativeRobot
      * 		If the timer is running, it will continue to run after being set to 0.
      * 		If the timer is stopped, it's value will be set to 0.
      */
-    
+    /** The preferences object that allows values to be grabbed from the smartdashboard. */
     Preferences prefs;
+    
+    // Objects and variables used to test specific things.
+    
+    // Using gyro to turn with PID control.
     private PIDOutputCalc PIDTester;
     private double desiredDegrees;
     
-    private Servo bottomServo = new Servo(0);
-    private Servo sideServo = new Servo(4);
-    private double testCounterX = 95;
-    private double testCounterY = 60;
-    private final int BOTTOM_SERVO_NEUTRAL_ANGLE = 95;
-    private final int SIDE_SERVO_NEUTRAL_ANGLE = 85;
-    private final int BOTTOM_SERVO_LOWER_LIMIT = 0;
-    private final int BOTTOM_SERVO_UPPER_LIMIT = 180;
-    private final int SIDE_SERVO_LOWER_LIMIT = 0;
-    private final int SIDE_SERVO_UPPER_LIMIT = 130;
-    boolean xLocked = false;
-    boolean yLocked = false;
+    // Gyro aided tracking
     boolean bothLocked = false;
-    
     double lastGyroAngle = 0.0;
     double gyroDampener;
-    
-    int recalcCount = 0;
-    
-    NetworkTable grip;
-    double[] area;
-    double[] defaultValue;
-    boolean toClose;
-    boolean toFar;
     
     // Miscellaneous objects and variables:
     
@@ -244,18 +260,6 @@ public class Robot extends IterativeRobot
     	
     	// Construct the VisionMethods
     	visionMaster = new VisionMethods(CAMERA_FRONT_NAME, CAMERA_SIDE_NAME);
-    	
-    	/* The code below is used to start GRIP upon turning on the robot.
-    	 * It allows GRIP to run without having to be deployed from the desktop application.
-    	grip = NetworkTable.getTable("grip");
-    	try 
-    	{
-    		new ProcessBuilder("/home/lvuser/grip").inheritIO().start();
-    	}
-    	catch (IOException e)
-    	{
-    		e.printStackTrace();
-    	}*/
     	
     	// Construct the AutoMethods
     	autoMethods = new AutoMethods(driveControl, arm, wedge);
@@ -324,8 +328,8 @@ public class Robot extends IterativeRobot
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
-    	bottomServo.setAngle(testCounterX); // Start with the camera looking up so it can find a goal.
-    	sideServo.setAngle(testCounterY); // Start with the camera looking up so it can find a goal.
+    	bottomServo.setAngle(95); // Start with the camera looking up so it can find a goal.
+    	sideServo.setAngle(60); // Start with the camera looking up so it can find a goal.
     	/*
     	visionMaster.setHSVThreshold(
     			prefs.getInt("HMin", 0), prefs.getInt("HMax", 360), 
@@ -400,17 +404,19 @@ public class Robot extends IterativeRobot
     	wedge.checkWedgeTimer();
     	
     	// Cameras
-    	if (stickB.getRawButton(JOYSTICK_B_CAMERA_TOGGLE)) // Toggles which camera feed is in use
+    	if (stickB.getRawButton(JOYSTICK_B_CAMERA_FEED_TOGGLE)) // Toggles which camera feed is in use
     		visionMaster.toggleActiveCamFeed();
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
-    		imageProcessingActive = true; //!imageProcessingActive;
-    	if (stickB.getRawButton(11))
-    		sendBinaryImage = ! sendBinaryImage;
-    	if (stickB.getRawButton(10))
     	{
-    		imageProcessingActive = false;
-    		//visionMaster.toggleCamSettings();
-    		//testTimer.delay(2); // Gives the camera time to update settings.
+    		imageProcessingActive = !imageProcessingActive;
+    		testTimer.delay(1); // Prevent imageProcessingActive from switching super quickly if the button is held down
+    	}
+    	if (stickB.getRawButton(JOYSTICK_B_IMAGE_TYPE_TOGGLE))
+    		sendBinaryImage = ! sendBinaryImage;
+    	if (stickB.getRawButton(JOYSTICK_B_CAMERA_SETTINGS_TOGGLE))
+    	{
+    		visionMaster.toggleCamSettings();
+    		testTimer.delay(2); // Gives the camera time to update settings.
     	}
     	
     	if (imageProcessingActive)
@@ -436,12 +442,12 @@ public class Robot extends IterativeRobot
 					{
 						int errorInPixels = visionMaster.getCenterOfMassX(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.x;
 						double errorInDegrees = visionMaster.getDampenedErrorInDegreesX(errorInPixels);
-						testCounterX += errorInDegrees;
+						bottomServoDesiredAngle += errorInDegrees;
 						
-						if (testCounterX < BOTTOM_SERVO_LOWER_LIMIT)
-							testCounterX = BOTTOM_SERVO_LOWER_LIMIT;
-						else if (testCounterX > BOTTOM_SERVO_UPPER_LIMIT)
-							testCounterX = BOTTOM_SERVO_UPPER_LIMIT;
+						if (bottomServoDesiredAngle < BOTTOM_SERVO_LOWER_LIMIT)
+							bottomServoDesiredAngle = BOTTOM_SERVO_LOWER_LIMIT;
+						else if (bottomServoDesiredAngle > BOTTOM_SERVO_UPPER_LIMIT)
+							bottomServoDesiredAngle = BOTTOM_SERVO_UPPER_LIMIT;
 					}
 					else
 						xLocked = true;
@@ -452,12 +458,12 @@ public class Robot extends IterativeRobot
 					{
 						int errorInPixels = visionMaster.getCenterOfMassY(visionMaster.getCurrentParticle()) - visionMaster.centerOfImage.y;
 						double errorInDegrees = visionMaster.getDampenedErrorInDegreesY(errorInPixels);
-						testCounterY += errorInDegrees;
+						sideServoDesiredAngle += errorInDegrees;
 						
-						if (testCounterY < SIDE_SERVO_LOWER_LIMIT)
-							testCounterY = SIDE_SERVO_LOWER_LIMIT;
-						else if (testCounterY > SIDE_SERVO_UPPER_LIMIT)
-							testCounterY = SIDE_SERVO_UPPER_LIMIT;
+						if (sideServoDesiredAngle < SIDE_SERVO_LOWER_LIMIT)
+							sideServoDesiredAngle = SIDE_SERVO_LOWER_LIMIT;
+						else if (sideServoDesiredAngle > SIDE_SERVO_UPPER_LIMIT)
+							sideServoDesiredAngle = SIDE_SERVO_UPPER_LIMIT;
 					}
 					else
 						yLocked = true;
@@ -474,8 +480,8 @@ public class Robot extends IterativeRobot
 					xLocked = false;
 					yLocked = false;
 					
-					bottomServo.setAngle(testCounterX);
-		    		sideServo.setAngle(testCounterY);
+					bottomServo.setAngle(bottomServoDesiredAngle);
+		    		sideServo.setAngle(sideServoDesiredAngle);
 				}
     		}
     		if (sendBinaryImage)
@@ -491,30 +497,30 @@ public class Robot extends IterativeRobot
      * This function is run once when the robot enters test mode.
      */
     public void testInit()
-    {	
-    	desiredDegrees = prefs.getDouble("Setpoint", 0);
-    	PIDTester = new PIDOutputCalc(prefs.getDouble("P", 0), prefs.getDouble("I", 0), prefs.getDouble("D", 0));
-    	PIDTester.setMaxOutput(0.5);
-    	PIDTester.setMinOutput(-0.5);
-    	PIDTester.setToleranceThreshold(prefs.getDouble("Tolerance Threshold", 0));
-    	PIDTester.setIntegralThreshold(prefs.getDouble("Integral Threshold", 0));
+    {
     	testMode = 0;
     	driveControl.resetEncoders();
     	driveControl.getGyro().calibrate();
+    	
+    	desiredDegrees = prefs.getDouble("Setpoint", 0);
+    	PIDTester = new PIDOutputCalc(prefs.getDouble("P", 0), prefs.getDouble("I", 0), prefs.getDouble("D", 0));
     	System.out.println("P: "+prefs.getDouble("P", 0));
     	System.out.println("I: "+prefs.getDouble("I", 0));
     	System.out.println("D: "+prefs.getDouble("D", 0));
+    	
+    	desiredDegrees = prefs.getDouble("Setpoint", 0);
     	System.out.println("Setpoint: "+prefs.getDouble("Setpoint", 0));
-    	System.out.println("Tolerance Threshold: "+prefs.getDouble("Tolerance Threshold", 0));
+    	
+    	PIDTester.setIntegralThreshold(prefs.getDouble("Integral Threshold", 0));
     	System.out.println("Integral Threshold: "+prefs.getDouble("Integral Threshold", 0));
+    	
+    	PIDTester.setToleranceThreshold(prefs.getDouble("Tolerance Threshold", 0));
+    	System.out.println("Tolerance Threshold: "+prefs.getDouble("Tolerance Threshold", 0));
+    	
+    	PIDTester.setMinOutput(-0.5);
+    	PIDTester.setMaxOutput(0.5);
+    	
     	System.out.println("Test Init Complete");
-    	System.out.println("Creating default value array");
-    	defaultValue = new double[1];
-    	defaultValue[0] = 0;
-    	System.out.println("defaultValue[0]: "+defaultValue[0]);
-    	toFar = false;
-    	toClose = false;
-    	System.out.println("Ok, now we're really done");
     }
     
     /**
@@ -522,22 +528,22 @@ public class Robot extends IterativeRobot
      */
     public void testPeriodic()
     {
-    	PIDTester.putDataOnSmartDashboard();
-    	SmartDashboard.putNumber("Gyro Angle (Test)", driveControl.getGyro().getAngle());
-    	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_BACKWARDS) && stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS))
+    	if (stickB.getRawButton(1))
     		testMode = 1;
-    	else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_APPROACH) && stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
+    	else if (stickB.getRawButton(2))
     		testMode = 2;
-    	else if (stickA.getRawButton(8))
+    	else if (stickB.getRawButton(3))
     		testMode = 3;
-    	else if (stickA.getRawButton(10))
+    	else if (stickB.getRawButton(4))
     		testMode = 4;
-    	else if (stickB.getRawButton(10))
+    	else if (stickB.getRawButton(5))
     		testMode = 5;
-    	else if (stickB.getRawButton(11))
+    	else if (stickB.getRawButton(6))
     		testMode = 6;
-    	else if (stickB.getRawButton(8))
+    	else if (stickB.getRawButton(7))
     		testMode = 7;
+    	else if (stickB.getRawButton(8))
+    		testMode = 8;
     	
     	if (testMode == 1) // Manually control pickup arm
     	{
@@ -550,23 +556,11 @@ public class Robot extends IterativeRobot
         	else
         		arm.stopPickupWheels();
     	}
-    	else if (testMode == 2) // Auto turn 360 degrees using gyro
+    	else if (testMode == 2) // Test PID turning.
     	{
-    		System.out.println("Gyro angle: " + driveControl.getGyro().getAngle());
-    		if (autoMethods.autoTurnDegrees(360, true))
-    			testMode = 0;
-    	}
-    	else if (testMode == 3)
-    	{
-    		driveControl.arcadeDriveCustomValues(-stickA.getY(), -driveControl.getGyro().getAngle() * 0.03);
-    		//driveControl.arcadeDrivePickupArmInFront(stickA);
-    		System.out.println("Right Encoder Ticks: "+driveControl.getRightEncoder().get());
-    		System.out.println("Left Encoder Ticks: "+driveControl.getLeftEncoder().get());
-    		System.out.println("Right Encoder Distance: "+driveControl.getRightEncoder().getDistance());
-    		System.out.println("Left Encoder Distance: "+driveControl.getLeftEncoder().getDistance());
-    	}
-    	else if (testMode == 4)
-    	{
+    		PIDTester.putDataOnSmartDashboard();
+        	SmartDashboard.putNumber("Gyro Angle (Test)", driveControl.getGyro().getAngle());
+        	
     		PIDTester.calculateError(desiredDegrees, driveControl.getGyro().getAngle());
     		if (!PIDTester.errorIsAcceptable())
     		{
@@ -582,128 +576,33 @@ public class Robot extends IterativeRobot
     			testTimer.delay(1);
     		}
     	}
-    	else if (testMode == 5) // Manually control servos.
+    	else if (testMode == 3) // Manually control servos.
     	{
-    		/*
-    		if (testCounterX <= 180)
+    		if (stickA.getX() > 0.2 && bottomServoDesiredAngle < BOTTOM_SERVO_UPPER_LIMIT) // look right
+    			bottomServoDesiredAngle += 1;
+    		else if (stickA.getX() < -0.2 && bottomServoDesiredAngle > BOTTOM_SERVO_LOWER_LIMIT) // look left
+    			bottomServoDesiredAngle -= 1;
+    		
+    		if (-stickA.getY() > 0.2 && sideServoDesiredAngle < SIDE_SERVO_UPPER_LIMIT) // look down
+    			sideServoDesiredAngle += 1;
+    		else if (-stickA.getY() < -0.2 && sideServoDesiredAngle > SIDE_SERVO_LOWER_LIMIT) // look up
+    			sideServoDesiredAngle -= 1;
+    		
+    		if (stickA.getRawButton(10)) // reset to neutral position
     		{
-    			if (stickA.getX() >= 0.2 && stickA.getX() < 0.4)
-    				testCounterX++;
-    			else if (stickA.getX() >= 0.4 && stickA.getX() < 0.6)
-    				testCounterX += 2;
-    			else if (stickA.getX() >= 0.6 && stickA.getX() < 0.8)
-    				testCounterX += 3;
-    			else if (stickA.getX() >= 0.8)
-    				testCounterX += 4;
+    			bottomServoDesiredAngle = 90 + BOTTOM_SERVO_OFFSET;
+    			sideServoDesiredAngle = 90 + SIDE_SERVO_OFFSET;
     		}
     		
-    		if (testCounterX >= 0)
-    		{
-    			if (stickA.getX() <= -0.2 && stickA.getX() > -0.4)
-    				testCounterX++;
-    			else if (stickA.getX() <= -0.4 && stickA.getX() > -0.6)
-    				testCounterX += 2;
-    			else if (stickA.getX() <= -0.6 && stickA.getX() > -0.8)
-    				testCounterX += 3;
-    			else if (stickA.getX() <= -0.8)
-    				testCounterX += 4;
-    		}
+    		System.out.println("X: "+bottomServoDesiredAngle);
+    		System.out.println("Y: "+sideServoDesiredAngle);
     		
-    		if (testCounterY <= 180)
-    		{
-    			if (-stickA.getY() >= 0.8)
-    				testCounterY += 4;
-    			else if (-stickA.getY() >= 0.6)
-    				testCounterY += 3;
-    			else if (-stickA.getY() >= 0.4)
-    				testCounterY += 2;
-    			else if (-stickA.getY() >= 0.2)
-    				testCounterY += 2;
-    		}
-    		
-    		if (testCounterY >= 0)
-    		{
-    			if (-stickA.getY() <= -0.8)
-    				testCounterY -= 4;
-    			else if (-stickA.getY() <= -0.6)
-    				testCounterY -= 3;
-    			else if (-stickA.getY() <= -0.4)
-    				testCounterY -= 2;
-    			else if (-stickA.getY() <= -0.2)
-    				testCounterY -= 1;
-    		}
-    		*/
-    		
-    		if (stickA.getX() > 0.2 && testCounterX < BOTTOM_SERVO_UPPER_LIMIT) // look right
-    			testCounterX += 1;
-    		else if (stickA.getX() < -0.2 && testCounterX > BOTTOM_SERVO_LOWER_LIMIT) // look left
-    			testCounterX -= 1;
-    		
-    		if (-stickA.getY() > 0.2 && testCounterY < SIDE_SERVO_UPPER_LIMIT) // look down
-    			testCounterY += 1;
-    		else if (-stickA.getY() < -0.2 && testCounterY > SIDE_SERVO_LOWER_LIMIT) // look up
-    			testCounterY -= 1;
-    		
-    		if (stickB.getRawButton(10))
-    		{
-    			testCounterX = BOTTOM_SERVO_NEUTRAL_ANGLE;
-    			testCounterY = SIDE_SERVO_NEUTRAL_ANGLE;
-    		}
-    		
-    		System.out.println("X: "+testCounterX);
-    		System.out.println("Y: "+testCounterY);
-    		
-    		bottomServo.setAngle(testCounterX);
-    		sideServo.setAngle(testCounterY);
+    		bottomServo.setAngle(bottomServoDesiredAngle);
+    		sideServo.setAngle(sideServoDesiredAngle);
     	}
-    	else if (testMode == 6) // Tank drive the robot, just for fun.
+    	else if (testMode == 4) // Tank drive the robot, just for fun.
     	{
     		driveControl.theRobot.tankDrive(stickB, stickA);
-    	}
-    	else if (testMode == 7) // GRIP Testing
-    	{
-    		/*
-    		area = grip.getNumberArray("myContoursReport/area", defaultValue);
-    		if (area.length < 1)
-    			area = defaultValue;
-    		System.out.println("area: "+area[0]); */
-    		
-    		/*
-    		System.out.println("toFar: "+toFar);
-    		System.out.println("toClose: "+toClose);
-    		if (area[0] == 0)
-    			driveControl.stop();
-    		else if (!toFar && !toClose) // If right in the middle, check the camera
-    		{
-    			toFar = (area[0] < 3000);
-    			toClose = (area[0] > 5000);
-    			if (!toFar && !toClose)
-    				testTimer.delay(1);
-    		}
-    		else if (toFar)
-    			toFar = !autoMethods.autoDriveDistance(0.083, 0.25);
-    		else if (toClose)
-    			toClose = !autoMethods.autoDriveDistance(-0.083, 0.25);
-    		else
-    			driveControl.stop(); */
-    		
-    		/*
-    		if (area[0] == 0)
-    			driveControl.stop();
-    		else if (area[0] < 3000)
-    		{
-    			//driveControl.arcadeDriveCustomValues(0.25, 0);
-    			autoMethods.autoDriveDistance(20, 0.25);
-    		}
-    		else if (area[0] > 5000)
-    		{
-    			//driveControl.arcadeDriveCustomValues(-0.25, 0);
-    			autoMethods.autoDriveDistance(-20, 0.25);
-    		}
-    		else
-    			driveControl.stop(); */
-    		
-    		//camController.hsvFilter();
     	}
     }   
 }
