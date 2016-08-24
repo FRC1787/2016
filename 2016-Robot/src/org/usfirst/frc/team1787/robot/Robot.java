@@ -342,6 +342,8 @@ public class Robot extends IterativeRobot
     	//visionMaster.setControlLoopDampener(prefs.getDouble("vision dampener", 0.83));
     	xLocked = false;
     	yLocked = false;
+    	SmartDashboard.putBoolean("X Locked", xLocked);
+    	SmartDashboard.putBoolean("Y Locked", yLocked);
     	/*
     	gyroDampener = prefs.getDouble("gyroDampener", 0.5);
     	System.out.println("Gyro Dampener: "+gyroDampener);
@@ -423,6 +425,10 @@ public class Robot extends IterativeRobot
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_PROCESSING_TOGGLE))
     	{
     		imageProcessingActive = !imageProcessingActive;
+    		xLocked = false;
+    		yLocked = false;
+    		SmartDashboard.putBoolean("X Locked", xLocked);
+    		SmartDashboard.putBoolean("Y Locked", yLocked);
     		testTimer.delay(1); // Prevent imageProcessingActive from switching super quickly if the button is held down
     	}
     	if (stickB.getRawButton(JOYSTICK_B_IMAGE_TYPE_TOGGLE))
