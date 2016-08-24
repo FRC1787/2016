@@ -174,9 +174,9 @@ public class Robot extends IterativeRobot
 	/** The side servo on the camera mount. */
 	private Servo sideServo = new Servo(SIDE_SERVO_PWM_PORT);
 	/** The angle of the bottom servo. */
-	private double bottomServoDesiredAngle;
+	private double bottomServoDesiredAngle = 95;
 	/** The angle of the side servo. */
-	private double sideServoDesiredAngle;
+	private double sideServoDesiredAngle = 60;
 	/** This is how many degrees off the bottom servo is from the angle it thinks it's at (ie setting the angle to 90 doesn't make the mount point at the front of the robot, but setting it to 95 does. It is 5 degrees off). This is only used when you want to know the actual angle of the servo. */
 	private final double BOTTOM_SERVO_OFFSET = 5;
 	/** This is how many degrees off the side servo is from the angle it thinks it's at (ie setting the angle to 90 doesn't make the mount level, but setting it to 85 does. It is -5 degrees off). This is only used when you want to know the actual angle of the servo. */
@@ -331,9 +331,7 @@ public class Robot extends IterativeRobot
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
-    	bottomServoDesiredAngle = 95;
     	bottomServo.setAngle(bottomServoDesiredAngle); // Start with the camera looking up so it can find a goal.
-    	sideServoDesiredAngle = 60;
     	sideServo.setAngle(sideServoDesiredAngle); // Start with the camera looking up so it can find a goal.
     	/*
     	visionMaster.setHSVThreshold(
@@ -388,7 +386,7 @@ public class Robot extends IterativeRobot
 			bottomServo.setAngle(95);
 			sideServo.setAngle(0);
 		}
-		else
+		else // othewise, go back to where you were before
 		{
 			bottomServo.setAngle(bottomServoDesiredAngle);
 			sideServo.setAngle(sideServoDesiredAngle);
