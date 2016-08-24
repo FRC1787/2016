@@ -328,15 +328,17 @@ public class Robot extends IterativeRobot
     	driveControl.setLowGear();
     	driveControl.resetEncodersAndGyro();
     	pickupArmDesiredRegion = -1; // Ensures the pickup arm only begins to move when we tell it to.
-    	bottomServo.setAngle(95); // Start with the camera looking up so it can find a goal.
-    	sideServo.setAngle(60); // Start with the camera looking up so it can find a goal.
+    	bottomServoDesiredAngle = 95;
+    	bottomServo.setAngle(bottomServoDesiredAngle); // Start with the camera looking up so it can find a goal.
+    	sideServoDesiredAngle = 60;
+    	sideServo.setAngle(sideServoDesiredAngle); // Start with the camera looking up so it can find a goal.
     	/*
     	visionMaster.setHSVThreshold(
     			prefs.getInt("HMin", 0), prefs.getInt("HMax", 360), 
     			prefs.getInt("SMin", 0), prefs.getInt("SMax", 255), 
     			prefs.getInt("VMin", 0), prefs.getInt("VMax", 255));
     	*/
-    	visionMaster.setControlLoopDampener(prefs.getDouble("vision dampener", 0.83));
+    	//visionMaster.setControlLoopDampener(prefs.getDouble("vision dampener", 0.83));
     	xLocked = false;
     	yLocked = false;
     	/*
@@ -378,8 +380,19 @@ public class Robot extends IterativeRobot
 		else if (stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP))
 			pickupArmDesiredRegion = PickupArm.REG_PICKUP;
 		
+		if (pickupArmDesiredRegion != arm.getCurrentRegion() && pickupArmDesiredRegion != -1) // if the arm is moving, or hasn't moved yet, move the camera mount out of the way.
+		{
+			bottomServo.setAngle(95);
+			sideServo.setAngle(0);
+		}
+		else
+		{
+			bottomServo.setAngle(bottomServoDesiredAngle);
+			sideServo.setAngle(sideServoDesiredAngle);
+		}
+		
 		if (pickupArmDesiredRegion >= 0) // Used to see if an arm region button has been pressed in teleop yet.
-			//arm.moveToRegion(pickupArmDesiredRegion); <----- COMMENTED OUT TO PREVENT DAMAGE TO SERVO MOUNT!!!!!
+			arm.moveToRegion(pickupArmDesiredRegion);
     	
     	// Pickup Wheels
     	if (stickA.getRawButton(JOYSTICK_A_PICKUP_WHEELS_FORWARDS) || (arm.getCurrentRegion() == 4 && stickA.getRawButton(JOYSTICK_A_PICKUP_ARM_PICKUP)))
@@ -419,7 +432,7 @@ public class Robot extends IterativeRobot
     		testTimer.delay(2); // Gives the camera time to update settings.
     	}
     	
-    	if (imageProcessingActive)
+    	if (imageProcessingActive && (pickupArmDesiredRegion == -1 || pickupArmDesiredRegion == arm.getCurrentRegion()))
     	{
     		/*
     		if (bothLocked)
