@@ -217,6 +217,9 @@ public class Robot extends IterativeRobot
     /** The preferences object that allows values to be grabbed from the smartdashboard. */
     Preferences prefs;
     
+    private double testCounterX;
+    private double testCounterY;
+    
     // Objects and variables used to test specific things.
     
     // Using gyro to turn with PID control.
@@ -592,26 +595,26 @@ public class Robot extends IterativeRobot
     	else if (testMode == 3) // Manually control servos.
     	{
     		if (stickA.getX() > 0.2 && bottomServoDesiredAngle < BOTTOM_SERVO_UPPER_LIMIT) // look right
-    			bottomServoDesiredAngle += 1;
+    			testCounterX += 1;
     		else if (stickA.getX() < -0.2 && bottomServoDesiredAngle > BOTTOM_SERVO_LOWER_LIMIT) // look left
-    			bottomServoDesiredAngle -= 1;
+    			testCounterX -= 1;
     		
     		if (-stickA.getY() > 0.2 && sideServoDesiredAngle < SIDE_SERVO_UPPER_LIMIT) // look down
-    			sideServoDesiredAngle += 1;
+    			testCounterY += 1;
     		else if (-stickA.getY() < -0.2 && sideServoDesiredAngle > SIDE_SERVO_LOWER_LIMIT) // look up
-    			sideServoDesiredAngle -= 1;
+    			testCounterY -= 1;
     		
     		if (stickA.getRawButton(10)) // reset to neutral position
     		{
-    			bottomServoDesiredAngle = 90 + BOTTOM_SERVO_OFFSET;
-    			sideServoDesiredAngle = 90 + SIDE_SERVO_OFFSET;
+    			testCounterX = 90 + BOTTOM_SERVO_OFFSET;
+    			testCounterY = 90 + SIDE_SERVO_OFFSET;
     		}
     		
-    		System.out.println("X: "+bottomServoDesiredAngle);
-    		System.out.println("Y: "+sideServoDesiredAngle);
+    		System.out.println("X: "+testCounterX);
+    		System.out.println("Y: "+testCounterY);
     		
-    		bottomServo.setAngle(bottomServoDesiredAngle);
-    		sideServo.setAngle(sideServoDesiredAngle);
+    		bottomServo.setAngle(testCounterX);
+    		sideServo.setAngle(testCounterY);
     	}
     	else if (testMode == 4) // Tank drive the robot, just for fun.
     	{
