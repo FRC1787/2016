@@ -344,11 +344,11 @@ public class Robot extends IterativeRobot
     	yLocked = false;
     	SmartDashboard.putBoolean("X Locked", xLocked);
     	SmartDashboard.putBoolean("Y Locked", yLocked);
-    	/*
-    	gyroDampener = prefs.getDouble("gyroDampener", 0.5);
-    	System.out.println("Gyro Dampener: "+gyroDampener);
-    	bothLocked = false;
-    	lastGyroAngle = 0.0; */
+
+    	//gyroDampener = prefs.getDouble("gyroDampener", 0.5); // Used to help adjust gyro aided tracking.
+    	//System.out.println("Gyro Dampener: "+gyroDampener); // Used to help adjust gyro aided tracking.
+    	bothLocked = false; // Used for gyro aided tracking
+    	lastGyroAngle = 0.0; // Used for gyro aided tracking
     }
     
     /**
@@ -388,7 +388,7 @@ public class Robot extends IterativeRobot
 			bottomServo.setAngle(95);
 			sideServo.setAngle(0);
 		}
-		else // othewise, go back to where you were before
+		else // otherwise, go back to where you were before
 		{
 			bottomServo.setAngle(bottomServoDesiredAngle);
 			sideServo.setAngle(sideServoDesiredAngle);
@@ -441,14 +441,14 @@ public class Robot extends IterativeRobot
     	
     	if (imageProcessingActive && (pickupArmDesiredRegion == -1 || pickupArmDesiredRegion == arm.getCurrentRegion()))
     	{
-    		/*
-    		if (bothLocked)
+    		if (bothLocked) // Used for gyro aided tracking
     		{
     			double gyroAngleDifference = lastGyroAngle - driveControl.getGyro().getAngle();
-    			testCounterX += (gyroAngleDifference * gyroDampener);
-    			bottomServo.setAngle(testCounterX);
+    			bottomServoDesiredAngle += (gyroAngleDifference * gyroDampener);
+    			bottomServo.setAngle(bottomServoDesiredAngle);
     			lastGyroAngle = driveControl.getGyro().getAngle();
-    		} */
+    		}
+    		
     		visionMaster.performHSVFilter();
     		visionMaster.removeSmallParticles();
     		if (visionMaster.getNumOfParticles() > 0) // if there is at least 1 particle, look for the biggest one.
@@ -488,15 +488,15 @@ public class Robot extends IterativeRobot
 					else
 						yLocked = true;
 					
-					SmartDashboard.putBoolean("X Locked", xLocked);
-					SmartDashboard.putBoolean("Y Locked", yLocked);
-					/*
-					if (xLocked && yLocked)
+					if (xLocked && yLocked) // Used for gyro aided tracking
 					{
 						if (!bothLocked)
 							driveControl.resetEncodersAndGyro();
 						bothLocked = true;
-					} */
+					}
+					
+					SmartDashboard.putBoolean("X Locked", xLocked);
+					SmartDashboard.putBoolean("Y Locked", yLocked);
 					xLocked = false;
 					yLocked = false;
 					
